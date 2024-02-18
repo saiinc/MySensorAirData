@@ -1,0 +1,24 @@
+[
+	{
+		"timestamp":"2024-01-05 21:10:56",
+		"sampling_rate":null,
+		"id":18672717064,
+		"sensordatavalues":[
+			{"id":42346222824,"value_type":"temperature","value":"-16.82"},
+			{"id":42346222826,"value_type":"humidity","value":"73.95"}
+		],
+		"sensor":{"sensor_type":{"id":26,"manufacturer":"Sensirion AG","name":"SHT30"},"id":71128,"pin":"7"},
+		"location":{"longitude":"30.568","exact_location":0,"id":59249,"latitude":"59.736","indoor":0,"altitude":"16.5","country":"RU"}
+	},
+	{
+		"timestamp":"2024-01-05 21:08:27",
+		"sampling_rate":null,
+		"id":18672692956,
+		"sensordatavalues":[
+			{"id":42346165976,"value_type":"temperature","value":"-16.81"},
+			{"id":42346165979,"value_type":"humidity","value":"74.07"}
+		],
+		"sensor":{"sensor_type":{"id":26,"manufacturer":"Sensirion AG","name":"SHT30"},"id":71128,"pin":"7"},
+		"location":{"longitude":"30.568","exact_location":0,"id":59249,"latitude":"59.736","indoor":0,"altitude":"16.5","country":"RU"}
+	}
+]
