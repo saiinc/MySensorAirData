@@ -1,11 +1,8 @@
 package com.example.myfirstapp.ui
 
-import android.graphics.drawable.Icon
-import android.widget.AutoCompleteTextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -18,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material.icons.twotone.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,10 +27,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.DefaultAlpha
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -64,7 +58,7 @@ fun MainAppBar(
                 text = searchTextState,
                 onTextChange = onTextChange,
                 onCloseClicked = onCloseClicked,
-                onSearchClicked = onSearchClicked
+                onSearchClicked = onSearchClicked,
             )
         }
     }
@@ -82,7 +76,9 @@ fun ClosedAppBar(onSearchClicked: () -> Unit) {
         },
         actions = {
             IconButton(
-                onClick = { onSearchClicked() }
+                onClick = {
+                    onSearchClicked()
+                }
             ) {
                 Icon(
                     imageVector = Icons.Filled.Search,
@@ -125,7 +121,7 @@ fun OpenedAppBar(
                 )
             },
             textStyle = TextStyle(
-                fontSize = MaterialTheme.typography.labelMedium.fontSize
+                fontSize = MaterialTheme.typography.labelLarge.fontSize
             ),
             singleLine = true,
             leadingIcon = {
@@ -179,7 +175,11 @@ fun OpenedAppBar(
             .padding(start = 32.dp, top = 54.dp)
     ) {
         items(historyItems) {historyItem ->
-            Box(modifier = Modifier.clickable{onTextChange(historyItem)}) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable{onTextChange(historyItem)}
+            ) {
                 Text(
                     text = historyItem,
                     //modifier = Modifier.clickable { onSearchClicked(text) },
