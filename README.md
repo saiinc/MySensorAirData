@@ -1,4 +1,4 @@
-This app can get the PM or Temperature/Humidity/Pressure values on smartphone.
+This app can get the PM or Temperature/Humidity/Pressure values for Android smartphone.
 
 You need to enter your sensor ID from the map https://sensor.community/ in app search bar.
 
