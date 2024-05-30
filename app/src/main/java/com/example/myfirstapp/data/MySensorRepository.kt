@@ -9,6 +9,7 @@ interface MySensorRepository {
 class NetworkMySensorRepository(
     private val sensorService: SensorService
 ) : MySensorRepository {
+
     override suspend fun getSensor(
         senorId: String
     ): List<MySensor> =
@@ -21,12 +22,12 @@ class NetworkMySensorRepository(
             }
         } catch (e: IndexOutOfBoundsException) {
             listOf(MySensor(
-                valueType = "Sensor not found",
+                valueType = "Sensor \"$senorId\" not found",
                 value = ""
             ))
         } catch (e: NumberFormatException) {
             listOf(MySensor(
-                valueType = "Sensor not found",
+                valueType = "Sensor \"$senorId\" not found",
                 value = ""
             ))
         }
