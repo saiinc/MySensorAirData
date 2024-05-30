@@ -1,13 +1,11 @@
 package com.example.myfirstapp.data
 
-import android.content.Context
 import com.example.myfirstapp.network.model.SensorService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 interface AppContainer {
     val mySensorRepository: MySensorRepository
-
 }
 
 class DefaultAppContainer() : AppContainer{
@@ -25,5 +23,4 @@ class DefaultAppContainer() : AppContainer{
     override val mySensorRepository: MySensorRepository by lazy {
         NetworkMySensorRepository(retrofitService)
     }
-
 }

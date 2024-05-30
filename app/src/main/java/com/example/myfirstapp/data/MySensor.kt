@@ -1,7 +1,7 @@
 package com.example.myfirstapp.data
 
 data class MySensor(
-    val valueType : String?,
-    val value     : String?,
+    var valueType : String?,
+    var value     : String?,
     //val name      : String?
 )
