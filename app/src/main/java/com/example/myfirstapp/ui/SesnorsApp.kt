@@ -6,7 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.myfirstapp.ui.screens.HomeScreen
@@ -17,32 +16,35 @@ fun SensorsApp(
 ) {
     val mySensorViewModel: MySensorViewModel =
         viewModel(factory = MySensorViewModel.Factory)
-    val searchWidgetState = mySensorViewModel.optionsBoxState
-    val historyItems = mySensorViewModel.historyItems
+    val optionsBoxState = mySensorViewModel.optionsBoxState
+    val settingsItems = mySensorViewModel.settingsItems
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             MainAppBar(
-                searchWidgetState = searchWidgetState.value,
-                historyItems = historyItems,
+                optionsBoxState = optionsBoxState.value,
+                settingsItems = settingsItems,
                 onTextChange = {
                                mySensorViewModel.updateSensorIdTextState(newValue = it)
+                },
+                onSettingsChange = {
+                                   mySensorViewModel.updateSettingsItems(newValue = it)
                 },
                 onCloseClicked = {
                     mySensorViewModel.resetSettings()
                     mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
                 },
-                onSearchClicked = {
+                onDoneClicked = {
                     mySensorViewModel.saveSensorId(it)
-                    mySensorViewModel.getMySensor(it.toMutableStateList())
+                    mySensorViewModel.getMySensor(it)
                     mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
                 },
-                onSearchTriggered = {
+                onOptionsBoxTriggered = {
                     mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.OPENED)
                 },
                 onRefreshClicked = {
-                    mySensorViewModel.getMySensor(it.toMutableStateList())
+                    mySensorViewModel.getMySensor(it)
                 }
             )
         }
@@ -54,7 +56,7 @@ fun SensorsApp(
         ) {
             HomeScreen(
                 mySensorUiState = mySensorViewModel.mySensorUiState,
-                retryAction = { mySensorViewModel.getMySensor(historyItems) },
+                retryAction = { mySensorViewModel.getMySensor(settingsItems) },
                 modifier = modifier
             )
         }

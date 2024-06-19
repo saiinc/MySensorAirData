@@ -43,16 +43,20 @@ class MySensorViewModel(
         mutableStateOf(value = OptionsBoxState.CLOSED)
     val optionsBoxState: State<OptionsBoxState> = _optionsBoxState
 
-    private val _searchTextState : MutableState<String> =
-        mutableStateOf(value = "")
-    val searchTextState: State<String> = _searchTextState
-
     private val _sensorIdTextState : MutableState<String> =
         mutableStateOf(value = "")
     val sensorIdTextState: State<String> = _sensorIdTextState
 
-    private val _historyItems : SnapshotStateList<String> = mutableStateListOf()
-    val historyItems: SnapshotStateList<String> = _historyItems
+    private val _settingsItems : SnapshotStateList<String> = mutableStateListOf()
+    val settingsItems: SnapshotStateList<String> = _settingsItems
+
+    fun updateSettingsItems(newValue: List<String>) : List<String>{
+        val list = mutableListOf<String>()
+        list.addAll(newValue)
+        settingsItems.clear()
+        settingsItems.addAll(list)
+        return settingsItems
+    }
 
     fun updateOptionsBoxState(newValue: OptionsBoxState) {
         _optionsBoxState.value = newValue
@@ -62,46 +66,38 @@ class MySensorViewModel(
     }
 
     fun saveSensorId(ids: List<String>) {
-        val newIds: List<String> = if (ids.size > 5)
-            ids.slice(0..5)
-            else ids
         viewModelScope.launch {
             dataStoreManager.saveSettings(
                 SettingsData(
-                    sensorId = "none",
-
-                    sensorHistory = newIds.toSet()
+                    sensorIdList = ids.toSet()
                 )
             )
         }
     }
 
     init {
-        getSensorId()
+        initLoad()
     }
-    private fun getSensorId() : String {
-        var getId: String = "none1"
+    private fun initLoad() {
         viewModelScope.launch(Dispatchers.Main) {
             dataStoreManager.getSettings().collectLatest {
-                getId = it.sensorId
-                _historyItems.clear()
-                _historyItems.addAll(it.sensorHistory.toMutableList())
-                getMySensor(historyItems)
+                _settingsItems.clear()
+                _settingsItems.addAll(it.sensorIdList.toMutableList())
+                getMySensor(settingsItems)
             }
         }
-        return getId
     }
 
     fun resetSettings() {
         viewModelScope.launch(Dispatchers.Main) {
             dataStoreManager.getSettings().collectLatest {
-                _historyItems.clear()
-                _historyItems.addAll(it.sensorHistory.toMutableList())
+                _settingsItems.clear()
+                _settingsItems.addAll(it.sensorIdList.toMutableList())
             }
         }
     }
 
-    private suspend fun getAllSensors(ids: List<String>) : MutableList<MySensor> {
+    private suspend fun getAllSensors(ids: Set<String>) : MutableList<MySensor> {
         val allSensors = mutableListOf<MySensor>()
         for (id in ids) {
             val singleSensor = mySensorRepository.getSensor(id)
@@ -134,16 +130,16 @@ class MySensorViewModel(
             }
         }
         if ((allSensors.size == 1) and (allSensors[0].valueType == "Sensor \"\" not found")) {
-            allSensors[0].valueType = "Please tap the settings icon to add your sensor IDs."
+            allSensors[0].valueType = "Please tap the settings icon (⚙) to add your sensor IDs."
         }
         return allSensors
     }
 
-    fun getMySensor(ids: SnapshotStateList<String> ) {
+    fun getMySensor(ids: List<String> ) {
         viewModelScope.launch {
             mySensorUiState = MySensorUiState.Loading
             mySensorUiState = try {
-                MySensorUiState.Success(getAllSensors(ids))
+                MySensorUiState.Success(getAllSensors(ids.toSet()))
             } catch (e: IOException) {
                 MySensorUiState.Error
             } catch (e: HttpRetryException) {

@@ -49,18 +49,19 @@ import androidx.compose.ui.window.Dialog
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CustomDialog(
-    historyItems: MutableList<String>,
+    settingsItems: MutableList<String>,
     onTextChange: (String) -> Unit,
-    onSearchClicked: (MutableList<String>) -> Unit,
+    onSettingsChange: (List<String>) -> List<String>,
+    onDoneClicked: (List<String>) -> Unit,
     onCloseClicked: () -> Unit,
     setShowDialog: (Boolean) -> Unit,
 
 ) {
-    if (historyItems.isEmpty()) {
-        historyItems.add("")
+    if (settingsItems.isEmpty()) {
+        settingsItems.add("")
     }
+
     //val txtFieldError = remember { mutableStateOf("") }
-    val historyItemsState = remember { mutableStateOf(historyItems) }
 
     Dialog(onDismissRequest = { setShowDialog(false) }) {
         Surface(
@@ -102,20 +103,20 @@ fun CustomDialog(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    historyItems.forEachIndexed { index, sensorIdText ->
-                        Input(historyItems, onSearchClicked, onTextChange, index, sensorIdText,
+                    settingsItems.forEachIndexed { index, sensorIdText ->
+                        Input(settingsItems, onDoneClicked, onTextChange, onSettingsChange, index, sensorIdText,
                             {
-                                editedId -> historyItems[index] = editedId
+                                editedId -> settingsItems[index] = editedId
                             },
                             {
-                                historyItems.removeAt(index)
+                                settingsItems.removeAt(index)
                             }
                         )
                     }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    if (historyItems.size > 4) {
+                    if (settingsItems.size > 4) {
                         IconButton(
                             modifier = Modifier
                                 .border(
@@ -126,7 +127,6 @@ fun CustomDialog(
                                     shape = RoundedCornerShape(15)
                                 ),
                             onClick = {
-                                historyItems.add("")
                             },
                             enabled = false
                         ) {
@@ -147,7 +147,7 @@ fun CustomDialog(
                                     shape = RoundedCornerShape(15)
                                 ),
                             onClick = {
-                                historyItems.add("")
+                                settingsItems.add("")
                             },
                         ) {
                             Icon(
@@ -167,7 +167,7 @@ fun CustomDialog(
                                     txtFieldError.value = "Field can not be empty"
                                     return@Button
                                 }*/
-                                onSearchClicked(historyItemsState.value)
+                                onDoneClicked(onSettingsChange(settingsItems.distinct()))
                                 //setShowDialog(false)
                             },
                             shape = RoundedCornerShape(50.dp),
@@ -187,9 +187,10 @@ fun CustomDialog(
 
 @Composable
 fun Input(
-    historyItems: List<String>,
-    onSearchClicked: (MutableList<String>) -> Unit,
+    settingsItems: MutableList<String>,
+    onDoneClicked: (List<String>) -> Unit,
     onTextChange: (String) -> Unit,
+    onSettingsChange: (List<String>) -> List<String>,
     index: Int,
     sensorIdText: String,
     onEdit: (String) -> (Unit),
@@ -197,7 +198,6 @@ fun Input(
 ) {
     //val txtFieldError = remember { mutableStateOf("") }
     val txtField = remember { mutableStateOf(sensorIdText) }
-    val historyItemsState = remember { mutableStateOf(historyItems) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -233,11 +233,11 @@ fun Input(
             value = txtField.value,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Search
+                imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
-                onSearch = {
-                    onSearchClicked(historyItemsState.value.toMutableList())
+                onDone = {
+                    onDoneClicked(onSettingsChange(settingsItems.distinct()))
                 }),
             onValueChange = {
                 txtField.value = it.take(10)
@@ -245,13 +245,13 @@ fun Input(
                 onTextChange(it)
             }
         )
-            if ((index == historyItems.size - 1) and (historyItems.size > 1)) {
+            if ((index == settingsItems.size - 1) and (settingsItems.size > 1)) {
                 IconButton(
                     onClick = { onRemove() }
                     ) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "Back"
+                        contentDescription = "Delete"
                     )
                 }
             } else {
@@ -261,7 +261,7 @@ fun Input(
                     Icon(
                         imageVector = Icons.Default.Clear,
                         tint = Color.Transparent,
-                        contentDescription = "Back"
+                        contentDescription = "Delete"
                     )
                 }
             }

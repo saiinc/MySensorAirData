@@ -36,20 +36,21 @@ import com.example.myfirstapp.R
 
 @Composable
 fun MainAppBar(
-    searchWidgetState: OptionsBoxState,
-    historyItems: MutableList<String>,
+    optionsBoxState: OptionsBoxState,
+    settingsItems: MutableList<String>,
     onTextChange: (String) -> Unit,
+    onSettingsChange: (List<String>) -> List<String>,
     onCloseClicked: () -> Unit,
-    onSearchClicked: (List<String>) -> Unit,
+    onDoneClicked: (List<String>) -> Unit,
     onRefreshClicked: (List<String>) -> Unit,
-    onSearchTriggered: () -> Unit
+    onOptionsBoxTriggered: () -> Unit
 ) {
-    when (searchWidgetState) {
+    when (optionsBoxState) {
         OptionsBoxState.CLOSED -> {
             ClosedAppBar (
-                onSearchClicked = onSearchTriggered,
+                onSettingsClicked = onOptionsBoxTriggered,
                 onRefreshClicked = onRefreshClicked,
-                historyItems = historyItems
+                settingsItems = settingsItems
             )
         }
         OptionsBoxState.OPENED -> {
@@ -60,14 +61,15 @@ fun MainAppBar(
                 onSearchClicked = onSearchClicked,
             )*/
             ClosedAppBar (
-                onSearchClicked = onSearchTriggered,
+                onSettingsClicked = onOptionsBoxTriggered,
                 onRefreshClicked = onRefreshClicked,
-                historyItems = historyItems
+                settingsItems = settingsItems
             )
             CustomDialog(
-                historyItems = historyItems,
+                settingsItems = settingsItems,
                 onTextChange = onTextChange,
-                onSearchClicked = onSearchClicked,
+                onSettingsChange = onSettingsChange,
+                onDoneClicked = onDoneClicked,
                 onCloseClicked = onCloseClicked,
                 /*setShowDialog = {
                 showDialog.value = it
@@ -83,9 +85,9 @@ fun MainAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClosedAppBar(
-    onSearchClicked: () -> Unit,
+    onSettingsClicked: () -> Unit,
     onRefreshClicked: (List<String>) -> Unit,
-    historyItems: List<String>
+    settingsItems: List<String>
 ) {
     TopAppBar(
         title = {
@@ -96,7 +98,7 @@ fun ClosedAppBar(
         actions = {
             IconButton(
                 onClick = {
-                    onRefreshClicked(historyItems)
+                    onRefreshClicked(settingsItems)
                 }
             ) {
                 Icon(
@@ -107,7 +109,7 @@ fun ClosedAppBar(
             }
             IconButton(
                 onClick = {
-                    onSearchClicked()
+                    onSettingsClicked()
                 }
             ) {
                 Icon(
