@@ -103,8 +103,9 @@ fun ClosedAppBar(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Refresh,
-                    contentDescription = "RefreshIcon",
-                    tint = Color.Black
+                    contentDescription = "RefreshIcon"
+                    //tint = Color.DarkGray
+
                 )
             }
             IconButton(
@@ -114,8 +115,8 @@ fun ClosedAppBar(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Settings,
-                    contentDescription = "SettingsIcon",
-                    tint = Color.Black
+                    contentDescription = "SettingsIcon"
+                    //tint = Color.DarkGray
                 )
                 
             }
