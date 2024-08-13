@@ -66,7 +66,8 @@ fun CustomDialog(
     Dialog(onDismissRequest = { setShowDialog(false) }) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = Color.White
+            //color = MaterialTheme.colorScheme.background
+            //color = Color.White
         ) {
             Box(
                 contentAlignment = Alignment.Center
@@ -240,9 +241,10 @@ fun Input(
                     onDoneClicked(onSettingsChange(settingsItems.distinct()))
                 }),
             onValueChange = {
-                txtField.value = it.take(10)
-                onEdit(it.take(10))
-                onTextChange(it)
+                value -> txtField.value = (value.filter { it.isDigit() }).take(10)
+                //txtField.value = it.take(10)
+                onEdit(value.take(10))
+                onTextChange(value)
             }
         )
             if ((index == settingsItems.size - 1) and (settingsItems.size > 1)) {

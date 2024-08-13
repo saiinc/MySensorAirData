@@ -108,8 +108,11 @@ class MySensorViewModel(
                     allSensors.replaceAll {
                         if (it.valueType == sensorRecord.valueType) {
                             toAddFlag = false
-                            it.value = ((sensorRecord.value?.toDouble()
-                                ?.let { it1 -> it.value?.toDouble()?.plus(it1) })?.div(2)).toString()
+                            val myDoubleValue = (sensorRecord.value?.toDouble()
+                                ?.let { it1 -> it.value?.toDouble()?.plus(it1) })?.div(2)
+                            if (myDoubleValue != null) {
+                                it.value = ((myDoubleValue * 100).roundToInt() / 100.0).toString()
+                            }
                         }
                         it
                     }
