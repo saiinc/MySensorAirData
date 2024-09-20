@@ -14,26 +14,28 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.myfirstapp.MySensorApplication
-import com.example.myfirstapp.data.DataStoreManager
+import com.example.myfirstapp.data.MyDevice
 import com.example.myfirstapp.data.MySensor
 import com.example.myfirstapp.data.MySensorRepository
-import com.example.myfirstapp.data.SettingsData
+import com.example.myfirstapp.data.SettingsRepository
+import com.example.myfirstapp.data.SettingsSensor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.net.HttpRetryException
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.roundToInt
 
 sealed interface MySensorUiState {
-    data class Success(val getVal: List<MySensor>) : MySensorUiState
+    data class Success(val getVal: List<MyDevice>) : MySensorUiState
     object Error : MySensorUiState
     object Loading : MySensorUiState
 }
 
 class MySensorViewModel(
     private val mySensorRepository: MySensorRepository,
-    private val dataStoreManager: DataStoreManager
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     var mySensorUiState: MySensorUiState by mutableStateOf(MySensorUiState.Loading)
@@ -47,11 +49,11 @@ class MySensorViewModel(
         mutableStateOf(value = "")
     val sensorIdTextState: State<String> = _sensorIdTextState
 
-    private val _settingsItems : SnapshotStateList<String> = mutableStateListOf()
-    val settingsItems: SnapshotStateList<String> = _settingsItems
+    private val _settingsItems : MutableList<SettingsSensor> = mutableStateListOf()
+    val settingsItems: MutableList<SettingsSensor> = _settingsItems
 
-    fun updateSettingsItems(newValue: List<String>) : List<String>{
-        val list = mutableListOf<String>()
+    fun updateSettingsItems(newValue: List<SettingsSensor>) : List<SettingsSensor>{
+        val list = mutableListOf<SettingsSensor>()
         list.addAll(newValue)
         settingsItems.clear()
         settingsItems.addAll(list)
@@ -65,13 +67,9 @@ class MySensorViewModel(
         _sensorIdTextState.value = newValue
     }
 
-    fun saveSensorId(ids: List<String>) {
+    fun saveSettings(mySettings: List<SettingsSensor>) {
         viewModelScope.launch {
-            dataStoreManager.saveSettings(
-                SettingsData(
-                    sensorIdList = ids.toSet()
-                )
-            )
+            settingsRepository.saveSettings(mySettings)
         }
     }
 
@@ -80,28 +78,43 @@ class MySensorViewModel(
     }
     private fun initLoad() {
         viewModelScope.launch(Dispatchers.Main) {
-            dataStoreManager.getSettings().collectLatest {
+            settingsRepository.getSettings().collectLatest {mySettings ->
                 _settingsItems.clear()
-                _settingsItems.addAll(it.sensorIdList.toMutableList())
-                getMySensor(settingsItems)
+                _settingsItems.addAll(mySettings)
+                getMySensor(_settingsItems)
             }
         }
     }
 
     fun resetSettings() {
         viewModelScope.launch(Dispatchers.Main) {
-            dataStoreManager.getSettings().collectLatest {
+            settingsRepository.getSettings().collectLatest {
                 _settingsItems.clear()
-                _settingsItems.addAll(it.sensorIdList.toMutableList())
+                _settingsItems.addAll(it)
             }
         }
     }
 
-    private suspend fun getAllSensors(ids: Set<String>) : MutableList<MySensor> {
-        val allSensors = mutableListOf<MySensor>()
-        for (id in ids) {
-            val singleSensor = mySensorRepository.getSensor(id)
-            for (sensorRecord in singleSensor) {
+    private suspend fun getAllSensors(devices: List<SettingsSensor>) : List<MyDevice> {
+        //val allSensors = mutableListOf<MySensor>()
+        val allDevices = mutableListOf<MyDevice>()
+        val devicesClone = devices.toList()
+        for (device in devicesClone) {
+            val singleSensor = mySensorRepository.getSensor(device.id)
+            val singleSensorCopy = CopyOnWriteArrayList(singleSensor)
+            singleSensorCopy.forEach {
+                when (it.valueType) {
+                    "P1" -> {it.valueType = "PM10"; it.value = "${it.value}µg/m³"}
+                    "P2" -> {it.valueType = "PM2.5"; it.value = "${it.value}µg/m³"}
+                    "temperature" -> it.value = "${it.value?.toDouble()?.roundToInt()}°C"
+                    "humidity" -> it.value = "${it.value?.toDouble()?.roundToInt()}% RH"
+                    "noise_LAeq" -> {it.valueType = "noise LAeq"; it.value = "${it.value}dBA"}
+                    "pressure" -> it.value = "${it.value?.toDouble()?.div(100)?.roundToInt()}hPA"
+                    "pressure_at_sealevel" -> singleSensorCopy.remove(it)
+                }
+            }
+            allDevices.add(MyDevice(id = device.id, description = device.description, deviceSensors = singleSensorCopy))
+            /*for (sensorRecord in singleSensor) {
                 val toDelete :List<String> = listOf("pressure_at_sealevel", "noise_LA_min", "noise_LA_max")
                 if (sensorRecord.valueType !in toDelete) {
                     var toAddFlag = true
@@ -120,9 +133,9 @@ class MySensorViewModel(
                         allSensors.add(sensorRecord)
                     }
                 }
-            }
+            }*/
         }
-        allSensors.forEach {
+        /*allSensors.forEach {
             when (it.valueType) {
                 "P1" -> {it.valueType = "PM10"; it.value = "${it.value}µg/m³"}
                 "P2" -> {it.valueType = "PM2.5"; it.value = "${it.value}µg/m³"}
@@ -134,15 +147,18 @@ class MySensorViewModel(
         }
         if ((allSensors.size == 1) and (allSensors[0].valueType == "Sensor \"\" not found")) {
             allSensors[0].valueType = "Please tap the settings icon (⚙) to add your sensor IDs."
+        }*/
+        if ((allDevices.size == 1) and (allDevices[0].deviceSensors[0].valueType == "Sensor \"\" not found")) {
+            allDevices[0].deviceSensors[0].valueType = "Please tap the settings icon (⚙) to add your sensor IDs."
         }
-        return allSensors
+        return allDevices
     }
 
-    fun getMySensor(ids: List<String> ) {
+    fun getMySensor(devices: List<SettingsSensor> ) {
         viewModelScope.launch {
             mySensorUiState = MySensorUiState.Loading
             mySensorUiState = try {
-                MySensorUiState.Success(getAllSensors(ids.toSet()))
+                MySensorUiState.Success(getAllSensors(devices))
             } catch (e: IOException) {
                 MySensorUiState.Error
             } catch (e: HttpRetryException) {
@@ -156,11 +172,12 @@ class MySensorViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as MySensorApplication)
                 val mySensorRepository = application.container.mySensorRepository
-                val dataStoreManager = DataStoreManager(application)
+                val settingsRepository = SettingsRepository(application)
 
                 MySensorViewModel(
                     mySensorRepository = mySensorRepository,
-                    dataStoreManager= dataStoreManager
+                    settingsRepository = settingsRepository
+
                 )
             }
         }

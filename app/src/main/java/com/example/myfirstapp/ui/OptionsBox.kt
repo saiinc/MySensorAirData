@@ -21,7 +21,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Money
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,27 +44,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.example.myfirstapp.data.SettingsSensor
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CustomDialog(
-    settingsItems: MutableList<String>,
+    settingsItems: MutableList<SettingsSensor>,
+
     onTextChange: (String) -> Unit,
-    onSettingsChange: (List<String>) -> List<String>,
-    onDoneClicked: (List<String>) -> Unit,
+    onSettingsChange: (List<SettingsSensor>) -> List<SettingsSensor>,
+    onDoneClicked: (List<SettingsSensor>) -> Unit,
     onCloseClicked: () -> Unit,
     setShowDialog: (Boolean) -> Unit,
 
-) {
+    ) {
     if (settingsItems.isEmpty()) {
-        settingsItems.add("")
+        settingsItems.add(SettingsSensor(id = "", description = ""))
     }
 
     //val txtFieldError = remember { mutableStateOf("") }
 
-    Dialog(onDismissRequest = { setShowDialog(false) }) {
+    Dialog(
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+        onDismissRequest = { setShowDialog(false) }
+    ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.fillMaxWidth()
             //color = MaterialTheme.colorScheme.background
             //color = Color.White
         ) {
@@ -104,10 +110,13 @@ fun CustomDialog(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    settingsItems.forEachIndexed { index, sensorIdText ->
-                        Input(settingsItems, onDoneClicked, onTextChange, onSettingsChange, index, sensorIdText,
+                    settingsItems.forEachIndexed { index, sensorIdObject ->
+                        Input(settingsItems, onDoneClicked, onTextChange, onSettingsChange, index, sensorIdObject,
                             {
-                                editedId -> settingsItems[index] = editedId
+                                editedId -> settingsItems[index].id = editedId
+                            },
+                            {
+                                editedDescription -> settingsItems[index].description = editedDescription
                             },
                             {
                                 settingsItems.removeAt(index)
@@ -117,7 +126,7 @@ fun CustomDialog(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    if (settingsItems.size > 4) {
+                    if (settingsItems.size > 5) {
                         IconButton(
                             modifier = Modifier
                                 .border(
@@ -148,7 +157,7 @@ fun CustomDialog(
                                     shape = RoundedCornerShape(15)
                                 ),
                             onClick = {
-                                settingsItems.add("")
+                                settingsItems.add(SettingsSensor(id = "", description = ""))
                             },
                         ) {
                             Icon(
@@ -188,17 +197,24 @@ fun CustomDialog(
 
 @Composable
 fun Input(
-    settingsItems: MutableList<String>,
-    onDoneClicked: (List<String>) -> Unit,
+    settingsItems: MutableList<SettingsSensor>,
+    onDoneClicked: (List<SettingsSensor>) -> Unit,
     onTextChange: (String) -> Unit,
-    onSettingsChange: (List<String>) -> List<String>,
+    onSettingsChange: (List<SettingsSensor>) -> List<SettingsSensor>,
     index: Int,
-    sensorIdText: String,
-    onEdit: (String) -> (Unit),
+    sensorIdObject: SettingsSensor,
+    onEditId: (String) -> (Unit),
+    onEditDescription: (String) -> (Unit),
     onRemove: () -> (Unit)
 ) {
     //val txtFieldError = remember { mutableStateOf("") }
-    val txtField = remember { mutableStateOf(sensorIdText) }
+    val txtFieldId = remember {
+        mutableStateOf(sensorIdObject.id)
+    }
+    val txtFieldDescription = remember {
+        mutableStateOf(sensorIdObject.description)
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -208,19 +224,20 @@ fun Input(
         TextField(
             modifier = Modifier
                 .weight(1f)
+                .padding(end = 2.dp)
                 .border(
                     BorderStroke(
                         width = 2.dp,
                         color = colorResource(id = android.R.color.holo_green_light) /* if (onTextChange.toString().isEmpty()) R.color.holo_green_light else R.color.holo_red_dark) */
                     ),
-                    shape = RoundedCornerShape(50)
+                    shape = RoundedCornerShape(25)
                 ),
-            shape = RoundedCornerShape(50),
+            shape = RoundedCornerShape(25),
             colors = TextFieldDefaults.colors(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
             ),
-            leadingIcon = {
+            /*leadingIcon = {
                 Icon(
                     imageVector = Icons.Filled.Money,
                     contentDescription = "",
@@ -229,26 +246,56 @@ fun Input(
                         .width(20.dp)
                         .height(20.dp)
                 )
-            },
-            placeholder = { Text(text = "Enter sensor id") },
-            value = txtField.value,
+            },*/
+            placeholder = { Text(text = "Enter id") },
+            maxLines = 1,
+            value = txtFieldId.value,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
-            keyboardActions = KeyboardActions(
+            /*keyboardActions = KeyboardActions(
                 onDone = {
                     onDoneClicked(onSettingsChange(settingsItems.distinct()))
-                }),
+                }),*/
             onValueChange = {
-                value -> txtField.value = (value.filter { it.isDigit() }).take(10)
+                value -> txtFieldId.value = (value.filter { it.isDigit() }).take(7)
                 //txtField.value = it.take(10)
-                onEdit(value.take(10))
+                onEditId(value.take(7))
                 onTextChange(value)
             }
         )
+        TextField(
+            modifier = Modifier
+                .weight(2f)
+                .padding(start = 2.dp)
+                .border(
+                    BorderStroke(
+                        width = 2.dp,
+                        color = colorResource(id = android.R.color.holo_green_light) /* if (onTextChange.toString().isEmpty()) R.color.holo_green_light else R.color.holo_red_dark) */
+                    ),
+                    shape = RoundedCornerShape(25)
+                ),
+            shape = RoundedCornerShape(25),
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            placeholder = {Text(text = "Description (optional)")},
+            maxLines = 1,
+            value = txtFieldDescription.value,
+            onValueChange = { value ->
+                txtFieldDescription.value = value.take(23)
+                onEditDescription(value.take(23))
+                onTextChange(value)
+            },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done
+            )
+        )
             if ((index == settingsItems.size - 1) and (settingsItems.size > 1)) {
                 IconButton(
+                    modifier = Modifier.padding(vertical = 2.dp),
                     onClick = { onRemove() }
                     ) {
                     Icon(
@@ -258,6 +305,7 @@ fun Input(
                 }
             } else {
                 IconButton(
+                    modifier = Modifier.padding(vertical = 2.dp),
                     onClick = { onRemove() },
                     enabled = false) {
                     Icon(

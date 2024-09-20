@@ -32,17 +32,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.myfirstapp.R
+import com.example.myfirstapp.data.SettingsSensor
 
 
 @Composable
 fun MainAppBar(
     optionsBoxState: OptionsBoxState,
-    settingsItems: MutableList<String>,
+    settingsItems: MutableList<SettingsSensor>,
     onTextChange: (String) -> Unit,
-    onSettingsChange: (List<String>) -> List<String>,
+    onSettingsChange: (List<SettingsSensor>) -> List<SettingsSensor>,
     onCloseClicked: () -> Unit,
-    onDoneClicked: (List<String>) -> Unit,
-    onRefreshClicked: (List<String>) -> Unit,
+    onDoneClicked: (List<SettingsSensor>) -> Unit,
+    onRefreshClicked: (List<SettingsSensor>) -> Unit,
     onOptionsBoxTriggered: () -> Unit
 ) {
     when (optionsBoxState) {
@@ -86,8 +87,8 @@ fun MainAppBar(
 @Composable
 fun ClosedAppBar(
     onSettingsClicked: () -> Unit,
-    onRefreshClicked: (List<String>) -> Unit,
-    settingsItems: List<String>
+    onRefreshClicked: (List<SettingsSensor>) -> Unit,
+    settingsItems: List<SettingsSensor>
 ) {
     TopAppBar(
         title = {
