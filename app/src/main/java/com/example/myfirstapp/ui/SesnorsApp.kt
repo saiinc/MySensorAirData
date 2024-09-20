@@ -35,16 +35,16 @@ fun SensorsApp(
                     mySensorViewModel.resetSettings()
                     mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
                 },
-                onDoneClicked = {
-                    mySensorViewModel.saveSensorId(it)
-                    mySensorViewModel.getMySensor(it)
+                onDoneClicked = { mySettings ->
+                    mySensorViewModel.saveSettings(mySettings)
+                    mySensorViewModel.getMySensor(mySettings)
                     mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
                 },
                 onOptionsBoxTriggered = {
                     mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.OPENED)
                 },
-                onRefreshClicked = {
-                    mySensorViewModel.getMySensor(it)
+                onRefreshClicked = { mySettings ->
+                    mySensorViewModel.getMySensor(mySettings)
                 }
             )
         }
