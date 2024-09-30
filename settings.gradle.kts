@@ -1,3 +1,7 @@
+/*
+ * Copyright © Anton Sorokin 2024. All rights reserved
+ */
+
 pluginManagement {
     repositories {
         google()
@@ -13,6 +17,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "My First App"
+rootProject.name = "MySensor"
 include(":app")
  

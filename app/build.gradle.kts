@@ -1,14 +1,25 @@
+/*
+ * Copyright © Anton Sorokin 2024. All rights reserved
+ */
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+
+    // Make sure that you have the Google services Gradle plugin
+    id("com.google.gms.google-services")
+
+    // Add the Crashlytics Gradle plugin
+    id("com.google.firebase.crashlytics")
+
 }
 
 android {
-    namespace = "com.example.myfirstapp"
+    namespace = "com.saionji.mysensor"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.myfirstapp"
+        applicationId = "com.saionji.mysensor"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -62,6 +73,19 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
+
+
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation("com.google.firebase:firebase-analytics")
+
+
+    // Add the dependencies for any other desired Firebase products
+    // https://firebase.google.com/docs/android/setup#available-libraries
 
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
