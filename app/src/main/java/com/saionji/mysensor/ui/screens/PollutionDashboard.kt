@@ -34,7 +34,6 @@ fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(4.dp),
     ) {
         // Рендерим карточки для каждого элемента списка
         items(pollutionDataList.size) {index ->
@@ -48,7 +47,7 @@ fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
 fun PollutionGrid(data: MyDevice) {
     Column(
         modifier = Modifier
-            .padding(8.dp)
+            .padding(12.dp)
             .background(
                 color = MaterialTheme.colorScheme.background,
                 shape = RoundedCornerShape(8.dp)
@@ -57,15 +56,14 @@ fun PollutionGrid(data: MyDevice) {
                 BorderStroke(2.dp, color = MaterialTheme.colorScheme.secondary),
                 shape = RoundedCornerShape(8.dp)
             )
-            .padding(8.dp),
     ) {
-        // Заголовок и значение
+        // Заголовок и id
         Row(
             modifier = Modifier
                 .padding(
-                    start = 16.dp,
-                    top = 8.dp,
-                    end = 8.dp
+                    start = 22.dp,
+                    top = 12.dp,
+                    end = 14.dp
                 )
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -89,13 +87,14 @@ fun PollutionGrid(data: MyDevice) {
         // Сетка значений
         FlowRow(
             modifier = Modifier
-                .fillMaxWidth(),
-            mainAxisAlignment = FlowMainAxisAlignment.SpaceAround,
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
+            mainAxisAlignment = FlowMainAxisAlignment.Start,
         ) {
             data.deviceSensors.forEach { sensor ->
                 Card(
                     modifier = Modifier
-                        .padding(4.dp)
+                        .padding(start = 26.dp)
                         .size(145.dp)
                         .requiredHeight(116.dp),
                     ) {
