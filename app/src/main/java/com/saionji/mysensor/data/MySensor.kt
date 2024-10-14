@@ -4,9 +4,10 @@
 
 package com.saionji.mysensor.data
 
+import androidx.compose.ui.graphics.Color
+
 data class MySensor(
     var valueType : String?,
     var value     : String?,
-    //val id        : String?,
-    //val description        : String?
+    var color     : Color = Color.Transparent
 )

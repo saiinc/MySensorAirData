@@ -14,10 +14,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment.Companion.TopEnd
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -32,7 +35,6 @@ fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(4.dp),
-        //verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Рендерим карточки для каждого элемента списка
         items(pollutionDataList.size) {index ->
@@ -47,13 +49,15 @@ fun PollutionGrid(data: MyDevice) {
     Column(
         modifier = Modifier
             .padding(8.dp)
-            .background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(8.dp))
+            .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(8.dp)
+            )
             .border(
                 BorderStroke(2.dp, color = MaterialTheme.colorScheme.secondary),
                 shape = RoundedCornerShape(8.dp)
             )
             .padding(8.dp),
-        //horizontalAlignment = Alignment.Start
     ) {
         // Заголовок и значение
         Row(
@@ -85,12 +89,8 @@ fun PollutionGrid(data: MyDevice) {
         // Сетка значений
         FlowRow(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    start = 8.dp,
-                    end = 8.dp
-                ),
-            mainAxisAlignment = FlowMainAxisAlignment.SpaceBetween,
+                .fillMaxWidth(),
+            mainAxisAlignment = FlowMainAxisAlignment.SpaceAround,
         ) {
             data.deviceSensors.forEach { sensor ->
                 Card(
@@ -99,29 +99,39 @@ fun PollutionGrid(data: MyDevice) {
                         .size(145.dp)
                         .requiredHeight(116.dp),
                     ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceAround
-                    ) {
-                        sensor.valueType?.let {
-                            Text(
-                                modifier = Modifier
-                                    .padding(top = 8.dp),
-                                text = it,
-                                textAlign = TextAlign.Center,
-                                fontSize = 21.sp
-                            )
+                    Box {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.SpaceAround
+                        ) {
+                            sensor.valueType?.let {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(top = 8.dp),
+                                    text = it,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 21.sp
+                                )
+                            }
+                            sensor.value?.let {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(bottom = 14.dp),
+                                    text = it,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 21.sp,
+                                )
+                            }
                         }
-                        sensor.value?.let {
-                            Text(
-                                modifier = Modifier
-                                    .padding(bottom = 14.dp),
-                                text = it,
-                                textAlign = TextAlign.Center,
-                                fontSize = 21.sp,
-                            )
-                        }
+                        Box(
+                            modifier = Modifier
+                                .padding(end = 8.dp, top = 8.dp)
+                                .size(15.dp)
+                                .clip(CircleShape)
+                                .align(TopEnd)
+                                .background(color = sensor.color)
+                        )
                     }
                 }
             }
