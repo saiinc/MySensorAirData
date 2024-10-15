@@ -72,7 +72,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
+    //implementation ("com.google.accompanist:accompanist-flowlayout:0.30.1")
+    implementation("androidx.compose.foundation:foundation:1.4.3")
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))

@@ -26,8 +26,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saionji.mysensor.data.MyDevice
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
-import com.google.accompanist.flowlayout.FlowRow
 
 @Composable
 fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
@@ -43,6 +41,8 @@ fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
 }
 
 // Компонент для отображения одной карточки
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PollutionGrid(data: MyDevice) {
     Column(
@@ -89,7 +89,7 @@ fun PollutionGrid(data: MyDevice) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            mainAxisAlignment = FlowMainAxisAlignment.Start,
+            //mainAxisAlignment = FlowMainAxisAlignment.Start,
         ) {
             data.deviceSensors.forEach { sensor ->
                 Card(
