@@ -19,10 +19,18 @@ class NetworkMySensorRepository(
     ): List<MySensor> =
         try {
             sensorService.getVal(senorId.toInt())[0].sensordatavalues.map { it ->
-                MySensor(
-                    valueType = it.valueType,
-                    value = it.value
-                )
+                try {
+                    it.value?.toDouble()
+                    MySensor(
+                        valueType = it.valueType,
+                        value = it.value
+                    )
+                } catch (e: NumberFormatException) {
+                    MySensor(
+                        valueType = it.valueType,
+                        value = "0"
+                    )
+                }
             }
         } catch (e: IndexOutOfBoundsException) {
             listOf(MySensor(
