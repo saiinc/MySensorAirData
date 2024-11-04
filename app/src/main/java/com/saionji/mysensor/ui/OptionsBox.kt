@@ -18,8 +18,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Cancel
@@ -74,125 +77,133 @@ fun CustomDialog(
     ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
         ) {
-            Box(
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier
+                    .padding(20.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = "Set sensor ID",
-                            style = TextStyle(
-                                fontSize = 24.sp,
-                                fontFamily = FontFamily.Default,
-                                fontWeight = FontWeight.Bold
-                            )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        textAlign = TextAlign.Center,
+                        text = "Set sensor ID",
+                        style = TextStyle(
+                            fontSize = 24.sp,
+                            fontFamily = FontFamily.Default,
+                            fontWeight = FontWeight.Bold
                         )
-                        Icon(
-                            imageVector = Icons.Filled.Cancel,
-                            contentDescription = "",
-                            tint = colorResource(android.R.color.darker_gray),
-                            modifier = Modifier
-                                .width(30.dp)
-                                .height(30.dp)
-                                .clickable {
-                                    //setShowDialog(false)
-                                    onCloseClicked()
-                                }
-                        )
-                    }
+                    )
+                    Icon(
+                        imageVector = Icons.Filled.Cancel,
+                        contentDescription = "",
+                        tint = colorResource(android.R.color.darker_gray),
+                        modifier = Modifier
+                            .width(30.dp)
+                            .height(30.dp)
+                            .clickable {
+                                //setShowDialog(false)
+                                onCloseClicked()
+                            }
+                    )
+                }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     settingsItems.forEachIndexed { index, sensorIdObject ->
                         Input(settingsItems, onTextChange, index, sensorIdObject,
-                            {
-                                editedId -> settingsItems[index].id = editedId
+                            { editedId ->
+                                settingsItems[index].id = editedId
                             },
-                            {
-                                editedDescription -> settingsItems[index].description = editedDescription
+                            { editedDescription ->
+                                settingsItems[index].description = editedDescription
                             },
                             {
                                 settingsItems.removeAt(index)
                             }
                         )
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    if (settingsItems.size > 5) {
-                        IconButton(
-                            modifier = Modifier
-                                .border(
-                                    BorderStroke(
-                                        width = 2.dp,
-                                        color = colorResource(android.R.color.holo_green_light)
-                                    ),
-                                    shape = RoundedCornerShape(15)
+                if (settingsItems.size > 5) {
+                    IconButton(
+                        modifier = Modifier
+                            .border(
+                                BorderStroke(
+                                    width = 2.dp,
+                                    color = colorResource(android.R.color.holo_green_light)
                                 ),
-                            onClick = {
-                            },
-                            enabled = false
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Add"
-                            )
-                        }
+                                shape = RoundedCornerShape(15)
+                            ),
+                        onClick = {
+                        },
+                        enabled = false
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Add"
+                        )
                     }
-                    else {
-                        IconButton(
-                            modifier = Modifier
-                                .border(
-                                    BorderStroke(
-                                        width = 2.dp,
-                                        color = colorResource(android.R.color.holo_green_light)
-                                    ),
-                                    shape = RoundedCornerShape(15)
+                }
+                else {
+                    IconButton(
+                        modifier = Modifier
+                            .border(
+                                BorderStroke(
+                                    width = 2.dp,
+                                    color = colorResource(android.R.color.holo_green_light)
                                 ),
-                            onClick = {
-                                settingsItems.add(SettingsSensor(id = "", description = ""))
-                            },
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Add"
-                            )
-                        }
+                                shape = RoundedCornerShape(15)
+                            ),
+                        onClick = {
+                            settingsItems.add(SettingsSensor(id = "", description = ""))
+                        },
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Add,
+                            contentDescription = "Add"
+                        )
                     }
+                }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                        Button(
-                            onClick = {
-                                /*if (onTextChange.toString().isEmpty()) {
-                                    onTextChange("Field can not be empty")
-                                    txtFieldError.value = "Field can not be empty"
-                                    return@Button
-                                }*/
-                                onDoneClicked(onSettingsChange(settingsItems.distinct()))
-                                //setShowDialog(false)
-                            },
-                            shape = RoundedCornerShape(50.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                        ) {
-                            Text(text = "Done")
-                        }
+                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+                    Button(
+                        onClick = {
+                            /*if (onTextChange.toString().isEmpty()) {
+                                onTextChange("Field can not be empty")
+                                txtFieldError.value = "Field can not be empty"
+                                return@Button
+                            }*/
+                            onDoneClicked(onSettingsChange(settingsItems.distinct()))
+                            //setShowDialog(false)
+                        },
+                        shape = RoundedCornerShape(50.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                    ) {
+                        Text(text = "Done")
                     }
                 }
             }
         }
     }
 }
+
 
 
 @Composable
@@ -276,27 +287,27 @@ fun Input(
                 imeAction = ImeAction.Done
             )
         )
-            if ((index == settingsItems.size - 1) and (settingsItems.size > 1)) {
-                IconButton(
-                    modifier = Modifier.padding(vertical = 2.dp),
-                    onClick = { onRemove() }
-                    ) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        contentDescription = "Delete"
-                    )
-                }
-            } else {
-                IconButton(
-                    modifier = Modifier.padding(vertical = 2.dp),
-                    onClick = { onRemove() },
-                    enabled = false) {
-                    Icon(
-                        imageVector = Icons.Default.Clear,
-                        tint = Color.Transparent,
-                        contentDescription = "Delete"
-                    )
-                }
+        if ((index == settingsItems.size - 1) and (settingsItems.size > 1)) {
+            IconButton(
+                modifier = Modifier.padding(vertical = 2.dp),
+                onClick = { onRemove() }
+                ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = "Delete"
+                )
             }
+        } else {
+            IconButton(
+                modifier = Modifier.padding(vertical = 2.dp),
+                onClick = { onRemove() },
+                enabled = false) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    tint = Color.Transparent,
+                    contentDescription = "Delete"
+                )
+            }
+        }
     }
 }
