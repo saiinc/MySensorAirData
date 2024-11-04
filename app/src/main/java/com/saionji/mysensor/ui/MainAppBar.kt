@@ -6,6 +6,7 @@ package com.saionji.mysensor.ui
 
 import android.util.Log
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,21 +29,24 @@ fun MainAppBar(
     onCloseClicked: () -> Unit,
     onDoneClicked: (List<SettingsSensor>) -> Unit,
     onRefreshClicked: (List<SettingsSensor>) -> Unit,
-    onOptionsBoxTriggered: () -> Unit
+    onOptionsBoxTriggered: () -> Unit,
+    onAboutClicked: () -> Unit,
 ) {
     when (optionsBoxState) {
         OptionsBoxState.CLOSED -> {
             ClosedAppBar (
                 onSettingsClicked = onOptionsBoxTriggered,
                 onRefreshClicked = onRefreshClicked,
-                settingsItems = settingsItems
+                onAboutClicked = onAboutClicked,
+                settingsItems = settingsItems,
             )
         }
         OptionsBoxState.OPENED -> {
             ClosedAppBar (
                 onSettingsClicked = onOptionsBoxTriggered,
                 onRefreshClicked = onRefreshClicked,
-                settingsItems = settingsItems
+                onAboutClicked = onAboutClicked,
+                settingsItems = settingsItems,
             )
             CustomDialog(
                 settingsItems = settingsItems,
@@ -66,7 +70,8 @@ fun MainAppBar(
 fun ClosedAppBar(
     onSettingsClicked: () -> Unit,
     onRefreshClicked: (List<SettingsSensor>) -> Unit,
-    settingsItems: List<SettingsSensor>
+    onAboutClicked: () -> Unit,
+    settingsItems: List<SettingsSensor>,
 ) {
     TopAppBar(
         title = {
@@ -84,6 +89,14 @@ fun ClosedAppBar(
                     imageVector = Icons.Filled.Refresh,
                     contentDescription = "RefreshIcon"
 
+                )
+            }
+            IconButton(
+                onClick = { onAboutClicked() }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = "AboutIcon"
                 )
             }
             IconButton(

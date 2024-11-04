@@ -98,6 +98,7 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.2")
     implementation("com.google.firebase:protolite-well-known-types:18.0.0")
 
+    implementation("androidx.navigation:navigation-compose:2.8.3")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit")
