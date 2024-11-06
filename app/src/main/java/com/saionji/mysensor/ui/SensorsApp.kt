@@ -10,6 +10,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -28,8 +29,15 @@ fun SensorsApp(
     val settingsItems = mySensorViewModel.settingsItems
 
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
+
+    // Подписка на навигационные события
+    LaunchedEffect(mySensorViewModel.navigationEvent) {
+        mySensorViewModel.navigationEvent.collect { screen ->
+            navController.navigate(screen)
+        }
+    }
+    NavHost(navController = navController, startDestination = "main") {
+        composable("main") {
             Scaffold(
                 modifier = modifier.fillMaxSize(),
                 topBar = {
@@ -58,7 +66,7 @@ fun SensorsApp(
                             mySensorViewModel.getMySensor(mySettings)
                         },
                         onAboutClicked = {
-                            navController.navigate("about")
+                            mySensorViewModel.navigateTo("about")
                         }
                     )
                 }
