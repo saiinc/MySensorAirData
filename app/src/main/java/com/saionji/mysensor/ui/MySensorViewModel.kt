@@ -18,11 +18,12 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.saionji.mysensor.MySensorApplication
 import com.saionji.mysensor.data.MyDevice
-import com.saionji.mysensor.data.MySensorRepository
 import com.saionji.mysensor.data.SettingsRepository
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetAllSensorsUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -52,6 +53,15 @@ class MySensorViewModel(
 
     private val _settingsItems : MutableList<SettingsSensor> = mutableStateListOf()
     val settingsItems: MutableList<SettingsSensor> = _settingsItems
+
+    private val _navigationEvent = MutableSharedFlow<String>()
+    val navigationEvent = _navigationEvent.asSharedFlow()
+
+    fun navigateTo(screen: String) {
+        viewModelScope.launch {
+            _navigationEvent.emit(screen)
+        }
+    }
 
     fun updateSettingsItems(newValue: List<SettingsSensor>) : List<SettingsSensor>{
         val list = mutableListOf<SettingsSensor>()
