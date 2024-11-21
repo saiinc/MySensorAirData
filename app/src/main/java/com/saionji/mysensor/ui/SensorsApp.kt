@@ -12,12 +12,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
+import com.saionji.mysensor.ui.screens.ShareScreen
+import com.saionji.mysensor.ui.screens.saveBitmapToCache
+import com.saionji.mysensor.ui.screens.shareUri
 
 @Composable
 fun SensorsApp(
@@ -27,6 +31,8 @@ fun SensorsApp(
         viewModel(factory = MySensorViewModel.Factory)
     val optionsBoxState = mySensorViewModel.optionsBoxState
     val settingsItems = mySensorViewModel.settingsItems
+
+    val context = LocalContext.current
 
     val navController = rememberNavController()
 
@@ -67,7 +73,8 @@ fun SensorsApp(
                         },
                         onAboutClicked = {
                             mySensorViewModel.navigateTo("about")
-                        }
+                        },
+                        onShareClicked = {mySensorViewModel.setShowShareScreen(true)}
                     )
                 }
             ) {
@@ -90,6 +97,18 @@ fun SensorsApp(
                 onBackClicked = { navController.popBackStack() }
             )
         }
-
+    }
+    if (mySensorViewModel.showShareScreen.value) {
+        ShareScreen(
+            mySensorUiState = mySensorViewModel.mySensorUiState,
+            onBitmapGenerated = { bitmap ->
+                if (bitmap != null) {
+                    saveBitmapToCache(context, bitmap)?.let { uri ->
+                        shareUri(context, uri)
+                    }
+                }
+                mySensorViewModel.setShowShareScreen(false) // Закрываем ShareScreen
+            }
+        )
     }
 }

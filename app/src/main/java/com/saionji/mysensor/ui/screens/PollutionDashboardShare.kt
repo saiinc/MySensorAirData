@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -28,15 +27,23 @@ import androidx.compose.ui.unit.sp
 import com.saionji.mysensor.data.MyDevice
 
 @Composable
-fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
-    LazyColumn(
+fun PollutionDashboardShare(pollutionDataList: List<MyDevice>) {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
+
     ) {
         // Рендерим карточки для каждого элемента списка
-        items(pollutionDataList.size) {index ->
-            PollutionGrid(data = pollutionDataList[index])
+        pollutionDataList.forEach { pollutionDataList ->
+            PollutionGridShare(data = pollutionDataList)
         }
+        Text(
+            text = "https://github.com/saiinc/MySensorAirData",
+            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 16.dp)
+        )
     }
 }
 
@@ -44,7 +51,7 @@ fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PollutionGrid(data: MyDevice) {
+fun PollutionGridShare(data: MyDevice) {
     Column(
         modifier = Modifier
             .padding(12.dp)
@@ -89,7 +96,6 @@ fun PollutionGrid(data: MyDevice) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            //mainAxisAlignment = FlowMainAxisAlignment.Start,
         ) {
             data.deviceSensors.forEach { sensor ->
                 Card(
@@ -97,7 +103,7 @@ fun PollutionGrid(data: MyDevice) {
                         .padding(start = 28.dp)
                         .size(145.dp)
                         .requiredHeight(116.dp),
-                    ) {
+                ) {
                     Box {
                         Column(
                             modifier = Modifier.fillMaxSize(),

@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,6 +32,7 @@ fun MainAppBar(
     onRefreshClicked: (List<SettingsSensor>) -> Unit,
     onOptionsBoxTriggered: () -> Unit,
     onAboutClicked: () -> Unit,
+    onShareClicked: () -> Unit
 ) {
     when (optionsBoxState) {
         OptionsBoxState.CLOSED -> {
@@ -39,6 +41,7 @@ fun MainAppBar(
                 onRefreshClicked = onRefreshClicked,
                 onAboutClicked = onAboutClicked,
                 settingsItems = settingsItems,
+                onShareClicked = onShareClicked
             )
         }
         OptionsBoxState.OPENED -> {
@@ -47,6 +50,7 @@ fun MainAppBar(
                 onRefreshClicked = onRefreshClicked,
                 onAboutClicked = onAboutClicked,
                 settingsItems = settingsItems,
+                onShareClicked = onShareClicked
             )
             CustomDialog(
                 settingsItems = settingsItems,
@@ -71,6 +75,7 @@ fun ClosedAppBar(
     onSettingsClicked: () -> Unit,
     onRefreshClicked: (List<SettingsSensor>) -> Unit,
     onAboutClicked: () -> Unit,
+    onShareClicked: () -> Unit,
     settingsItems: List<SettingsSensor>,
 ) {
     TopAppBar(
@@ -88,6 +93,17 @@ fun ClosedAppBar(
                 Icon(
                     imageVector = Icons.Filled.Refresh,
                     contentDescription = "RefreshIcon"
+
+                )
+            }
+            IconButton(
+                onClick = {
+                    onShareClicked()
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Share,
+                    contentDescription = "ShareIcon"
 
                 )
             }

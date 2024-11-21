@@ -26,6 +26,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.io.IOException
 import java.net.HttpRetryException
 
@@ -61,6 +62,13 @@ class MySensorViewModel(
         viewModelScope.launch {
             _navigationEvent.emit(screen)
         }
+    }
+
+    private val _showShareScreen = mutableStateOf(false)
+    val showShareScreen: State<Boolean> = _showShareScreen
+
+    fun setShowShareScreen(value: Boolean) {
+        _showShareScreen.value = value
     }
 
     fun updateSettingsItems(newValue: List<SettingsSensor>) : List<SettingsSensor>{
@@ -114,6 +122,8 @@ class MySensorViewModel(
             } catch (e: IOException) {
                 MySensorUiState.Error
             } catch (e: HttpRetryException) {
+                MySensorUiState.Error
+            } catch (e: HttpException) {
                 MySensorUiState.Error
             }
         }
