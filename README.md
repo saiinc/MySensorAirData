@@ -1,6 +1,6 @@
 Download [latest version from Releases page](https://github.com/saiinc/MySensorAirData/releases) and install apk.
 
-This app retrieves PM and Temperature/Humidity/Pressure data from [sensor.community](https://sensor.community/) and displays it on an Android smartphone.
+This app retrieves PM and Temperature/Humidity/Pressure data from sensor.community and displays it on an Android smartphone.
 
 You need to enter your sensor ID from the map [sensor.community](https://sensor.community/) to the app settings box.
 
