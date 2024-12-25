@@ -10,11 +10,14 @@ You need to enter your sensor ID from the map [sensor.community](https://sensor.
 ![mysensor_options](https://github.com/user-attachments/assets/79f55e54-0a9d-4c23-b503-04c18d29e2e9)
 
 
-You can use the app as a dashboard for your area, or to view your personal sensor.
+
+
+You can use the app as a dashboard for your area, 
 
      
 ![mysensor_dashboard](https://github.com/user-attachments/assets/7fb954e1-6c6f-4087-8a61-7c44aebe6c36)
 
+or to view your personal sensor.
 
 ![mysensor_outdoor](https://github.com/user-attachments/assets/155bb325-ea85-4583-a736-c10519204491)
 
