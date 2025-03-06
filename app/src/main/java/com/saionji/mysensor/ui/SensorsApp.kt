@@ -1,5 +1,5 @@
 /*
- * Copyright © Anton Sorokin 2024. All rights reserved
+ * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
 package com.saionji.mysensor.ui
@@ -30,6 +30,7 @@ fun SensorsApp(
     val mySensorViewModel: MySensorViewModel =
         viewModel(factory = MySensorViewModel.Factory)
     val optionsBoxState = mySensorViewModel.optionsBoxState
+    val settingsApp = mySensorViewModel.settingsApp.value
     val settingsItems = mySensorViewModel.settingsItems
 
     val context = LocalContext.current
@@ -50,17 +51,23 @@ fun SensorsApp(
                     MainAppBar(
                         optionsBoxState = optionsBoxState.value,
                         settingsItems = settingsItems,
+                        settingsApp = settingsApp,
                         onTextChange = {
                             mySensorViewModel.updateSensorIdTextState(newValue = it)
+                        },
+                        onAppSettingsChange = {
+                            mySensorViewModel.updateSettingsAppState(newValue = it)
                         },
                         onSettingsChange = {
                             mySensorViewModel.updateSettingsItems(newValue = it)
                         },
                         onCloseClicked = {
+                            mySensorViewModel.resetAppSettings()
                             mySensorViewModel.resetSettings()
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
                         },
-                        onDoneClicked = { mySettings ->
+                        onDoneClicked = { mySettings, settingsApp ->
+                            mySensorViewModel.saveAppSettings(settingsApp)
                             mySensorViewModel.saveSettings(mySettings)
                             mySensorViewModel.getMySensor(mySettings)
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
@@ -74,7 +81,7 @@ fun SensorsApp(
                         onAboutClicked = {
                             mySensorViewModel.navigateTo("about")
                         },
-                        onShareClicked = {mySensorViewModel.setShowShareScreen(true)}
+                        onShareClicked = { mySensorViewModel.setShowShareScreen(true) },
                     )
                 }
             ) {
@@ -100,6 +107,7 @@ fun SensorsApp(
     }
     if (mySensorViewModel.showShareScreen.value) {
         ShareScreen(
+            settingsApp = mySensorViewModel.settingsApp.value,
             mySensorUiState = mySensorViewModel.mySensorUiState,
             onBitmapGenerated = { bitmap ->
                 if (bitmap != null) {

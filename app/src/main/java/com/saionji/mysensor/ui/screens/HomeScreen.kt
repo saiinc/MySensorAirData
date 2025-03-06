@@ -1,5 +1,5 @@
 /*
- * Copyright © Anton Sorokin 2024. All rights reserved
+ * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
 package com.saionji.mysensor.ui.screens

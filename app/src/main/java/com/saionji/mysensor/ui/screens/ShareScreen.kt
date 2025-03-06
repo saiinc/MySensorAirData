@@ -1,3 +1,7 @@
+/*
+ * Copyright © Anton Sorokin 2025. All rights reserved
+ */
+
 package com.saionji.mysensor.ui.screens
 
 import android.content.Context
@@ -29,12 +33,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
+import com.saionji.mysensor.data.SettingsApp
 import java.io.File
 import java.io.FileOutputStream
 
 
 @Composable
 fun ShareScreen(
+    settingsApp: SettingsApp,
     mySensorUiState: MySensorUiState,
     onBitmapGenerated: (Bitmap?) -> Unit
 ) {
@@ -79,7 +85,10 @@ fun ShareScreen(
                     contentHeight = layoutCoordinates.size.height
                 }
             ){
-                PollutionDashboardShare(pollutionDataList)
+                PollutionDashboardShare(
+                    settingsApp = settingsApp,
+                    pollutionDataList = pollutionDataList
+                )
             }
         }
     }

@@ -8,4 +8,14 @@
     <string name="loading">Loading</string>
 
     <string name="content_description">Sensor</string>
+
+    <string name="settings_header">Set sensor ID</string>
+
+    <string name="settings_switch">Hide sensor ID when using the \'Share\' feature</string>
+
+    <string name="settings_button">Done</string>
+
+    <string name="settings_sensor_id">Enter id</string>
+
+    <string name="settings_sensor_description">Description (optional)</string>
 </resources>

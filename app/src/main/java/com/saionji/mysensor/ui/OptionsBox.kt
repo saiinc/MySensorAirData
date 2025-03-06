@@ -1,12 +1,14 @@
 /*
- * Copyright © Anton Sorokin 2024. All rights reserved
+ * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
 package com.saionji.mysensor.ui
 
 
+
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +32,8 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -41,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -51,16 +55,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.saionji.mysensor.R
+import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsSensor
 
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CustomDialog(
     settingsItems: MutableList<SettingsSensor>,
-
+    settingsApp: SettingsApp,
     onTextChange: (String) -> Unit,
+    onAppSettingsChange: (SettingsApp) -> Unit,
     onSettingsChange: (List<SettingsSensor>) -> List<SettingsSensor>,
-    onDoneClicked: (List<SettingsSensor>) -> Unit,
+    onDoneClicked: (List<SettingsSensor>, SettingsApp) -> Unit,
     onCloseClicked: () -> Unit,
     setShowDialog: (Boolean) -> Unit,
 
@@ -68,135 +75,173 @@ fun CustomDialog(
     if (settingsItems.isEmpty()) {
         settingsItems.add(SettingsSensor(id = "", description = ""))
     }
-
     //val txtFieldError = remember { mutableStateOf("") }
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
         onDismissRequest = { setShowDialog(false) }
     ) {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
+                .background(
+                    MaterialTheme.colorScheme.surface, // Фон диалога
+                    shape = RoundedCornerShape(16.dp)
+                )
         ) {
-            Column(
+            Box(
                 modifier = Modifier
-                    .padding(20.dp)
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .background(
+                        Color.White.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(16.dp)
+                    )
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        textAlign = TextAlign.Center,
-                        text = "Set sensor ID",
-                        style = TextStyle(
-                            fontSize = 24.sp,
-                            fontFamily = FontFamily.Default,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    Icon(
-                        imageVector = Icons.Filled.Cancel,
-                        contentDescription = "",
-                        tint = colorResource(android.R.color.darker_gray),
-                        modifier = Modifier
-                            .width(30.dp)
-                            .height(30.dp)
-                            .clickable {
-                                //setShowDialog(false)
-                                onCloseClicked()
-                            }
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
                 Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .padding(20.dp)
+                        .verticalScroll(rememberScrollState())
                 ) {
-                    settingsItems.forEachIndexed { index, sensorIdObject ->
-                        Input(settingsItems, onTextChange, index, sensorIdObject,
-                            { editedId ->
-                                settingsItems[index].id = editedId
-                            },
-                            { editedDescription ->
-                                settingsItems[index].description = editedDescription
-                            },
-                            {
-                                settingsItems.removeAt(index)
-                            }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                if (settingsItems.size > 5) {
-                    IconButton(
-                        modifier = Modifier
-                            .border(
-                                BorderStroke(
-                                    width = 2.dp,
-                                    color = colorResource(android.R.color.holo_green_light)
-                                ),
-                                shape = RoundedCornerShape(15)
-                            ),
-                        onClick = {
-                        },
-                        enabled = false
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Text(
+                            textAlign = TextAlign.Center,
+                            text = stringResource(id = R.string.settings_header),
+                            style = TextStyle(
+                                fontSize = 24.sp,
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
                         Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Add"
+                            imageVector = Icons.Filled.Cancel,
+                            contentDescription = "Cancel",
+                            tint = colorResource(android.R.color.darker_gray),
+                            modifier = Modifier
+                                .width(30.dp)
+                                .height(30.dp)
+                                .clickable {
+                                    //setShowDialog(false)
+                                    onCloseClicked()
+                                }
                         )
                     }
-                }
-                else {
-                    IconButton(
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Column(
                         modifier = Modifier
-                            .border(
-                                BorderStroke(
-                                    width = 2.dp,
-                                    color = colorResource(android.R.color.holo_green_light)
-                                ),
-                                shape = RoundedCornerShape(15)
-                            ),
-                        onClick = {
-                            settingsItems.add(SettingsSensor(id = "", description = ""))
-                        },
+                            .fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = "Add"
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(end = 15.dp),
+                                textAlign = TextAlign.Left,
+                                style = TextStyle(
+                                    fontSize = 18.sp,
+                                    fontFamily = FontFamily.Default
+                                ),
+                                text = stringResource(id = R.string.settings_switch)
+                            )
+                            Switch(
+                                checked = settingsApp.shareId,
+                                onCheckedChange = { value ->
+                                    onAppSettingsChange(SettingsApp(value))
+                                }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        settingsItems.forEachIndexed { index, sensorIdObject ->
+                            Input(settingsItems, onTextChange, index, sensorIdObject,
+                                { editedId ->
+                                    settingsItems[index].id = editedId
+                                },
+                                { editedDescription ->
+                                    settingsItems[index].description = editedDescription
+                                },
+                                {
+                                    settingsItems.removeAt(index)
+                                }
+                            )
+                        }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                    Button(
-                        onClick = {
-                            /*if (onTextChange.toString().isEmpty()) {
+                    if (settingsItems.size > 6) {
+                        IconButton(
+                            modifier = Modifier
+                                .border(
+                                    BorderStroke(
+                                        width = 2.dp,
+                                        color = colorResource(android.R.color.holo_green_light)
+                                    ),
+                                    shape = RoundedCornerShape(15)
+                                ),
+                            onClick = {
+                            },
+                            enabled = false
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Add"
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            modifier = Modifier
+                                .border(
+                                    BorderStroke(
+                                        width = 2.dp,
+                                        color = colorResource(android.R.color.holo_green_light)
+                                    ),
+                                    shape = RoundedCornerShape(15)
+                                ),
+                            onClick = {
+                                settingsItems.add(SettingsSensor(id = "", description = ""))
+                            },
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Add"
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
+                        Button(
+                            onClick = {
+                                /*if (onTextChange.toString().isEmpty()) {
                                 onTextChange("Field can not be empty")
                                 txtFieldError.value = "Field can not be empty"
                                 return@Button
                             }*/
-                            onDoneClicked(onSettingsChange(settingsItems.distinct()))
-                            //setShowDialog(false)
-                        },
-                        shape = RoundedCornerShape(50.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                    ) {
-                        Text(text = "Done")
+                                onDoneClicked(
+                                    onSettingsChange(settingsItems.distinct()),
+                                    settingsApp
+                                )
+                                //setShowDialog(false)
+                            },
+                            shape = RoundedCornerShape(50.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp)
+                        ) {
+                            Text(text = stringResource(id = R.string.settings_button))
+                        }
                     }
                 }
             }
@@ -246,7 +291,7 @@ fun Input(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
             ),
-            placeholder = { Text(text = "Enter id") },
+            placeholder = { Text(text = stringResource(id = R.string.settings_sensor_id)) },
             maxLines = 1,
             value = txtFieldId.value,
             keyboardOptions = KeyboardOptions(
@@ -275,7 +320,7 @@ fun Input(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            placeholder = {Text(text = "Description (optional)")},
+            placeholder = {Text(text = stringResource(id = R.string.settings_sensor_description))},
             maxLines = 1,
             value = txtFieldDescription.value,
             onValueChange = { value ->

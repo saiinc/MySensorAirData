@@ -1,5 +1,5 @@
 /*
- * Copyright © Anton Sorokin 2024. All rights reserved
+ * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
 plugins {
@@ -24,7 +24,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.1.2"
+        versionName = "1.1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
