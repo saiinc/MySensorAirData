@@ -30,9 +30,9 @@
 Пример экрана настроек / Example of the settings screen:  
 ![mysensor_options](https://github.com/user-attachments/assets/79f55e54-0a9d-4c23-b503-04c18d29e2e9)  
 
-## 📊 Возможности / Features
+## 📍 Возможности / Features
 
-### 📍 Локальная карта качества воздуха / Local Air Quality Dashboard
+### 📊 Сводка общего состояния качества воздуха / Local Air Quality Dashboard
 Вы можете использовать приложение как **дашборд** для мониторинга качества воздуха в вашем регионе.  
 You can use the app as a **dashboard** to monitor air quality in your area.  
 ![mysensor_dashboard](https://github.com/user-attachments/assets/7fb954e1-6c6f-4087-8a61-7c44aebe6c36)  
