@@ -42,9 +42,5 @@ You can use the app as a **dashboard** to monitor air quality in your area.
 The app allows you to monitor **a specific sensor** in real-time.  
 ![mysensor_outdoor](https://github.com/user-attachments/assets/155bb325-ea85-4583-a736-c10519204491)  
 
-## 🔗 Полезные ссылки / Useful Links
-- 📌 [sensor.community — сайт проекта / Official website](https://sensor.community/)  
-- 🔄 [Исходный код приложения / Source code](https://github.com/saiinc/MySensorAirData)  
-- 🛠 [Страница релизов / Releases page](https://github.com/saiinc/MySensorAirData/releases)  
 
 ---
