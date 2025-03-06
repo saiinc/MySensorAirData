@@ -1,3 +1,7 @@
+/*
+ * Copyright © Anton Sorokin 2025. All rights reserved
+ */
+
 package com.saionji.mysensor.ui.theme
 
 import androidx.compose.material3.Typography

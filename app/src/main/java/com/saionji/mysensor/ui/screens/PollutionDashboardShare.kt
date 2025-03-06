@@ -1,6 +1,6 @@
 package com.saionji.mysensor.ui.screens
 /*
- * Copyright © Anton Sorokin 2024. All rights reserved
+ * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
 import androidx.compose.foundation.BorderStroke
@@ -25,9 +25,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saionji.mysensor.data.MyDevice
+import com.saionji.mysensor.data.SettingsApp
 
 @Composable
-fun PollutionDashboardShare(pollutionDataList: List<MyDevice>) {
+fun PollutionDashboardShare(
+    settingsApp: SettingsApp,
+    pollutionDataList: List<MyDevice>
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -35,7 +39,10 @@ fun PollutionDashboardShare(pollutionDataList: List<MyDevice>) {
     ) {
         // Рендерим карточки для каждого элемента списка
         pollutionDataList.forEach { pollutionDataList ->
-            PollutionGridShare(data = pollutionDataList)
+            PollutionGridShare(
+                settingsApp = settingsApp,
+                data = pollutionDataList
+            )
         }
         Text(
             text = "https://github.com/saiinc/MySensorAirData",
@@ -51,7 +58,10 @@ fun PollutionDashboardShare(pollutionDataList: List<MyDevice>) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PollutionGridShare(data: MyDevice) {
+fun PollutionGridShare(
+    settingsApp: SettingsApp,
+    data: MyDevice
+) {
     Column(
         modifier = Modifier
             .padding(12.dp)
@@ -82,12 +92,14 @@ fun PollutionGridShare(data: MyDevice) {
                     fontSize = 20.sp
                 )
             }
-            data.id?.let {
-                Text(
-                    text = it,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(bottom = 6.dp)
-                )
+            if(!settingsApp.shareId) {
+                data.id?.let {
+                    Text(
+                        text = it,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
+                }
             }
         }
 

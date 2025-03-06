@@ -4,7 +4,6 @@
 
 package com.saionji.mysensor.data
 
-data class SettingsSensor(
-    var id: String,
-    var description: String
+data class SettingsApp(
+    val shareId: Boolean
 )

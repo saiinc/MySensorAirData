@@ -1,3 +1,7 @@
+/*
+ * Copyright © Anton Sorokin 2025. All rights reserved
+ */
+
 package com.saionji.mysensor.ui.theme
 
 import android.app.Activity
@@ -38,7 +42,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun MyFirstAppTheme(
+fun SensorsAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

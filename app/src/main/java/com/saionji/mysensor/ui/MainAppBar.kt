@@ -1,5 +1,5 @@
 /*
- * Copyright © Anton Sorokin 2024. All rights reserved
+ * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
 package com.saionji.mysensor.ui
@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.saionji.mysensor.R
+import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsSensor
 
 
@@ -25,10 +26,12 @@ import com.saionji.mysensor.data.SettingsSensor
 fun MainAppBar(
     optionsBoxState: OptionsBoxState,
     settingsItems: MutableList<SettingsSensor>,
+    settingsApp: SettingsApp,
     onTextChange: (String) -> Unit,
+    onAppSettingsChange: (SettingsApp) -> Unit,
     onSettingsChange: (List<SettingsSensor>) -> List<SettingsSensor>,
     onCloseClicked: () -> Unit,
-    onDoneClicked: (List<SettingsSensor>) -> Unit,
+    onDoneClicked: (List<SettingsSensor>, SettingsApp) -> Unit,
     onRefreshClicked: (List<SettingsSensor>) -> Unit,
     onOptionsBoxTriggered: () -> Unit,
     onAboutClicked: () -> Unit,
@@ -54,7 +57,9 @@ fun MainAppBar(
             )
             CustomDialog(
                 settingsItems = settingsItems,
+                settingsApp = settingsApp,
                 onTextChange = onTextChange,
+                onAppSettingsChange = onAppSettingsChange,
                 onSettingsChange = onSettingsChange,
                 onDoneClicked = onDoneClicked,
                 onCloseClicked = onCloseClicked,

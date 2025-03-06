@@ -1,3 +1,7 @@
+/*
+ * Copyright © Anton Sorokin 2025. All rights reserved
+ */
+
 package com.saionji.mysensor.data
 
 import android.content.Context

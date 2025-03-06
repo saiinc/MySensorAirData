@@ -1,5 +1,5 @@
 /*
- * Copyright © Anton Sorokin 2024. All rights reserved
+ * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
 package com.saionji.mysensor.ui
@@ -14,10 +14,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.saionji.mysensor.MySensorApplication
 import com.saionji.mysensor.data.MyDevice
+import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsRepository
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetAllSensorsUseCase
@@ -48,11 +50,15 @@ class MySensorViewModel(
         mutableStateOf(value = OptionsBoxState.CLOSED)
     val optionsBoxState: State<OptionsBoxState> = _optionsBoxState
 
-    private val _sensorIdTextState : MutableState<String> =
+    private val _sensorIdTextState: MutableState<String> =
         mutableStateOf(value = "")
     val sensorIdTextState: State<String> = _sensorIdTextState
 
-    private val _settingsItems : MutableList<SettingsSensor> = mutableStateListOf()
+    private val _settingsApp: MutableState<SettingsApp> =
+        mutableStateOf(value = SettingsApp(true))
+    val settingsApp: State<SettingsApp> = _settingsApp
+
+    private val _settingsItems: MutableList<SettingsSensor> = mutableStateListOf()
     val settingsItems: MutableList<SettingsSensor> = _settingsItems
 
     private val _navigationEvent = MutableSharedFlow<String>()
@@ -71,6 +77,10 @@ class MySensorViewModel(
         _showShareScreen.value = value
     }
 
+    fun updateSettingsAppState(newValue: SettingsApp) {
+        _settingsApp.value = newValue
+    }
+
     fun updateSettingsItems(newValue: List<SettingsSensor>) : List<SettingsSensor>{
         val list = mutableListOf<SettingsSensor>()
         list.addAll(newValue)
@@ -86,6 +96,12 @@ class MySensorViewModel(
         _sensorIdTextState.value = newValue
     }
 
+    fun saveAppSettings(settingsApp: SettingsApp) {
+        viewModelScope.launch {
+            settingsRepository.saveAppSettings(settingsApp)
+        }
+    }
+
     fun saveSettings(mySettings: List<SettingsSensor>) {
         viewModelScope.launch {
             settingsRepository.saveSettings(mySettings)
@@ -97,10 +113,23 @@ class MySensorViewModel(
     }
     private fun initLoad() {
         viewModelScope.launch(Dispatchers.Main) {
-            settingsRepository.getSettings().collectLatest {mySettings ->
+            settingsRepository.getSettings().collectLatest { mySettings ->
                 _settingsItems.clear()
                 _settingsItems.addAll(mySettings)
                 getMySensor(_settingsItems)
+            }
+        }
+        viewModelScope.launch(Dispatchers.Main) {
+            settingsRepository.getAppSettings().collectLatest {
+                _settingsApp.value = it
+            }
+        }
+    }
+
+    fun resetAppSettings() {
+        viewModelScope.launch(Dispatchers.Main) {
+            settingsRepository.getAppSettings().collectLatest {
+                _settingsApp.value = it
             }
         }
     }
