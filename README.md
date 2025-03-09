@@ -28,7 +28,7 @@
 ![air_map](https://github.com/user-attachments/assets/5b9510af-21a2-4df5-8a4c-db95a15a4f52)  
 
 Пример экрана настроек / Example of the settings screen:  
-![mysensor_options](https://github.com/user-attachments/assets/79f55e54-0a9d-4c23-b503-04c18d29e2e9)  
+![options_mysensor](https://github.com/user-attachments/assets/fb2ce7f9-7b78-46b9-bd57-af7bec4d9234)  
 
 ## 📍 Возможности / Features
 
