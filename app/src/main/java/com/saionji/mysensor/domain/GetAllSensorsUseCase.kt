@@ -80,6 +80,10 @@ class GetAllSensorsUseCase(private val mySensorRepository: MySensorRepository) {
 
                 singleSensorCopy.forEach {
                     when (it.valueType) {
+                        "P0" -> {
+                            it.valueType = "PM1"
+                            it.value = "${it.value}µg/m³"
+                        }
                         "P1" -> {
                             it.valueType = "PM10"
                             it.color = Color(interpolateColor(it.value!!.toDouble(), listOf(

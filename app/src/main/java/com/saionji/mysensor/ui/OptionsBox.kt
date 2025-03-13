@@ -67,6 +67,10 @@ fun CustomDialog(
     onTextChange: (String) -> Unit,
     onAppSettingsChange: (SettingsApp) -> Unit,
     onSettingsChange: (List<SettingsSensor>) -> List<SettingsSensor>,
+    onAddClicked: () -> Unit,
+    onRemoveClicked: (SettingsSensor) -> Unit,
+    onEditSensorId: (Int, String) -> Unit,
+    onEditSensorDescription: (Int, String) -> Unit,
     onDoneClicked: (List<SettingsSensor>, SettingsApp) -> Unit,
     onCloseClicked: () -> Unit,
     setShowDialog: (Boolean) -> Unit,
@@ -163,15 +167,19 @@ fun CustomDialog(
                         Spacer(modifier = Modifier.height(20.dp))
 
                         settingsItems.forEachIndexed { index, sensorIdObject ->
-                            Input(settingsItems, onTextChange, index, sensorIdObject,
-                                { editedId ->
-                                    settingsItems[index].id = editedId
+                            Input(
+                                settingsItems = settingsItems,
+                                onTextChange = onTextChange,
+                                index = index,
+                                sensorIdObject = sensorIdObject,
+                                onEditId = { editedId ->
+                                    onEditSensorId(index, editedId)
                                 },
-                                { editedDescription ->
-                                    settingsItems[index].description = editedDescription
+                                onEditDescription = { editedDescription ->
+                                    onEditSensorDescription(index, editedDescription)
                                 },
-                                {
-                                    settingsItems.removeAt(index)
+                                onRemoveClicked = {
+                                    onRemoveClicked(sensorIdObject)
                                 }
                             )
                         }
@@ -209,7 +217,7 @@ fun CustomDialog(
                                     shape = RoundedCornerShape(15)
                                 ),
                             onClick = {
-                                settingsItems.add(SettingsSensor(id = "", description = ""))
+                                onAddClicked()
                             },
                         ) {
                             Icon(
@@ -259,7 +267,7 @@ fun Input(
     sensorIdObject: SettingsSensor,
     onEditId: (String) -> (Unit),
     onEditDescription: (String) -> (Unit),
-    onRemove: () -> (Unit)
+    onRemoveClicked: () -> (Unit)
 ) {
     //val txtFieldError = remember { mutableStateOf("") }
     val txtFieldId = remember {
@@ -300,8 +308,8 @@ fun Input(
             ),
             onValueChange = {
                 value -> txtFieldId.value = (value.filter { it.isDigit() }).take(8)
-                onEditId(value.take(8))
-                onTextChange(value)
+                onEditId(value.filter { it.isDigit() }.take(8))
+                onTextChange(value.filter { it.isDigit() })
             }
         )
         TextField(
@@ -335,7 +343,7 @@ fun Input(
         if ((index == settingsItems.size - 1) and (settingsItems.size > 1)) {
             IconButton(
                 modifier = Modifier.padding(vertical = 2.dp),
-                onClick = { onRemove() }
+                onClick = { onRemoveClicked() }
                 ) {
                 Icon(
                     imageVector = Icons.Default.Clear,
@@ -345,7 +353,7 @@ fun Input(
         } else {
             IconButton(
                 modifier = Modifier.padding(vertical = 2.dp),
-                onClick = { onRemove() },
+                onClick = { onRemoveClicked() },
                 enabled = false) {
                 Icon(
                     imageVector = Icons.Default.Clear,

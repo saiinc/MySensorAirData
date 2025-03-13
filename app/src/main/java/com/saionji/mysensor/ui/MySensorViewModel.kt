@@ -77,6 +77,26 @@ class MySensorViewModel(
         _showShareScreen.value = value
     }
 
+    fun addSettingsItem() {
+        _settingsItems.add(SettingsSensor(id = "", description = ""))
+    }
+
+    fun removeSettingsItem(settingsSensorItem: SettingsSensor) {
+        _settingsItems.remove(settingsSensorItem)
+    }
+
+    fun updateSettingsItemId(index: Int, settingsSensorItemId: String) {
+        if (index in _settingsItems.indices) {
+            _settingsItems[index].id = settingsSensorItemId
+        }
+    }
+
+    fun updateSettingsItemDescription(index: Int, settingsSensorItemDescription: String) {
+        if (index in _settingsItems.indices) {
+            _settingsItems[index].description = settingsSensorItemDescription
+        }
+    }
+
     fun updateSettingsAppState(newValue: SettingsApp) {
         _settingsApp.value = newValue
     }

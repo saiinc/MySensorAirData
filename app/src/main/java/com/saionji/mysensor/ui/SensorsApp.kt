@@ -17,6 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
 import com.saionji.mysensor.ui.screens.ShareScreen
@@ -71,6 +72,18 @@ fun SensorsApp(
                             mySensorViewModel.saveSettings(mySettings)
                             mySensorViewModel.getMySensor(mySettings)
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
+                        },
+                        onAddClicked = {
+                            mySensorViewModel.addSettingsItem()
+                        },
+                        onRemoveClicked = {
+                            mySensorViewModel.removeSettingsItem(it)
+                        },
+                        onEditSensorId = { index, settingsSensorItemId ->
+                            mySensorViewModel.updateSettingsItemId(index = index, settingsSensorItemId = settingsSensorItemId)
+                        },
+                        onEditSensorDescription = { index, settingsSensorItemDescription->
+                            mySensorViewModel.updateSettingsItemDescription(index = index, settingsSensorItemDescription = settingsSensorItemDescription)
                         },
                         onOptionsBoxTriggered = {
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.OPENED)
