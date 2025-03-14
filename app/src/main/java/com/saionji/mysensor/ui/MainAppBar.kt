@@ -25,7 +25,7 @@ import com.saionji.mysensor.data.SettingsSensor
 @Composable
 fun MainAppBar(
     optionsBoxState: OptionsBoxState,
-    settingsItems: MutableList<SettingsSensor>,
+    settingsItems: List<SettingsSensor>,
     settingsApp: SettingsApp,
     onTextChange: (String) -> Unit,
     onAppSettingsChange: (SettingsApp) -> Unit,
