@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.saionji.mysensor.MySensorApplication
@@ -59,7 +58,7 @@ class MySensorViewModel(
     val settingsApp: State<SettingsApp> = _settingsApp
 
     private val _settingsItems: MutableList<SettingsSensor> = mutableStateListOf()
-    val settingsItems: MutableList<SettingsSensor> = _settingsItems
+    val settingsItems: List<SettingsSensor> = _settingsItems
 
     private val _navigationEvent = MutableSharedFlow<String>()
     val navigationEvent = _navigationEvent.asSharedFlow()
@@ -104,8 +103,8 @@ class MySensorViewModel(
     fun updateSettingsItems(newValue: List<SettingsSensor>) : List<SettingsSensor>{
         val list = mutableListOf<SettingsSensor>()
         list.addAll(newValue)
-        settingsItems.clear()
-        settingsItems.addAll(list)
+        _settingsItems.clear()
+        _settingsItems.addAll(list)
         return settingsItems
     }
 

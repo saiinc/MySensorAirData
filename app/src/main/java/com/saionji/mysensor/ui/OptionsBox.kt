@@ -62,7 +62,7 @@ import com.saionji.mysensor.data.SettingsSensor
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CustomDialog(
-    settingsItems: MutableList<SettingsSensor>,
+    settingsItems: List<SettingsSensor>,
     settingsApp: SettingsApp,
     onTextChange: (String) -> Unit,
     onAppSettingsChange: (SettingsApp) -> Unit,
@@ -77,7 +77,7 @@ fun CustomDialog(
 
     ) {
     if (settingsItems.isEmpty()) {
-        settingsItems.add(SettingsSensor(id = "", description = ""))
+        onAddClicked()
     }
     //val txtFieldError = remember { mutableStateOf("") }
 
@@ -261,7 +261,7 @@ fun CustomDialog(
 
 @Composable
 fun Input(
-    settingsItems: MutableList<SettingsSensor>,
+    settingsItems: List<SettingsSensor>,
     onTextChange: (String) -> Unit,
     index: Int,
     sensorIdObject: SettingsSensor,
