@@ -66,7 +66,6 @@ fun CustomDialog(
     settingsApp: SettingsApp,
     onTextChange: (String) -> Unit,
     onAppSettingsChange: (SettingsApp) -> Unit,
-    onSettingsChange: (List<SettingsSensor>) -> List<SettingsSensor>,
     onAddClicked: () -> Unit,
     onRemoveClicked: (SettingsSensor) -> Unit,
     onEditSensorId: (Int, String) -> Unit,
@@ -238,7 +237,7 @@ fun CustomDialog(
                                 return@Button
                             }*/
                                 onDoneClicked(
-                                    onSettingsChange(settingsItems.distinct()),
+                                    settingsItems,
                                     settingsApp
                                 )
                                 //setShowDialog(false)

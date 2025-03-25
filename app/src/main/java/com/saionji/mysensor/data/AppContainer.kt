@@ -9,6 +9,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.saionji.mysensor.domain.GetAllSensorsUseCase
+import com.saionji.mysensor.domain.GetAllSensorsUseCaseDev
 import com.saionji.mysensor.network.model.SensorService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -22,6 +23,7 @@ interface AppContainer {
     val settingsRepository: SettingsRepository
     val dataStore: DataStore<Preferences>
     val getAllSensorsUseCase: GetAllSensorsUseCase // Добавляем UseCase
+    val getAllSensorsUseCaseDev: GetAllSensorsUseCaseDev // Добавляем UseCase
 }
 
 class DefaultAppContainer(context: Context) : AppContainer{
@@ -50,5 +52,9 @@ class DefaultAppContainer(context: Context) : AppContainer{
 
     override val getAllSensorsUseCase: GetAllSensorsUseCase by lazy {
         GetAllSensorsUseCase(mySensorRepository) // Передаем репозиторий в UseCase
+    }
+
+    override val getAllSensorsUseCaseDev: GetAllSensorsUseCaseDev by lazy {
+        GetAllSensorsUseCaseDev(mySensorRepository) // Передаем репозиторий в UseCase
     }
 }

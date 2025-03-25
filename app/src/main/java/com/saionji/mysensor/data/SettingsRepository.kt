@@ -58,7 +58,7 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
                 gson.fromJson(jsonString, type) // Преобразуем JSON обратно в список объектов
             }
             else {
-                listOf(SettingsSensor("", "")) // Возвращаем пустой список, если данных нет
+                listOf(SettingsSensor("", "", emptyList())) // Возвращаем пустой список, если данных нет
             }
         }
     }

@@ -26,7 +26,8 @@ android {
         versionCode = 1
         versionName = "1.1.4"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.kaspersky.kaspresso.runner.KaspressoRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -100,13 +101,22 @@ dependencies {
     implementation("com.google.firebase:protolite-well-known-types:18.0.0")
 
     implementation("androidx.navigation:navigation-compose:2.8.4")
+    implementation("androidx.compose.ui:ui-test-android:1.7.8")
     //implementation("androidx.appcompat:appcompat:1.7.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit")
-    androidTestImplementation("androidx.test.espresso:espresso-core")
+    //androidTestImplementation("androidx.test.espresso:espresso-core")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.11.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    implementation ("com.google.android.material:material:1.10.0")
+    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.6.0") {
+        exclude(module = "protobuf-lite")
+    }
+    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.6.0") {
+        exclude(module = "protobuf-lite")
+    }
 }
