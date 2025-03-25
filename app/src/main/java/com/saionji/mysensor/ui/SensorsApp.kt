@@ -59,9 +59,6 @@ fun SensorsApp(
                         onAppSettingsChange = {
                             mySensorViewModel.updateSettingsAppState(newValue = it)
                         },
-                        onSettingsChange = {
-                            mySensorViewModel.updateSettingsItems(newValue = it)
-                        },
                         onCloseClicked = {
                             mySensorViewModel.resetAppSettings()
                             mySensorViewModel.resetSettings()

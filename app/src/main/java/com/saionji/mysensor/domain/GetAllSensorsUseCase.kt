@@ -18,7 +18,6 @@ import kotlin.math.roundToInt
 class GetAllSensorsUseCase(private val mySensorRepository: MySensorRepository) {
 
     suspend operator fun invoke(devices: List<SettingsSensor>): List<MyDevice> = coroutineScope {
-        val devicesClone = devices.toList()
 
         // Универсальная функция для интерполяции цвета на основе значения и списка цветовых диапазонов
         fun interpolateColor(value: Double, ranges: List<Triple<Double, Double, Triple<Int, Int, Int>>>): Int {
@@ -58,7 +57,7 @@ class GetAllSensorsUseCase(private val mySensorRepository: MySensorRepository) {
             return 0xFF000000.toInt() // Черный цвет по умолчанию
         }
 
-        if ((devicesClone.size == 1) && (devices[0].id.isBlank())) {
+        if ((devices.size == 1) && (devices[0].id.isBlank())) {
             return@coroutineScope listOf(
                 MyDevice(
                     id = "",
@@ -73,7 +72,7 @@ class GetAllSensorsUseCase(private val mySensorRepository: MySensorRepository) {
             )
         }
 
-        val deferredDevices = devicesClone.map { device ->
+        val deferredDevices = devices.map { device ->
             async {
                 val singleSensor = mySensorRepository.getSensor(device.id)
                 val singleSensorCopy = CopyOnWriteArrayList(singleSensor)

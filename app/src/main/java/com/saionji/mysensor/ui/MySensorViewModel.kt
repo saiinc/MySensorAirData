@@ -22,6 +22,7 @@ import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsRepository
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetAllSensorsUseCase
+import com.saionji.mysensor.domain.GetAllSensorsUseCaseDev
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -39,7 +40,8 @@ sealed interface MySensorUiState {
 
 class MySensorViewModel(
     private val settingsRepository: SettingsRepository,
-    private val getAllSensorsUseCase: GetAllSensorsUseCase
+    private val getAllSensorsUseCase: GetAllSensorsUseCase,
+    private val getAllSensorsUseCaseDev: GetAllSensorsUseCaseDev
 ) : ViewModel() {
 
     var mySensorUiState: MySensorUiState by mutableStateOf(MySensorUiState.Loading)
@@ -77,7 +79,7 @@ class MySensorViewModel(
     }
 
     fun addSettingsItem() {
-        _settingsItems.add(SettingsSensor(id = "", description = ""))
+        _settingsItems.add(SettingsSensor(id = "", description = "", emptyList()))
     }
 
     fun removeSettingsItem(settingsSensorItem: SettingsSensor) {
@@ -98,14 +100,6 @@ class MySensorViewModel(
 
     fun updateSettingsAppState(newValue: SettingsApp) {
         _settingsApp.value = newValue
-    }
-
-    fun updateSettingsItems(newValue: List<SettingsSensor>) : List<SettingsSensor>{
-        val list = mutableListOf<SettingsSensor>()
-        list.addAll(newValue)
-        _settingsItems.clear()
-        _settingsItems.addAll(list)
-        return settingsItems
     }
 
     fun updateOptionsBoxState(newValue: OptionsBoxState) {
@@ -183,10 +177,12 @@ class MySensorViewModel(
                 val application = (this[APPLICATION_KEY] as MySensorApplication)
                 val settingsRepository = application.container.settingsRepository
                 val getAllSensorsUseCase = application.container.getAllSensorsUseCase
+                val getAllSensorsUseCaseDev = application.container.getAllSensorsUseCaseDev
 
                 MySensorViewModel(
                     settingsRepository = settingsRepository,
-                    getAllSensorsUseCase = getAllSensorsUseCase
+                    getAllSensorsUseCase = getAllSensorsUseCase,
+                    getAllSensorsUseCaseDev = getAllSensorsUseCaseDev
 
                 )
             }
