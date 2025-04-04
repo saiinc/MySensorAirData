@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -27,13 +28,13 @@ import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import com.saionji.mysensor.ui.MySensorUiState
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
 import com.saionji.mysensor.data.SettingsApp
+import com.saionji.mysensor.data.SettingsSensor
 import java.io.File
 import java.io.FileOutputStream
 
@@ -41,7 +42,7 @@ import java.io.FileOutputStream
 @Composable
 fun ShareScreen(
     settingsApp: SettingsApp,
-    mySensorUiState: MySensorUiState,
+    settingsItems: State<List<SettingsSensor>>,
     onBitmapGenerated: (Bitmap?) -> Unit
 ) {
     var graphicsLayer = rememberGraphicsLayer()
@@ -73,11 +74,6 @@ fun ShareScreen(
                 .requiredWidth(400.dp)
         ) {
             // The content being recorded
-            val pollutionDataList = if (mySensorUiState is MySensorUiState.Success) {
-                mySensorUiState.getVal
-            } else {
-                emptyList()
-            }
             Surface(modifier = Modifier
                 .fillMaxSize()
                 .onGloballyPositioned { layoutCoordinates ->
@@ -87,7 +83,7 @@ fun ShareScreen(
             ){
                 PollutionDashboardShare(
                     settingsApp = settingsApp,
-                    pollutionDataList = pollutionDataList
+                    pollutionDataList = settingsItems
                 )
             }
         }

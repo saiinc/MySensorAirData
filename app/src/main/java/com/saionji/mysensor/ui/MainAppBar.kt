@@ -7,7 +7,6 @@ package com.saionji.mysensor.ui
 import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.res.stringResource
 import com.saionji.mysensor.R
 import com.saionji.mysensor.data.SettingsApp
@@ -25,7 +25,7 @@ import com.saionji.mysensor.data.SettingsSensor
 @Composable
 fun MainAppBar(
     optionsBoxState: OptionsBoxState,
-    settingsItems: List<SettingsSensor>,
+    sensorsOptions: State<List<SettingsSensor>>,
     settingsApp: SettingsApp,
     onTextChange: (String) -> Unit,
     onAppSettingsChange: (SettingsApp) -> Unit,
@@ -34,8 +34,7 @@ fun MainAppBar(
     onRemoveClicked: (SettingsSensor) -> Unit,
     onEditSensorId: (Int, String) -> Unit,
     onEditSensorDescription: (Int, String) -> Unit,
-    onDoneClicked: (List<SettingsSensor>, SettingsApp) -> Unit,
-    onRefreshClicked: (List<SettingsSensor>) -> Unit,
+    onDoneClicked: (State<List<SettingsSensor>>, SettingsApp) -> Unit,
     onOptionsBoxTriggered: () -> Unit,
     onAboutClicked: () -> Unit,
     onShareClicked: () -> Unit
@@ -44,22 +43,18 @@ fun MainAppBar(
         OptionsBoxState.CLOSED -> {
             ClosedAppBar (
                 onSettingsClicked = onOptionsBoxTriggered,
-                onRefreshClicked = onRefreshClicked,
                 onAboutClicked = onAboutClicked,
-                settingsItems = settingsItems,
                 onShareClicked = onShareClicked
             )
         }
         OptionsBoxState.OPENED -> {
             ClosedAppBar (
                 onSettingsClicked = onOptionsBoxTriggered,
-                onRefreshClicked = onRefreshClicked,
                 onAboutClicked = onAboutClicked,
-                settingsItems = settingsItems,
                 onShareClicked = onShareClicked
             )
             CustomDialog(
-                settingsItems = settingsItems,
+                sensorsOptions = sensorsOptions,
                 settingsApp = settingsApp,
                 onTextChange = onTextChange,
                 onAppSettingsChange = onAppSettingsChange,
@@ -84,10 +79,8 @@ fun MainAppBar(
 @Composable
 fun ClosedAppBar(
     onSettingsClicked: () -> Unit,
-    onRefreshClicked: (List<SettingsSensor>) -> Unit,
     onAboutClicked: () -> Unit,
     onShareClicked: () -> Unit,
-    settingsItems: List<SettingsSensor>,
 ) {
     TopAppBar(
         title = {
@@ -96,17 +89,6 @@ fun ClosedAppBar(
             )
         },
         actions = {
-            IconButton(
-                onClick = {
-                    onRefreshClicked(settingsItems)
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Refresh,
-                    contentDescription = "RefreshIcon"
-
-                )
-            }
             IconButton(
                 onClick = {
                     onShareClicked()
