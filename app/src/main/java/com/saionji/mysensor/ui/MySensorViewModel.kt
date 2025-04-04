@@ -6,10 +6,7 @@ package com.saionji.mysensor.ui
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -17,39 +14,34 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.saionji.mysensor.MySensorApplication
-import com.saionji.mysensor.data.MyDevice
+import com.saionji.mysensor.data.MySensor
 import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsRepository
 import com.saionji.mysensor.data.SettingsSensor
-import com.saionji.mysensor.domain.GetAllSensorsUseCase
-import com.saionji.mysensor.domain.GetAllSensorsUseCaseDev
+import com.saionji.mysensor.domain.GetSensorValuesUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
-import java.io.IOException
-import java.net.HttpRetryException
 
-sealed interface MySensorUiState {
-    data class Success(val getVal: List<MyDevice>) : MySensorUiState
-    object Error : MySensorUiState
-    object Loading : MySensorUiState
-}
 
 class MySensorViewModel(
     private val settingsRepository: SettingsRepository,
-    private val getAllSensorsUseCase: GetAllSensorsUseCase,
-    private val getAllSensorsUseCaseDev: GetAllSensorsUseCaseDev
+    private val getSensorValuesUseCase: GetSensorValuesUseCase
 ) : ViewModel() {
-
-    var mySensorUiState: MySensorUiState by mutableStateOf(MySensorUiState.Loading)
-        private set
 
     private val _optionsBoxState: MutableState<OptionsBoxState> =
         mutableStateOf(value = OptionsBoxState.CLOSED)
     val optionsBoxState: State<OptionsBoxState> = _optionsBoxState
+
+    private val _isRefreshing = MutableStateFlow(false)
+    val isRefreshing = _isRefreshing.asStateFlow()
 
     private val _sensorIdTextState: MutableState<String> =
         mutableStateOf(value = "")
@@ -59,11 +51,21 @@ class MySensorViewModel(
         mutableStateOf(value = SettingsApp(true))
     val settingsApp: State<SettingsApp> = _settingsApp
 
-    private val _settingsItems: MutableList<SettingsSensor> = mutableStateListOf()
-    val settingsItems: List<SettingsSensor> = _settingsItems
+    private val _settingsItems = MutableStateFlow<List<SettingsSensor>>(emptyList())
+    val settingsItems: StateFlow<List<SettingsSensor>> get() = _settingsItems
+
+    private val _sensorsOptions = MutableStateFlow<List<SettingsSensor>>(emptyList())
+    val sensorsOptions: StateFlow<List<SettingsSensor>> get() = _sensorsOptions
 
     private val _navigationEvent = MutableSharedFlow<String>()
     val navigationEvent = _navigationEvent.asSharedFlow()
+
+    fun refresh() = viewModelScope.launch {
+        _isRefreshing.update { true }
+        getDeviceSensors()
+        delay(1500)
+        _isRefreshing.update { false }
+    }
 
     fun navigateTo(screen: String) {
         viewModelScope.launch {
@@ -76,26 +78,6 @@ class MySensorViewModel(
 
     fun setShowShareScreen(value: Boolean) {
         _showShareScreen.value = value
-    }
-
-    fun addSettingsItem() {
-        _settingsItems.add(SettingsSensor(id = "", description = "", emptyList()))
-    }
-
-    fun removeSettingsItem(settingsSensorItem: SettingsSensor) {
-        _settingsItems.remove(settingsSensorItem)
-    }
-
-    fun updateSettingsItemId(index: Int, settingsSensorItemId: String) {
-        if (index in _settingsItems.indices) {
-            _settingsItems[index].id = settingsSensorItemId
-        }
-    }
-
-    fun updateSettingsItemDescription(index: Int, settingsSensorItemDescription: String) {
-        if (index in _settingsItems.indices) {
-            _settingsItems[index].description = settingsSensorItemDescription
-        }
     }
 
     fun updateSettingsAppState(newValue: SettingsApp) {
@@ -115,9 +97,42 @@ class MySensorViewModel(
         }
     }
 
-    fun saveSettings(mySettings: List<SettingsSensor>) {
+    fun saveSensors(sensors: List<SettingsSensor>) {
         viewModelScope.launch {
-            settingsRepository.saveSettings(mySettings)
+            settingsRepository.saveSettings(sensors)
+        }
+    }
+
+    fun sensorsLoad(sensors: List<SettingsSensor>) {
+        _settingsItems.value = sensors
+        _sensorsOptions.value = emptyList()
+    }
+
+    fun sensorsOptionsLoad() {
+        _sensorsOptions.value = _settingsItems.value
+    }
+
+    fun addSensorOptions() {
+        _sensorsOptions.value += SettingsSensor(id = "", description = "", emptyList())
+    }
+
+    fun removeSensorOptions(settingsSensorItem: SettingsSensor) {
+        _sensorsOptions.value -= settingsSensorItem
+    }
+
+    fun updateSensorOptionsItemId(index: Int, settingsSensorItemId: String) {
+        _sensorsOptions.update { list ->
+            list.mapIndexed { i, item ->
+                if (i == index) item.copy(id = settingsSensorItemId) else item
+            }
+        }
+    }
+
+    fun updateSensorOptionsItemDescription(index: Int, settingsSensorItemDescription: String) {
+        _sensorsOptions.update { list ->
+            list.mapIndexed { i, item ->
+                if (i == index) item.copy(description = settingsSensorItemDescription) else item
+            }
         }
     }
 
@@ -127,9 +142,8 @@ class MySensorViewModel(
     private fun initLoad() {
         viewModelScope.launch(Dispatchers.Main) {
             settingsRepository.getSettings().collectLatest { mySettings ->
-                _settingsItems.clear()
-                _settingsItems.addAll(mySettings)
-                getMySensor(_settingsItems)
+                _settingsItems.value = mySettings
+                getDeviceSensors()
             }
         }
         viewModelScope.launch(Dispatchers.Main) {
@@ -147,26 +161,28 @@ class MySensorViewModel(
         }
     }
 
-    fun resetSettings() {
-        viewModelScope.launch(Dispatchers.Main) {
-            settingsRepository.getSettings().collectLatest {
-                _settingsItems.clear()
-                _settingsItems.addAll(it)
-            }
-        }
-    }
-
-    fun getMySensor(devices: List<SettingsSensor> ) {
+    fun getDeviceSensors() {
         viewModelScope.launch {
-            mySensorUiState = MySensorUiState.Loading
-            mySensorUiState = try {
-                MySensorUiState.Success(getAllSensorsUseCase(devices))
-            } catch (e: IOException) {
-                MySensorUiState.Error
-            } catch (e: HttpRetryException) {
-                MySensorUiState.Error
-            } catch (e: HttpException) {
-                MySensorUiState.Error
+            if ((_settingsItems.value.size == 1) and ((_settingsItems.value[0].id == "") and (_settingsItems.value[0].description == ""))) {
+                _settingsItems.value[0].deviceSensors = listOf(MySensor(
+                    valueType = "Please tap the settings icon to add your sensor IDs.",
+                    value = ""
+                ))
+            }
+            else
+            _settingsItems.value.forEach { item ->
+                launch {
+                    val updatedSensors = getSensorValuesUseCase(item)
+                    _settingsItems.update { currentList ->
+                        currentList.map { currentItem ->
+                            if (currentItem.id == item.id) {
+                                currentItem.copy(deviceSensors = updatedSensors)
+                            } else {
+                                currentItem
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -176,13 +192,11 @@ class MySensorViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as MySensorApplication)
                 val settingsRepository = application.container.settingsRepository
-                val getAllSensorsUseCase = application.container.getAllSensorsUseCase
-                val getAllSensorsUseCaseDev = application.container.getAllSensorsUseCaseDev
+                val getSensorValuesUseCase = application.container.getSensorValuesUseCase
 
                 MySensorViewModel(
                     settingsRepository = settingsRepository,
-                    getAllSensorsUseCase = getAllSensorsUseCase,
-                    getAllSensorsUseCaseDev = getAllSensorsUseCaseDev
+                    getSensorValuesUseCase = getSensorValuesUseCase
 
                 )
             }

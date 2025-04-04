@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -62,7 +63,7 @@ import com.saionji.mysensor.data.SettingsSensor
 @SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CustomDialog(
-    settingsItems: List<SettingsSensor>,
+    sensorsOptions: State<List<SettingsSensor>>,
     settingsApp: SettingsApp,
     onTextChange: (String) -> Unit,
     onAppSettingsChange: (SettingsApp) -> Unit,
@@ -70,12 +71,12 @@ fun CustomDialog(
     onRemoveClicked: (SettingsSensor) -> Unit,
     onEditSensorId: (Int, String) -> Unit,
     onEditSensorDescription: (Int, String) -> Unit,
-    onDoneClicked: (List<SettingsSensor>, SettingsApp) -> Unit,
+    onDoneClicked: (State<List<SettingsSensor>>, SettingsApp) -> Unit,
     onCloseClicked: () -> Unit,
     setShowDialog: (Boolean) -> Unit,
 
     ) {
-    if (settingsItems.isEmpty()) {
+    if (sensorsOptions.value.isEmpty()) {
         onAddClicked()
     }
     //val txtFieldError = remember { mutableStateOf("") }
@@ -165,11 +166,10 @@ fun CustomDialog(
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        settingsItems.forEachIndexed { index, sensorIdObject ->
+                        sensorsOptions.value.forEachIndexed { index, sensorIdObject ->
                             Input(
-                                settingsItems = settingsItems,
+                                sensorsOptions = sensorsOptions,
                                 onTextChange = onTextChange,
-                                index = index,
                                 sensorIdObject = sensorIdObject,
                                 onEditId = { editedId ->
                                     onEditSensorId(index, editedId)
@@ -186,7 +186,7 @@ fun CustomDialog(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    if (settingsItems.size > 6) {
+                    if (sensorsOptions.value.size > 6) {
                         IconButton(
                             modifier = Modifier
                                 .border(
@@ -237,7 +237,7 @@ fun CustomDialog(
                                 return@Button
                             }*/
                                 onDoneClicked(
-                                    settingsItems,
+                                    sensorsOptions,
                                     settingsApp
                                 )
                                 //setShowDialog(false)
@@ -260,9 +260,8 @@ fun CustomDialog(
 
 @Composable
 fun Input(
-    settingsItems: List<SettingsSensor>,
+    sensorsOptions: State<List<SettingsSensor>>,
     onTextChange: (String) -> Unit,
-    index: Int,
     sensorIdObject: SettingsSensor,
     onEditId: (String) -> (Unit),
     onEditDescription: (String) -> (Unit),
@@ -300,7 +299,7 @@ fun Input(
             ),
             placeholder = { Text(text = stringResource(id = R.string.settings_sensor_id)) },
             maxLines = 1,
-            value = txtFieldId.value,
+            value = sensorIdObject.id,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -329,7 +328,7 @@ fun Input(
             ),
             placeholder = {Text(text = stringResource(id = R.string.settings_sensor_description))},
             maxLines = 1,
-            value = txtFieldDescription.value,
+            value = sensorIdObject.description,
             onValueChange = { value ->
                 txtFieldDescription.value = value.take(23)
                 onEditDescription(value.take(23))
@@ -339,13 +338,14 @@ fun Input(
                 imeAction = ImeAction.Done
             )
         )
-        if ((index == settingsItems.size - 1) and (settingsItems.size > 1)) {
+        if ((sensorsOptions.value.size == 1)) {
             IconButton(
                 modifier = Modifier.padding(vertical = 2.dp),
-                onClick = { onRemoveClicked() }
-                ) {
+                onClick = { onRemoveClicked() },
+                enabled = false) {
                 Icon(
                     imageVector = Icons.Default.Clear,
+                    //tint = Color.Transparent,
                     contentDescription = "Delete"
                 )
             }
@@ -353,10 +353,9 @@ fun Input(
             IconButton(
                 modifier = Modifier.padding(vertical = 2.dp),
                 onClick = { onRemoveClicked() },
-                enabled = false) {
+                enabled = true) {
                 Icon(
                     imageVector = Icons.Default.Clear,
-                    tint = Color.Transparent,
                     contentDescription = "Delete"
                 )
             }

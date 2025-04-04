@@ -11,13 +11,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
 import com.saionji.mysensor.ui.screens.ShareScreen
@@ -32,7 +32,9 @@ fun SensorsApp(
         viewModel(factory = MySensorViewModel.Factory)
     val optionsBoxState = mySensorViewModel.optionsBoxState
     val settingsApp = mySensorViewModel.settingsApp.value
-    val settingsItems = mySensorViewModel.settingsItems
+    val settingsItems = mySensorViewModel.settingsItems.collectAsState()
+    val sensorsOptions = mySensorViewModel.sensorsOptions.collectAsState()
+    val isRefreshing = mySensorViewModel.isRefreshing.collectAsState().value
 
     val context = LocalContext.current
 
@@ -51,7 +53,7 @@ fun SensorsApp(
                 topBar = {
                     MainAppBar(
                         optionsBoxState = optionsBoxState.value,
-                        settingsItems = settingsItems,
+                        sensorsOptions = sensorsOptions,
                         settingsApp = settingsApp,
                         onTextChange = {
                             mySensorViewModel.updateSensorIdTextState(newValue = it)
@@ -61,32 +63,31 @@ fun SensorsApp(
                         },
                         onCloseClicked = {
                             mySensorViewModel.resetAppSettings()
-                            mySensorViewModel.resetSettings()
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
                         },
-                        onDoneClicked = { mySettings, settingsApp ->
+                        onDoneClicked = { sensorsOptions, settingsApp ->
                             mySensorViewModel.saveAppSettings(settingsApp)
-                            mySensorViewModel.saveSettings(mySettings)
-                            mySensorViewModel.getMySensor(mySettings)
+                            val updatedSensors = sensorsOptions.value.map { it.copy() }
+                            mySensorViewModel.saveSensors(updatedSensors)
+                            mySensorViewModel.sensorsLoad(updatedSensors)
+                            mySensorViewModel.getDeviceSensors()
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
                         },
                         onAddClicked = {
-                            mySensorViewModel.addSettingsItem()
+                            mySensorViewModel.addSensorOptions()
                         },
                         onRemoveClicked = {
-                            mySensorViewModel.removeSettingsItem(it)
+                            mySensorViewModel.removeSensorOptions(it)
                         },
                         onEditSensorId = { index, settingsSensorItemId ->
-                            mySensorViewModel.updateSettingsItemId(index = index, settingsSensorItemId = settingsSensorItemId)
+                            mySensorViewModel.updateSensorOptionsItemId(index = index, settingsSensorItemId = settingsSensorItemId)
                         },
                         onEditSensorDescription = { index, settingsSensorItemDescription->
-                            mySensorViewModel.updateSettingsItemDescription(index = index, settingsSensorItemDescription = settingsSensorItemDescription)
+                            mySensorViewModel.updateSensorOptionsItemDescription(index = index, settingsSensorItemDescription = settingsSensorItemDescription)
                         },
                         onOptionsBoxTriggered = {
+                            mySensorViewModel.sensorsOptionsLoad()
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.OPENED)
-                        },
-                        onRefreshClicked = { mySettings ->
-                            mySensorViewModel.getMySensor(mySettings)
                         },
                         onAboutClicked = {
                             mySensorViewModel.navigateTo("about")
@@ -102,9 +103,9 @@ fun SensorsApp(
                     color = MaterialTheme.colorScheme.background
                 ) {
                     HomeScreen(
-                        mySensorUiState = mySensorViewModel.mySensorUiState,
-                        retryAction = { mySensorViewModel.getMySensor(settingsItems) },
-                        modifier = modifier
+                        settingsItems = settingsItems,
+                        isRefreshing = isRefreshing,
+                        onRefresh = mySensorViewModel::refresh
                     )
                 }
             }
@@ -118,7 +119,7 @@ fun SensorsApp(
     if (mySensorViewModel.showShareScreen.value) {
         ShareScreen(
             settingsApp = mySensorViewModel.settingsApp.value,
-            mySensorUiState = mySensorViewModel.mySensorUiState,
+            settingsItems = settingsItems,
             onBitmapGenerated = { bitmap ->
                 if (bitmap != null) {
                     saveBitmapToCache(context, bitmap)?.let { uri ->

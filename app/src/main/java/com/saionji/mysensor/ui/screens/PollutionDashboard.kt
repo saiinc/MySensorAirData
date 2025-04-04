@@ -19,23 +19,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.saionji.mysensor.data.MyDevice
+import com.saionji.mysensor.data.SettingsSensor
 
 @Composable
-fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
+fun PollutionDashboard(pollutionDataList: State<List<SettingsSensor>>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
     ) {
         // Рендерим карточки для каждого элемента списка
-        items(pollutionDataList.size) {index ->
-            PollutionGrid(data = pollutionDataList[index])
+        items(pollutionDataList.value.size) {index ->
+            PollutionGrid(data = pollutionDataList.value[index])
         }
     }
 }
@@ -44,7 +45,7 @@ fun PollutionDashboard(pollutionDataList: List<MyDevice>) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun PollutionGrid(data: MyDevice) {
+fun PollutionGrid(data: SettingsSensor) {
     Column(
         modifier = Modifier
             .padding(12.dp)
@@ -91,7 +92,7 @@ fun PollutionGrid(data: MyDevice) {
                 .padding(bottom = 8.dp),
             //mainAxisAlignment = FlowMainAxisAlignment.Start,
         ) {
-            data.deviceSensors.forEach { sensor ->
+            data.deviceSensors?.forEach { sensor ->
                 Card(
                     modifier = Modifier
                         .padding(start = 28.dp)
