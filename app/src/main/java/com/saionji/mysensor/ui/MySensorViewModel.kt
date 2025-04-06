@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 
 class MySensorViewModel(
@@ -172,13 +173,28 @@ class MySensorViewModel(
             else
             _settingsItems.value.forEach { item ->
                 launch {
-                    val updatedSensors = getSensorValuesUseCase(item)
-                    _settingsItems.update { currentList ->
-                        currentList.map { currentItem ->
-                            if (currentItem.id == item.id) {
-                                currentItem.copy(deviceSensors = updatedSensors)
-                            } else {
-                                currentItem
+                    try {
+                        val updatedSensors = getSensorValuesUseCase(item)
+                        _settingsItems.update { currentList ->
+                            currentList.map { currentItem ->
+                                if (currentItem.id == item.id) {
+                                    currentItem.copy(deviceSensors = updatedSensors)
+                                } else {
+                                    currentItem
+                                }
+                            }
+                        }
+                    } catch (_: IOException) {
+                        _settingsItems.update { currentList ->
+                            currentList.map { currentItem ->
+                                if (currentItem.id == item.id) {
+                                    currentItem.copy(deviceSensors = item.deviceSensors.map { sensorItem ->
+                                        sensorItem.copy(value = "—", valueType = sensorItem.valueType)
+                                    }
+                                    )
+                                } else {
+                                    currentItem
+                                }
                             }
                         }
                     }
