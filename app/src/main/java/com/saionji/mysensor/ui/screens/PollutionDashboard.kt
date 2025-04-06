@@ -29,7 +29,10 @@ import androidx.compose.ui.unit.sp
 import com.saionji.mysensor.data.SettingsSensor
 
 @Composable
-fun PollutionDashboard(pollutionDataList: State<List<SettingsSensor>>) {
+fun PollutionDashboard(
+    modfier: Modifier,
+    pollutionDataList: State<List<SettingsSensor>>
+) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
