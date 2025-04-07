@@ -18,4 +18,6 @@
     <string name="settings_sensor_id">Enter id</string>
 
     <string name="settings_sensor_description">Description (optional)</string>
+
+    <string name="error_loading">Loading error</string>
 </resources>
