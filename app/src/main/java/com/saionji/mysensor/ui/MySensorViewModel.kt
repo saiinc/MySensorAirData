@@ -44,6 +44,9 @@ class MySensorViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
+    private val _showErrorMessage = MutableStateFlow(false)
+    val showErrorMessage: StateFlow<Boolean> = _showErrorMessage
+
     private val _sensorIdTextState: MutableState<String> =
         mutableStateOf(value = "")
     val sensorIdTextState: State<String> = _sensorIdTextState
@@ -66,6 +69,10 @@ class MySensorViewModel(
         getDeviceSensors()
         delay(1500)
         _isRefreshing.update { false }
+    }
+
+    fun setShowErrorMessage(value: Boolean) {
+        _showErrorMessage.value = value
     }
 
     fun navigateTo(screen: String) {
@@ -143,7 +150,10 @@ class MySensorViewModel(
     private fun initLoad() {
         viewModelScope.launch(Dispatchers.Main) {
             settingsRepository.getSettings().collectLatest { mySettings ->
-                _settingsItems.value = mySettings
+                if (mySettings.isNotEmpty())
+                    _settingsItems.value = mySettings
+                else
+                    _settingsItems.value = listOf(SettingsSensor("", "", emptyList()))
                 getDeviceSensors()
             }
         }
@@ -170,35 +180,42 @@ class MySensorViewModel(
                     value = ""
                 ))
             }
-            else
-            _settingsItems.value.forEach { item ->
-                launch {
-                    try {
-                        val updatedSensors = getSensorValuesUseCase(item)
-                        _settingsItems.update { currentList ->
-                            currentList.map { currentItem ->
-                                if (currentItem.id == item.id) {
-                                    currentItem.copy(deviceSensors = updatedSensors)
-                                } else {
-                                    currentItem
+            else {
+                _settingsItems.value.forEach { item ->
+                    launch {
+                        try {
+                            val updatedSensors = getSensorValuesUseCase(item)
+                            _settingsItems.update { currentList ->
+                                currentList.map { currentItem ->
+                                    if (currentItem.id == item.id) {
+                                        currentItem.copy(deviceSensors = updatedSensors)
+                                    } else {
+                                        currentItem
+                                    }
                                 }
                             }
-                        }
-                    } catch (_: IOException) {
-                        _settingsItems.update { currentList ->
-                            currentList.map { currentItem ->
-                                if (currentItem.id == item.id) {
-                                    currentItem.copy(deviceSensors = item.deviceSensors.map { sensorItem ->
-                                        sensorItem.copy(value = "—", valueType = sensorItem.valueType)
+                        } catch (_: IOException) {
+                            setShowErrorMessage(true)
+                            _settingsItems.update { currentList ->
+                                currentList.map { currentItem ->
+                                    if (currentItem.id == item.id) {
+                                        currentItem.copy(deviceSensors = item.deviceSensors.map { sensorItem ->
+                                            sensorItem.copy(
+                                                value = "—",
+                                                valueType = sensorItem.valueType
+                                            )
+                                        }
+                                        )
+                                    } else {
+                                        currentItem
                                     }
-                                    )
-                                } else {
-                                    currentItem
                                 }
                             }
                         }
                     }
                 }
+                delay(5000)
+                saveSensors(settingsItems.value.map { it.copy() })
             }
         }
     }

@@ -4,6 +4,8 @@
 
 package com.saionji.mysensor.ui
 
+import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -12,17 +14,25 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.saionji.mysensor.R
 import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
 import com.saionji.mysensor.ui.screens.ShareScreen
 import com.saionji.mysensor.ui.screens.saveBitmapToCache
 import com.saionji.mysensor.ui.screens.shareUri
+import kotlinx.coroutines.delay
 
 @Composable
 fun SensorsApp(
@@ -35,6 +45,11 @@ fun SensorsApp(
     val settingsItems = mySensorViewModel.settingsItems.collectAsState()
     val sensorsOptions = mySensorViewModel.sensorsOptions.collectAsState()
     val isRefreshing = mySensorViewModel.isRefreshing.collectAsState().value
+    val showError by mySensorViewModel.showErrorMessage.collectAsState()
+    val backgroundColor = MaterialTheme.colorScheme.surface.toArgb()
+    val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
+    val strokeColor = MaterialTheme.colorScheme.outline.toArgb()
+    val errorMessage = stringResource(R.string.error_loading)
 
     val context = LocalContext.current
 
@@ -44,6 +59,19 @@ fun SensorsApp(
     LaunchedEffect(mySensorViewModel.navigationEvent) {
         mySensorViewModel.navigationEvent.collect { screen ->
             navController.navigate(screen)
+        }
+    }
+    LaunchedEffect(showError) {
+        if (showError) {
+            errorPopUp(
+                context = context,
+                message = errorMessage,
+                backgroundColor = backgroundColor,
+                textColor = textColor,
+                strokeColor = strokeColor
+            )
+            delay(3000)
+            mySensorViewModel.setShowErrorMessage(false)
         }
     }
     NavHost(navController = navController, startDestination = "main") {
@@ -99,7 +127,8 @@ fun SensorsApp(
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(it),
+                        .padding(it)
+                        .zIndex(0f),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     HomeScreen(
