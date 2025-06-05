@@ -64,26 +64,26 @@ fun PollutionGrid(data: SettingsSensor) {
         // Заголовок и id
         Row(
             modifier = Modifier
-                .padding(
-                    start = 22.dp,
-                    top = 12.dp,
-                    end = 14.dp
-                )
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(start = 22.dp, top = 12.dp, end = 14.dp)
+                .fillMaxWidth()
         ) {
             data.description?.let {
                 Text(
                     text = it,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .weight(1f)  // Занимает оставшееся место
+                        .padding(end = 8.dp),
+                    maxLines = Int.MAX_VALUE
                 )
             }
             data.id?.let {
                 Text(
                     text = it,
                     fontSize = 14.sp,
-                    modifier = Modifier.padding(bottom = 6.dp)
+                    modifier = Modifier
+                        .align(Alignment.Top)  // Выравнивание по верхнему краю
                 )
             }
         }

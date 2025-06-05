@@ -4,36 +4,47 @@
 
 package com.saionji.mysensor.ui
 
-import android.widget.Toast
-import androidx.compose.foundation.layout.Box
+import android.Manifest
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.ViewComfy
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.saionji.mysensor.R
 import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
+import com.saionji.mysensor.ui.screens.MapScreen
 import com.saionji.mysensor.ui.screens.ShareScreen
 import com.saionji.mysensor.ui.screens.saveBitmapToCache
 import com.saionji.mysensor.ui.screens.shareUri
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SensorsApp(
     modifier: Modifier = Modifier
@@ -46,12 +57,22 @@ fun SensorsApp(
     val sensorsOptions = mySensorViewModel.sensorsOptions.collectAsState()
     val isRefreshing = mySensorViewModel.isRefreshing.collectAsState().value
     val showError by mySensorViewModel.showErrorMessage.collectAsState()
+    val currentScreen by mySensorViewModel.currentScreen.collectAsState()
+    val currentLocation by mySensorViewModel.currentLocation
     val backgroundColor = MaterialTheme.colorScheme.surface.toArgb()
     val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
     val strokeColor = MaterialTheme.colorScheme.outline.toArgb()
     val errorMessage = stringResource(R.string.error_loading)
 
     val context = LocalContext.current
+
+    val locationPermissionsState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    )
+    val allPermissionsGranted = locationPermissionsState.permissions.all { it.status.isGranted }
 
     val navController = rememberNavController()
 
@@ -61,6 +82,7 @@ fun SensorsApp(
             navController.navigate(screen)
         }
     }
+
     LaunchedEffect(showError) {
         if (showError) {
             errorPopUp(
@@ -122,6 +144,22 @@ fun SensorsApp(
                         },
                         onShareClicked = { mySensorViewModel.setShowShareScreen(true) },
                     )
+                },
+                bottomBar = {
+                    NavigationBar {
+                        NavigationBarItem(
+                            selected = currentScreen is Screen.Dashboard,
+                            onClick = { mySensorViewModel.switchToScreen(Screen.Dashboard) },
+                            icon = { Icon(painter = painterResource(id = R.drawable.lists_24px), contentDescription = "Dashboard") },
+                            label = { Text("Dashboard") }
+                        )
+                        NavigationBarItem(
+                            selected = currentScreen is Screen.Map,
+                            onClick = { mySensorViewModel.switchToScreen(Screen.Map) },
+                            icon = { Icon(Icons.Filled.Map, contentDescription = "Map") },
+                            label = { Text("Map") }
+                        )
+                    }
                 }
             ) {
                 Surface(
@@ -131,11 +169,45 @@ fun SensorsApp(
                         .zIndex(0f),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen(
-                        settingsItems = settingsItems,
-                        isRefreshing = isRefreshing,
-                        onRefresh = mySensorViewModel::refresh
-                    )
+                    when (currentScreen) {
+                        Screen.Dashboard -> HomeScreen(
+                            settingsItems = settingsItems,
+                            isRefreshing = isRefreshing,
+                            onRefresh = mySensorViewModel::refresh
+                        )
+                        Screen.Map -> {
+                            // Первый запуск: если не даны — запрашиваем
+                            LaunchedEffect(Unit) {
+                                if (!allPermissionsGranted) {
+                                    locationPermissionsState.launchMultiplePermissionRequest()
+                                } else {
+                                    mySensorViewModel.updateCurrentLocation(context)
+                                }
+                            }
+
+                            // Если статус разрешений изменился
+                            LaunchedEffect(locationPermissionsState.permissions) {
+                                if (allPermissionsGranted) {
+                                    mySensorViewModel.updateCurrentLocation(context)
+                                }
+                            }
+                            MapScreen(
+                                currentLocation = currentLocation,
+                                context = context,
+                                sensorList = mySensorViewModel.sensorListByArea.collectAsState().value,
+                                settingsItems = settingsItems,
+                                onAreaChanged = { boundingBox ->
+                                    mySensorViewModel.loadSensorsForArea(boundingBox)
+                                },
+                                onAddToDashboard = { sensor, address ->
+                                    mySensorViewModel.addSensorDashboardFromMap(sensor, address)
+                                },
+                                onRemoveFromDashboard = { sensor ->
+                                    mySensorViewModel.removeSensorDashboardFromMap(sensor)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

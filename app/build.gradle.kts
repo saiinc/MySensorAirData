@@ -35,7 +35,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -101,7 +102,12 @@ dependencies {
     implementation("com.google.firebase:protolite-well-known-types:18.0.0")
 
     implementation("androidx.navigation:navigation-compose:2.8.4")
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
+    implementation("com.github.MKergall:OSMBonusPack:6.9.0")
     implementation("androidx.compose.ui:ui-test-android:1.7.8")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
+    implementation("androidx.preference:preference-ktx:1.2.1")
     //implementation("androidx.appcompat:appcompat:1.7.0")
 
     testImplementation("junit:junit:4.13.2")

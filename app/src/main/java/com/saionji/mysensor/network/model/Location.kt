@@ -10,12 +10,12 @@ import com.google.gson.annotations.SerializedName
 
 data class Location (
 
-  @SerializedName("longitude"      ) var longitude     : String? = null,
-  @SerializedName("exact_location" ) var exactLocation : Int?    = null,
-  @SerializedName("id"             ) var id            : Int?    = null,
-  @SerializedName("latitude"       ) var latitude      : String? = null,
-  @SerializedName("indoor"         ) var indoor        : Int?    = null,
-  @SerializedName("altitude"       ) var altitude      : String? = null,
-  @SerializedName("country"        ) var country       : String? = null
+  @SerializedName("longitude"      ) var longitude     : Double = 0.0,
+  @SerializedName("exact_location" ) var exactLocation : Int    = 0,
+  @SerializedName("id"             ) var id            : Int    = 0,
+  @SerializedName("latitude"       ) var latitude      : Double = 0.0,
+  @SerializedName("indoor"         ) var indoor        : Int    = 0,
+  @SerializedName("altitude"       ) var altitude      : String = "",
+  @SerializedName("country"        ) var country       : String = ""
 
 )
