@@ -14,6 +14,6 @@ data class MySensorRawData (
   @SerializedName("id"               ) var id               : String?                        = null,
   @SerializedName("sensordatavalues" ) var sensordatavalues : ArrayList<Sensordatavalues> = arrayListOf(),
   @SerializedName("sensor"           ) var sensor           : Sensor?                     = Sensor(),
-  @SerializedName("location"         ) var location         : Location?                   = Location()
+  @SerializedName("location"         ) var location         : Location                    = Location()
 
 )

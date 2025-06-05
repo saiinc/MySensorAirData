@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
@@ -298,7 +299,7 @@ fun Input(
                 unfocusedIndicatorColor = Color.Transparent,
             ),
             placeholder = { Text(text = stringResource(id = R.string.settings_sensor_id)) },
-            maxLines = 1,
+            maxLines = 2,
             value = sensorIdObject.id,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -312,7 +313,7 @@ fun Input(
         )
         TextField(
             modifier = Modifier
-                .weight(2f)
+                .weight(2.3f)
                 .padding(start = 2.dp)
                 .border(
                     BorderStroke(
@@ -327,7 +328,7 @@ fun Input(
                 unfocusedIndicatorColor = Color.Transparent
             ),
             placeholder = {Text(text = stringResource(id = R.string.settings_sensor_description))},
-            maxLines = 1,
+            maxLines = 3,
             value = sensorIdObject.description,
             onValueChange = { value ->
                 txtFieldDescription.value = value.take(23)
@@ -340,7 +341,9 @@ fun Input(
         )
         if ((sensorsOptions.value.size == 1)) {
             IconButton(
-                modifier = Modifier.padding(vertical = 2.dp),
+                modifier = Modifier
+                    .padding(vertical = 2.dp)
+                    .size(36.dp),
                 onClick = { onRemoveClicked() },
                 enabled = false) {
                 Icon(
@@ -351,7 +354,9 @@ fun Input(
             }
         } else {
             IconButton(
-                modifier = Modifier.padding(vertical = 2.dp),
+                modifier = Modifier
+                    .padding(vertical = 2.dp)
+                    .size(36.dp),
                 onClick = { onRemoveClicked() },
                 enabled = true) {
                 Icon(
