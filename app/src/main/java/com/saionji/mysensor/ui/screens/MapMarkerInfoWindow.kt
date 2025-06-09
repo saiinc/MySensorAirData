@@ -26,7 +26,7 @@ class MapMarkerInfoWindow(
     private val onRemoveFromDashboard: (MySensorRawData) -> Unit
 ) : InfoWindow(R.layout.custom_info_window, mapView) {
 
-    private var currentAddress = initialAddress ?: "Загрузка адреса..."
+    private var currentAddress = initialAddress ?: ""
 
     override fun onOpen(item: Any?) {
         val marker = item as? Marker ?: return
@@ -36,7 +36,7 @@ class MapMarkerInfoWindow(
 
         val position = marker.position
 
-        if (currentAddress == "Загрузка адреса...") {
+        if (currentAddress == "") {
             CoroutineScope(Dispatchers.Main).launch {
                 val newAddress = getAddressFromCoordinates(view.context, position.latitude, position.longitude)
                 currentAddress = newAddress

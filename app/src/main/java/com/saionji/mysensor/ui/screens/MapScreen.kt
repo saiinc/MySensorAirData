@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
+import com.saionji.mysensor.C
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.*
 import com.saionji.mysensor.network.model.MySensorRawData
@@ -89,7 +90,7 @@ fun MapScreen(
 
     var lastRequestedBox by remember { mutableStateOf<BoundingBox?>(null) }
     val valueTypes = listOf("PM2.5", "PM10", "temperature", "humidity", "pressure", "noise LAeq")
-    var selectedValueType by remember { mutableStateOf("PM2.5") }
+    var selectedValueType by remember { mutableStateOf(valueTypes[0]) }
     var expanded by remember { mutableStateOf(false) }
     val lastOpenedInfoWindow = remember { mutableStateOf<InfoWindow?>(null) }
     val addressCache = remember { mutableStateMapOf<String, String>() }
@@ -213,7 +214,7 @@ fun MapScreen(
                         val lon = sensor.location.longitude
                         val key = "$lat,$lon"
                         val geoPoint = GeoPoint(lat, lon)
-                        val address = addressCache[key] ?: "Загрузка адреса..."
+                        val address = addressCache[key] ?: ""
 
 
                         val marker = Marker(view).apply {
@@ -224,7 +225,7 @@ fun MapScreen(
                                 MapMarkerInfoWindow(
                                     mapView = map,
                                     isAdded = settingsItems.value.any { it.id == id.toString() },
-                                    isLimitReached = settingsItems.value.size >= 6,
+                                    isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
                                     id = id.toString(),
                                     initialAddress = address,
                                     valueType = selectedValueType,
@@ -254,7 +255,7 @@ fun MapScreen(
                                         MapMarkerInfoWindow(
                                             mapView = map,
                                             isAdded = settingsItems.value.any { it.id == id },
-                                            isLimitReached = settingsItems.value.size >= 6,
+                                            isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
                                             id = id,
                                             initialAddress = address,
                                             valueType = selectedValueType,
@@ -276,9 +277,9 @@ fun MapScreen(
                                         MapMarkerInfoWindow(
                                             mapView = map,
                                             isAdded = settingsItems.value.any { it.id == id },
-                                            isLimitReached = settingsItems.value.size >= 6,
+                                            isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
                                             id = id,
-                                            initialAddress = addressCache[key], // может быть null или "Загрузка адреса..."
+                                            initialAddress = addressCache[key], // может быть null или ""
                                             valueType = selectedValueType,
                                             value = value.toString(),
                                             onAddToDashboard = { sensor, address ->
@@ -303,7 +304,7 @@ fun MapScreen(
                                                 MapMarkerInfoWindow(
                                                     mapView = map,
                                                     isAdded = settingsItems.value.any { it.id == id },
-                                                    isLimitReached = settingsItems.value.size >= 6,
+                                                    isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
                                                     id = id,
                                                     initialAddress = resolved,
                                                     valueType = selectedValueType,

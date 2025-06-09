@@ -3,6 +3,7 @@ package com.saionji.mysensor.ui.screens
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 
 
@@ -146,6 +152,20 @@ fun AboutScreen(onBackClicked: () -> Unit) {
                 // Дополнительное описание
                 Text(
                     text = "Color ranges for other indicators (temperature, humidity, pressure, etc.) are taken from the sensor.community map.",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                Text(
+                    text = buildAnnotatedString{
+                        append("Build your DIY sensor and become part of the worldwide, opendata & civictech network. With airRohr you can measure air pollution yourself: ")
+                        withLink(
+                            LinkAnnotation.Url(
+                                "https://sensor.community/en/sensors/airrohr/",
+                                TextLinkStyles(style = SpanStyle(color = Color.Blue)))
+                        ) {
+                            append("https://sensor.community/en/sensors/airrohr/")
+                        }
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
