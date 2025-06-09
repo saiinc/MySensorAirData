@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.saionji.mysensor.C
 import com.saionji.mysensor.R
 import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsSensor
@@ -187,7 +188,7 @@ fun CustomDialog(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    if (sensorsOptions.value.size > 6) {
+                    if (sensorsOptions.value.size > C.DASHBOARD_SENSOR_LIMIT) {
                         IconButton(
                             modifier = Modifier
                                 .border(
