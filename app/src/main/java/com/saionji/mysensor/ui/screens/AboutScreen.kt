@@ -3,7 +3,6 @@ package com.saionji.mysensor.ui.screens
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
