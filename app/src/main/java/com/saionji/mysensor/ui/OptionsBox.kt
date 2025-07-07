@@ -188,7 +188,8 @@ fun CustomDialog(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    if (sensorsOptions.value.size > C.DASHBOARD_SENSOR_LIMIT) {
+                    if ((sensorsOptions.value.size > C.DASHBOARD_SENSOR_LIMIT) or
+                        ((sensorsOptions.value.size == 1) && ((sensorsOptions.value[0].id == "") && (sensorsOptions.value[0].description == "")))) {
                         IconButton(
                             modifier = Modifier
                                 .border(
@@ -231,25 +232,38 @@ fun CustomDialog(
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Box(modifier = Modifier.padding(40.dp, 0.dp, 40.dp, 0.dp)) {
-                        Button(
-                            onClick = {
-                                /*if (onTextChange.toString().isEmpty()) {
+                        if (!((sensorsOptions.value.size == 1) && ((sensorsOptions.value[0].id == "") && (sensorsOptions.value[0].description == "")))) {
+                            Button(
+                                onClick = {
+                                    /*if (onTextChange.toString().isEmpty()) {
                                 onTextChange("Field can not be empty")
                                 txtFieldError.value = "Field can not be empty"
                                 return@Button
                             }*/
-                                onDoneClicked(
-                                    sensorsOptions,
-                                    settingsApp
-                                )
-                                //setShowDialog(false)
-                            },
-                            shape = RoundedCornerShape(50.dp),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                        ) {
-                            Text(text = stringResource(id = R.string.settings_button))
+                                    onDoneClicked(
+                                        sensorsOptions,
+                                        settingsApp
+                                    )
+                                    //setShowDialog(false)
+                                },
+                                shape = RoundedCornerShape(50.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp)
+                            ) {
+                                Text(text = stringResource(id = R.string.settings_button))
+                            }
+                        } else {
+                            Button(
+                                enabled = false,
+                                onClick = {},
+                                shape = RoundedCornerShape(50.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(50.dp)
+                            ) {
+                                Text(text = stringResource(id = R.string.settings_button))
+                            }
                         }
                     }
                 }

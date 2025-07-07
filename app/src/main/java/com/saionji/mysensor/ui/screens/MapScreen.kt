@@ -269,7 +269,7 @@ fun MapScreen(
                                     m.showInfoWindow()
                                     lastOpenedInfoWindow.value = m.infoWindow
                                 } else {
-                                    // Пока нет адреса — покажем "Загрузка..." и начнём асинхронную загрузку
+                                    // Пока нет адреса — покажем пустую строку и начнём асинхронную загрузку
                                     m.infoWindow = mapView.value?.let { map ->
                                         MapMarkerInfoWindow(
                                             mapView = map,
@@ -491,10 +491,10 @@ suspend fun getAddressFromCoordinates(context: Context, lat: Double, lon: Double
                     address.countryName // страна
                 ).joinToString(", ")
             } else {
-                "Неизвестный адрес"
+                "Unknown address"
             }
         } catch (e: Exception) {
-            "Ошибка определения адреса"
+            "Error getting address"
         }
     }
 }

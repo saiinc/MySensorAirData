@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="error_loading">Error de carga</string>
+
+    <string name="add_sensor">Por favor, toca el ícono del mapa para añadir tu sensor</string>
 </resources>

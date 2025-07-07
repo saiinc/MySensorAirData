@@ -261,8 +261,8 @@ class MySensorViewModel(
             settingsRepository.getSettings().collectLatest { mySettings ->
                 if (mySettings.isNotEmpty())
                     _settingsItems.value = mySettings
-                else
-                    _settingsItems.value = listOf(SettingsSensor("", "", emptyList()))
+                //else
+                //    _settingsItems.value = listOf(SettingsSensor("", "", emptyList()))
                 getDeviceSensors()
             }
         }
@@ -283,13 +283,11 @@ class MySensorViewModel(
 
     fun getDeviceSensors() {
         viewModelScope.launch {
-            if ((_settingsItems.value.size == 1) and ((_settingsItems.value[0].id == "") and (_settingsItems.value[0].description == ""))) {
-                _settingsItems.value[0].deviceSensors = listOf(MySensor(
-                    valueType = "Please tap the settings icon to add your sensor IDs.",
-                    value = ""
-                ))
-            }
-            else {
+            //if ((_settingsItems.value.size == 1) and ((_settingsItems.value[0].id == "") and (_settingsItems.value[0].description == ""))) {
+            //    _settingsItems.value[0].description = "Please tap the map icon to add your sensor"
+            //}
+            //if (!((_settingsItems.value.size == 1) and ((_settingsItems.value[0].id == "") and (_settingsItems.value[0].description == "")))) {
+            if (_settingsItems.value.isNotEmpty()) {
                 _settingsItems.value.forEach { item ->
                     launch {
                         try {

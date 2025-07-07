@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="error_loading">Erreur de chargement</string>
+
+    <string name="add_sensor">Veuillez appuyer sur l’icône de la carte pour ajouter votre capteur</string>
 </resources>

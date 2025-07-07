@@ -22,24 +22,42 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment.Companion.TopEnd
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saionji.mysensor.data.SettingsSensor
+import com.saionji.mysensor.R
 
 @Composable
 fun PollutionDashboard(
     modfier: Modifier,
     pollutionDataList: State<List<SettingsSensor>>
 ) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
+    //if (pollutionDataList.value.size == 1 &&
+    //    pollutionDataList.value[0].id.isBlank() &&
+    //    pollutionDataList.value[0].description.isBlank()
+    if (pollutionDataList.value.isEmpty()
     ) {
-        // Рендерим карточки для каждого элемента списка
-        items(pollutionDataList.value.size) {index ->
-            PollutionGrid(data = pollutionDataList.value[index])
+        Column (
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.add_sensor),
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            // Рендерим карточки для каждого элемента списка
+            items(pollutionDataList.value.size) { index ->
+                PollutionGrid(data = pollutionDataList.value[index])
+            }
         }
     }
 }
