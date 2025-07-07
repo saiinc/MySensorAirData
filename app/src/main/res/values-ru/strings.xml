@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="error_loading">Ошибка загрузки</string>
+
+    <string name="add_sensor">Пожалуйста, нажмите на значок карты, чтобы добавить ваш сенсор</string>
 </resources>

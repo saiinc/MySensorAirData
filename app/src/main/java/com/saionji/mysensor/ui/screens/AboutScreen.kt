@@ -61,7 +61,9 @@ fun AboutScreen(onBackClicked: () -> Unit) {
             color = MaterialTheme.colorScheme.background
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
             ) {
                 // Заголовок приложения
                 Text(
@@ -165,7 +167,7 @@ fun AboutScreen(onBackClicked: () -> Unit) {
                             append("https://sensor.community/en/sensors/airrohr/")
                         }
                     },
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }

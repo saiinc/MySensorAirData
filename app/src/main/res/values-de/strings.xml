@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="error_loading">Ladefehler</string>
+
+    <string name="add_sensor">Tippen Sie bitte auf das Kartensymbol, um Ihren Sensor hinzuzufügen</string>
 </resources>
