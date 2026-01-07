@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +48,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.saionji.mysensor.C
+import com.saionji.mysensor.data.LatLng
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.*
+import com.saionji.mysensor.domain.model.LatLngBounds
+import com.saionji.mysensor.domain.model.MapBounds
 import com.saionji.mysensor.network.model.MySensorRawData
+import com.saionji.mysensor.ui.map.MapViewModel
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapListener
@@ -72,13 +77,12 @@ import kotlin.math.abs
 @OptIn(FlowPreview::class)
 @Composable
 fun MapScreen(
-    currentLocation: GeoPoint?,
+    mapViewModel: MapViewModel,
+    currentLocation: LatLng?,
     context: Context,
-    sensorList: List<MySensorRawData>,
     settingsItems: State<List<SettingsSensor>>,
-    onAreaChanged: (BoundingBox) -> Unit,
-    onAddToDashboard: (MySensorRawData, String) -> Unit,
-    onRemoveFromDashboard: (MySensorRawData) -> Unit
+    onAddToDashboard: (String, String) -> Unit,
+    onRemoveFromDashboard: (String) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val boundingBoxFlow = remember { MutableSharedFlow<BoundingBox>(extraBufferCapacity = 1) }
@@ -90,7 +94,13 @@ fun MapScreen(
     var selectedValueType by remember { mutableStateOf(valueTypes[0]) }
     var expanded by remember { mutableStateOf(false) }
     val lastOpenedInfoWindow = remember { mutableStateOf<InfoWindow?>(null) }
-    val addressCache = remember { mutableStateMapOf<String, String>() }
+    val mapUiState by mapViewModel.mapUiState.collectAsState()
+
+    val markers = when (mapUiState) {
+        is MapViewModel.MapUiState.Success ->
+            (mapUiState as MapViewModel.MapUiState.Success).markers
+        else -> emptyList()
+    }
 
     fun BoundingBox.similarTo(other: BoundingBox, threshold: Double = 0.05): Boolean {
         return abs(this.latNorth - other.latNorth) < threshold &&
@@ -125,7 +135,7 @@ fun MapScreen(
             .firstOrNull { it.latNorth != 0.0 && it.latSouth != 0.0 }?.let { bbox ->
                 val expandedBox = bbox.withPadding(0.03)
                 lastRequestedBox = expandedBox
-                onAreaChanged(expandedBox)
+                mapViewModel.loadSensorsForArea(expandedBox.toMapBounds())
             }
     }
 
@@ -136,7 +146,7 @@ fun MapScreen(
                 val expandedBox = bbox.withPadding(0.03)
                 if (lastRequestedBox == null || !expandedBox.similarTo(lastRequestedBox!!)) {
                     lastRequestedBox = expandedBox
-                    onAreaChanged(expandedBox)
+                    mapViewModel.loadSensorsForArea(expandedBox.toMapBounds())
                 }
             }
     }
@@ -161,13 +171,18 @@ fun MapScreen(
                     minZoomLevel = 6.0
                     maxZoomLevel = 18.0
                     controller.setZoom(10.5)
-                    currentLocation?.let { controller.setCenter(it) }
+                    currentLocation?.let { controller.setCenter(GeoPoint(it.lat, it.lon)) }
                     mapView.value = this
                 }
             },
             update = { view ->
                 if (!wasCentered.value && currentLocation != null) {
-                    view.controller.setCenter(currentLocation)
+                    view.controller.setCenter(
+                        GeoPoint(
+                            currentLocation.lat,
+                            currentLocation.lon
+                        )
+                    )
                     wasCentered.value = true
                 }
 
@@ -200,132 +215,49 @@ fun MapScreen(
                 }
 
                 // Добавляем маркеры (всегда) в кластерер
-                sensorList
-                    .filter { it.sensordatavalues.any { v -> v.valueType == selectedValueType } }
-                    .take(1000)
-                    .forEach { sensor ->
-                        val value = sensor.sensordatavalues.find { it.valueType == selectedValueType }?.value ?: 0.0
-                        val id = sensor.sensor?.id
-                        val color = sensor.sensordatavalues.find { it.valueType == selectedValueType }?.color ?: Color.Gray
-                        val lat = sensor.location.latitude
-                        val lon = sensor.location.longitude
-                        val key = "$lat,$lon"
-                        val geoPoint = GeoPoint(lat, lon)
-                        val address = addressCache[key] ?: ""
+                markers.forEach { markerUi ->
+                    val marker = Marker(view).apply {
+                        position = GeoPoint(
+                            markerUi.lat,
+                            markerUi.lon
+                        )
+                        icon = createColoredCircleDrawable(
+                            markerUi.colorInt,
+                            context
+                        )
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
 
+                        setOnMarkerClickListener { m, _ ->
+                            InfoWindow.closeAllInfoWindowsOn(view)
 
-                        val marker = Marker(view).apply {
-                            position = geoPoint
-                            icon = createColoredCircleDrawable(color.toArgb(), context)
-                            setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                            infoWindow = mapView.value?.let { map ->
-                                MapMarkerInfoWindow(
-                                    mapView = map,
-                                    isAdded = settingsItems.value.any { it.id == id.toString() },
-                                    isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
-                                    id = id.toString(),
-                                    initialAddress = address,
-                                    valueType = selectedValueType,
-                                    value = value.toString(),
-                                    onAddToDashboard = { sensor, address ->
-                                        onAddToDashboard(sensor, address)
-                                    },
-                                    onRemoveFromDashboard = {
-                                        onRemoveFromDashboard(sensor)
-                                    },
-                                    sensor = sensor
-                                )
+                            val infoWindow = MapMarkerInfoWindow(
+                                mapView = view,
+                                isAdded = settingsItems.value.any { it.id == markerUi.id },
+                                isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
+                                id = markerUi.id,
+                                initialAddress = "",
+                                valueType = markerUi.valueType,
+                                value = markerUi.value.toString(),
+                                onAddToDashboard = onAddToDashboard,
+                                onRemoveFromDashboard = onRemoveFromDashboard
+                            )
+
+                            m.infoWindow = infoWindow
+                            m.showInfoWindow()
+
+                            mapViewModel.loadAddressIfNeeded(
+                                markerUi.lat,
+                                markerUi.lon
+                            ) { address ->
+                                infoWindow.updateAddress(address)
                             }
-                            setOnMarkerClickListener { m, _ ->
-                                mapView.value?.let { InfoWindow.closeAllInfoWindowsOn(it) }
-                                lastOpenedInfoWindow.value = null
 
-                                val geo = m.position
-                                val key = "${geo.latitude},${geo.longitude}"
-                                val id = sensor.sensor?.id.toString()
-                                val value = sensor.sensordatavalues.find { it.valueType == selectedValueType }?.value ?: 0.0
-
-                                // Проверим, есть ли адрес в кэше
-                                val address = addressCache[key]
-                                if (address != null) {
-                                    m.infoWindow = mapView.value?.let { map ->
-                                        MapMarkerInfoWindow(
-                                            mapView = map,
-                                            isAdded = settingsItems.value.any { it.id == id },
-                                            isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
-                                            id = id,
-                                            initialAddress = address,
-                                            valueType = selectedValueType,
-                                            value = value.toString(),
-                                            onAddToDashboard = { sensor, address ->
-                                                onAddToDashboard(sensor, address)
-                                            },
-                                            onRemoveFromDashboard = {
-                                                onRemoveFromDashboard(sensor)
-                                            },
-                                            sensor = sensor
-                                        )
-                                    }
-                                    m.showInfoWindow()
-                                    lastOpenedInfoWindow.value = m.infoWindow
-                                } else {
-                                    // Пока нет адреса — покажем пустую строку и начнём асинхронную загрузку
-                                    m.infoWindow = mapView.value?.let { map ->
-                                        MapMarkerInfoWindow(
-                                            mapView = map,
-                                            isAdded = settingsItems.value.any { it.id == id },
-                                            isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
-                                            id = id,
-                                            initialAddress = addressCache[key], // может быть null или ""
-                                            valueType = selectedValueType,
-                                            value = value.toString(),
-                                            onAddToDashboard = { sensor, address ->
-                                                onAddToDashboard(sensor, address)
-                                            },
-                                            onRemoveFromDashboard = {
-                                                onRemoveFromDashboard(sensor)
-                                            },
-                                            sensor = sensor
-                                        )
-                                    }
-                                    m.showInfoWindow()
-                                    lastOpenedInfoWindow.value = m.infoWindow
-
-                                    coroutineScope.launch {
-                                        val resolved = getAddressFromCoordinates(context, geo.latitude, geo.longitude)
-                                        addressCache[key] = resolved
-
-                                        // Обновим InfoWindow с новым адресом
-                                        if (m.isInfoWindowShown) {
-                                            m.infoWindow = mapView.value?.let { map ->
-                                                MapMarkerInfoWindow(
-                                                    mapView = map,
-                                                    isAdded = settingsItems.value.any { it.id == id },
-                                                    isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
-                                                    id = id,
-                                                    initialAddress = resolved,
-                                                    valueType = selectedValueType,
-                                                    value = value.toString(),
-                                                    onAddToDashboard = { sensor, address ->
-                                                        onAddToDashboard(sensor, address)
-                                                    },
-                                                    onRemoveFromDashboard = {
-                                                        onRemoveFromDashboard(sensor)
-                                                    },
-                                                    sensor = sensor
-                                                )
-                                            }
-                                            m.showInfoWindow()
-                                        }
-                                    }
-                                }
-
-                                true
-                            }
+                            true
                         }
-
-                        clusterer.add(marker)
                     }
+
+                    clusterer.add(marker)
+                }
 
                 // Добавляем кластерер как основной слой с маркерами
                 view.overlays.add(clusterer)
@@ -365,7 +297,7 @@ fun MapScreen(
         IconButton(
             onClick = {
                 currentLocation?.let {
-                    mapView.value?.controller?.animateTo(it)
+                    mapView.value?.controller?.animateTo(GeoPoint(it.lat, it.lon))
                 }
             },
             modifier = Modifier
@@ -422,8 +354,12 @@ fun MapScreen(
                     DropdownMenuItem(
                         text = { Text(type) },
                         onClick = {
-                            selectedValueType = type
+                            mapViewModel.setSelectedValueType(type)
                             expanded = false
+
+                            lastRequestedBox?.let {
+                                mapViewModel.loadSensorsForArea(lastRequestedBox!!.toMapBounds())
+                            }
                         }
                     )
                 }
@@ -477,25 +413,11 @@ fun createColoredCircleDrawable(color: Int, context: Context): Drawable {
     return BitmapDrawable(context.resources, bitmap)
 }
 
-suspend fun getAddressFromCoordinates(context: Context, lat: Double, lon: Double): String {
-    return withContext(Dispatchers.IO) {
-        try {
-            val geocoder = Geocoder(context, Locale.getDefault())
-            val addresses = geocoder.getFromLocation(lat, lon, 1)
-            if (!addresses.isNullOrEmpty()) {
-                val address = addresses[0]
-                listOfNotNull(
-                    address.thoroughfare, // улица
-                    address.subThoroughfare, // номер дома
-                    address.locality, // город
-                    address.countryName // страна
-                ).joinToString(", ")
-            } else {
-                "Unknown address"
-            }
-        } catch (e: Exception) {
-            "Error getting address"
-        }
-    }
-}
+fun BoundingBox.toMapBounds(): MapBounds =
+    MapBounds(
+        north = latNorth,
+        south = latSouth,
+        east = lonEast,
+        west = lonWest
+    )
 

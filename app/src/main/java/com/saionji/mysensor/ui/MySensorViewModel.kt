@@ -4,6 +4,7 @@
 
 package com.saionji.mysensor.ui
 
+import android.R
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
@@ -48,43 +49,11 @@ sealed class Screen {
     object Map : Screen()
 }
 
-sealed interface SensorAreaUiState {
-    object Loading : SensorAreaUiState
-    data class Success(val data: List<MySensorRawData>) : SensorAreaUiState
-    data class Error(val message: String) : SensorAreaUiState
-}
-
 class MySensorViewModel(
     application: Application,
     private val settingsRepository: SettingsRepository,
     private val getSensorValuesUseCase: GetSensorValuesUseCase,
-    private val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase
 ) : AndroidViewModel(application) {
-
-    private val _sensorAreaUiState = MutableStateFlow<SensorAreaUiState>(SensorAreaUiState.Loading)
-    val sensorAreaUiState: StateFlow<SensorAreaUiState> = _sensorAreaUiState
-
-    fun loadSensorsForArea(boundingBox: BoundingBox) {
-        viewModelScope.launch {
-            try {
-                Log.d("MapDebug", "Fetching sensors for bbox: $boundingBox")
-                val result = getSensorValuesByAreaUseCase(
-                    boundingBox.latNorth,
-                    boundingBox.lonWest,
-                    boundingBox.latSouth,
-                    boundingBox.lonEast
-                )
-                _sensorAreaUiState.value = SensorAreaUiState.Success(result)
-                _sensorListByArea.value = result
-            } catch (e: Exception) {
-                _sensorAreaUiState.value = SensorAreaUiState.Error("Ошибка загрузки: ${e.localizedMessage}")
-                _sensorListByArea.value = emptyList()
-            }
-        }
-    }
-
-    private val _sensorListByArea = MutableStateFlow<List<MySensorRawData>>(emptyList())
-    val sensorListByArea: StateFlow<List<MySensorRawData>> = _sensorListByArea.asStateFlow()
 
     private val _optionsBoxState: MutableState<OptionsBoxState> =
         mutableStateOf(value = OptionsBoxState.CLOSED)
@@ -107,27 +76,6 @@ class MySensorViewModel(
         _currentScreen.value = screen
         if (screen == Screen.Dashboard) {
             onDashboardOpened()
-        }
-    }
-
-    private val _currentLocation = mutableStateOf<GeoPoint?>(null)
-    val currentLocation: State<GeoPoint?> = _currentLocation
-
-
-    @SuppressLint("MissingPermission")
-    fun updateCurrentLocation(context: Context) {
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-
-        fusedLocationClient.getCurrentLocation(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            CancellationTokenSource().token
-        ).addOnSuccessListener { location ->
-            if (location != null) {
-                // Преобразуем android.location.Location → GeoPoint
-                _currentLocation.value = GeoPoint(location.latitude, location.longitude)
-            }
-        }.addOnFailureListener {
-            Log.e("Location", "Ошибка при получении текущего местоположения", it)
         }
     }
 
@@ -210,21 +158,14 @@ class MySensorViewModel(
         _sensorsOptions.value = _settingsItems.value
     }
 
-    fun addSensorDashboardFromMap(sensor: MySensorRawData, address: String) {
-        _settingsItems.value += SettingsSensor(
-            id = sensor.sensor?.id.toString(),
-            description = address,
-            deviceSensors = sensor.sensordatavalues.map {
-                MySensor(
-                    valueType = it.valueType,
-                    value = it.value.toString()
-                )
-            }
-        )
+    private var lastMapSensors: List<MySensorRawData> = emptyList()
+
+    fun addSensorDashboardFromMap(settingsSensor: SettingsSensor) {
+        _settingsItems.value += settingsSensor
     }
 
-    fun removeSensorDashboardFromMap(sensor: MySensorRawData) {
-        _settingsItems.value.find { it.id == sensor.sensor?.id.toString() }?.let { foundItem ->
+    fun removeSensorDashboardFromMap(id: String) {
+        _settingsItems.value.find { it.id == id }?.let { foundItem ->
             _settingsItems.value -= foundItem
         }
     }
@@ -332,12 +273,10 @@ class MySensorViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as MySensorApplication)
                 val settingsRepository = application.container.settingsRepository
-                val getSensorValuesByAreaUseCase = application.container.getSensorValuesByAreaUseCase
                 val getSensorValuesUseCase = application.container.getSensorValuesUseCase
 
                 MySensorViewModel(
                     settingsRepository = settingsRepository,
-                    getSensorValuesByAreaUseCase = getSensorValuesByAreaUseCase,
                     getSensorValuesUseCase = getSensorValuesUseCase,
                     application = application
                 )

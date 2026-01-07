@@ -36,6 +36,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.saionji.mysensor.R
+import com.saionji.mysensor.ui.map.MapViewModel
 import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
 import com.saionji.mysensor.ui.screens.MapScreen
@@ -51,6 +52,8 @@ fun SensorsApp(
 ) {
     val mySensorViewModel: MySensorViewModel =
         viewModel(factory = MySensorViewModel.Factory)
+    val mapViewModel: MapViewModel =
+        viewModel(factory = MapViewModel.Factory)
     val optionsBoxState = mySensorViewModel.optionsBoxState
     val settingsApp = mySensorViewModel.settingsApp.value
     val settingsItems = mySensorViewModel.settingsItems.collectAsState()
@@ -58,7 +61,7 @@ fun SensorsApp(
     val isRefreshing = mySensorViewModel.isRefreshing.collectAsState().value
     val showError by mySensorViewModel.showErrorMessage.collectAsState()
     val currentScreen by mySensorViewModel.currentScreen.collectAsState()
-    val currentLocation by mySensorViewModel.currentLocation
+    val currentLocation by mapViewModel.currentLocation
     val backgroundColor = MaterialTheme.colorScheme.surface.toArgb()
     val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
     val strokeColor = MaterialTheme.colorScheme.outline.toArgb()
@@ -181,29 +184,28 @@ fun SensorsApp(
                                 if (!allPermissionsGranted) {
                                     locationPermissionsState.launchMultiplePermissionRequest()
                                 } else {
-                                    mySensorViewModel.updateCurrentLocation(context)
+                                    mapViewModel.updateCurrentLocation(context)
                                 }
                             }
 
                             // Если статус разрешений изменился
                             LaunchedEffect(locationPermissionsState.permissions) {
                                 if (allPermissionsGranted) {
-                                    mySensorViewModel.updateCurrentLocation(context)
+                                    mapViewModel.updateCurrentLocation(context)
                                 }
                             }
                             MapScreen(
+                                mapViewModel = mapViewModel,
                                 currentLocation = currentLocation,
                                 context = context,
-                                sensorList = mySensorViewModel.sensorListByArea.collectAsState().value,
                                 settingsItems = settingsItems,
-                                onAreaChanged = { boundingBox ->
-                                    mySensorViewModel.loadSensorsForArea(boundingBox)
+                                onAddToDashboard = { sensorId, address ->
+                                    mapViewModel.buildSettingsSensorFromMap(sensorId, address) {settingsSensor ->
+                                        mySensorViewModel.addSensorDashboardFromMap(settingsSensor)
+                                    }
                                 },
-                                onAddToDashboard = { sensor, address ->
-                                    mySensorViewModel.addSensorDashboardFromMap(sensor, address)
-                                },
-                                onRemoveFromDashboard = { sensor ->
-                                    mySensorViewModel.removeSensorDashboardFromMap(sensor)
+                                onRemoveFromDashboard = { id ->
+                                    mySensorViewModel.removeSensorDashboardFromMap(id)
                                 }
                             )
                         }
