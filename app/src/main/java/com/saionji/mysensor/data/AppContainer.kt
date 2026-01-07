@@ -5,6 +5,8 @@
 package com.saionji.mysensor.data
 
 import android.content.Context
+import android.location.Geocoder
+import androidx.compose.ui.text.intl.Locale
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
@@ -12,6 +14,8 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.domain.GetSensorValuesUseCase
+import com.saionji.mysensor.domain.model.GeocodingRepository
+import com.saionji.mysensor.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.network.model.SensorService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -26,6 +30,8 @@ interface AppContainer {
     val dataStore: DataStore<Preferences>
     val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase
     val getSensorValuesUseCase: GetSensorValuesUseCase // Добавляем UseCase
+
+    val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase
 }
 
 class DefaultAppContainer(context: Context) : AppContainer{
@@ -60,5 +66,20 @@ class DefaultAppContainer(context: Context) : AppContainer{
 
     override val getSensorValuesUseCase: GetSensorValuesUseCase by lazy {
         GetSensorValuesUseCase(mySensorRepository) // Передаем репозиторий в UseCase
+    }
+
+    // --- Android stuff ---
+    private val geocoder = Geocoder(
+        context.applicationContext,
+        Locale.current.platformLocale
+    )
+
+    // --- Data ---
+    private val geocodingRepository: GeocodingRepository =
+        AndroidGeocodingRepository(geocoder)
+
+    // --- Domain ---
+    override val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase by lazy {
+        GetAddressFromCoordinatesUseCase(geocodingRepository)
     }
 }
