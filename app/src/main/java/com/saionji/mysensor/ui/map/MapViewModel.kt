@@ -18,7 +18,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.saionji.mysensor.C
 import com.saionji.mysensor.MySensorApplication
-import com.saionji.mysensor.data.LatLng
+import com.saionji.mysensor.domain.model.LatLng
 import com.saionji.mysensor.data.MySensor
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
@@ -57,15 +57,17 @@ class MapViewModel(
 
     private val addressCache = mutableMapOf<String, String>()
 
+    private val _addresses =
+        MutableStateFlow<Map<String, String>>(emptyMap())
+
+    private fun addressKey(lat: Double, lon: Double) = "$lat,$lon"
+
+    val addresses: StateFlow<Map<String, String>> = _addresses
+
     private val _selectedValueType = MutableStateFlow("PM2.5")
     val selectedValueType: StateFlow<String> = _selectedValueType
 
     private var lastMapSensors: List<MySensorRawData> = emptyList()
-
-    private val _selectedMarker =
-        MutableStateFlow<SelectedMarkerUiState?>(null)
-
-    val selectedMarker: StateFlow<SelectedMarkerUiState?> = _selectedMarker
 
     fun loadAddressIfNeeded(
         lat: Double,
@@ -86,9 +88,14 @@ class MapViewModel(
         }
     }
 
-    private fun updateAddress(address: String) {
-        _selectedMarker.update {
-            it?.copy(address = address)
+    fun ensureAddress(lat: Double, lon: Double) {
+        val key = addressKey(lat, lon)
+
+        if (_addresses.value.containsKey(key)) return
+
+        viewModelScope.launch {
+            val address = getAddressFromCoordinatesUseCase(lat, lon)
+            _addresses.update { it + (key to address) }
         }
     }
 

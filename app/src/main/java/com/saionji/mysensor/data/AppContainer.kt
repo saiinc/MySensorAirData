@@ -58,7 +58,9 @@ class DefaultAppContainer(context: Context) : AppContainer{
     }
 
     // Репозиторий для работы с настройками
-    override val settingsRepository: SettingsRepository = SettingsRepository(context.dataStore)
+    override val settingsRepository by lazy {
+        SettingsRepository(context.dataStore)
+    }
 
     override val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase by lazy {
         GetSensorValuesByAreaUseCase(mySensorRepository)
