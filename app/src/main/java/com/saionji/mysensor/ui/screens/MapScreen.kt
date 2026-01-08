@@ -48,12 +48,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.saionji.mysensor.C
-import com.saionji.mysensor.data.LatLng
+import com.saionji.mysensor.domain.model.LatLng
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.*
 import com.saionji.mysensor.domain.model.LatLngBounds
 import com.saionji.mysensor.domain.model.MapBounds
 import com.saionji.mysensor.network.model.MySensorRawData
+import com.saionji.mysensor.ui.map.MapMarkerInfoWindow
 import com.saionji.mysensor.ui.map.MapViewModel
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
@@ -93,8 +94,8 @@ fun MapScreen(
     val valueTypes = listOf("PM2.5", "PM10", "temperature", "humidity", "pressure", "noise LAeq")
     var selectedValueType by remember { mutableStateOf(valueTypes[0]) }
     var expanded by remember { mutableStateOf(false) }
-    val lastOpenedInfoWindow = remember { mutableStateOf<InfoWindow?>(null) }
     val mapUiState by mapViewModel.mapUiState.collectAsState()
+    val addressMap by mapViewModel.addresses.collectAsState()
 
     val markers = when (mapUiState) {
         is MapViewModel.MapUiState.Success ->
@@ -190,7 +191,6 @@ fun MapScreen(
                 val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
                     override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
                         mapView.value?.let { InfoWindow.closeAllInfoWindowsOn(it) }
-                        lastOpenedInfoWindow.value = null
                         return true
                     }
 
@@ -232,12 +232,17 @@ fun MapScreen(
 
                             val infoWindow = MapMarkerInfoWindow(
                                 mapView = view,
-                                isAdded = settingsItems.value.any { it.id == markerUi.id },
-                                isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
                                 id = markerUi.id,
-                                initialAddress = "",
+                                lat = markerUi.lat,
+                                lon = markerUi.lon,
                                 valueType = markerUi.valueType,
                                 value = markerUi.value.toString(),
+                                isAdded = settingsItems.value.any { it.id == markerUi.id },
+                                isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
+                                addressProvider = { lat, lon ->
+                                    val key = "$lat,$lon"
+                                    addressMap[key]
+                                },
                                 onAddToDashboard = onAddToDashboard,
                                 onRemoveFromDashboard = onRemoveFromDashboard
                             )
@@ -245,12 +250,7 @@ fun MapScreen(
                             m.infoWindow = infoWindow
                             m.showInfoWindow()
 
-                            mapViewModel.loadAddressIfNeeded(
-                                markerUi.lat,
-                                markerUi.lon
-                            ) { address ->
-                                infoWindow.updateAddress(address)
-                            }
+                            mapViewModel.ensureAddress(markerUi.lat, markerUi.lon)
 
                             true
                         }

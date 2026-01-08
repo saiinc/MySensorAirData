@@ -1,4 +1,4 @@
-package com.saionji.mysensor.data
+package com.saionji.mysensor.domain.model
 
 data class LatLng(
     val lat: Double,
