@@ -2,11 +2,9 @@ package com.saionji.mysensor.ui.map
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.location.Geocoder
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -16,27 +14,25 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.saionji.mysensor.C
 import com.saionji.mysensor.MySensorApplication
 import com.saionji.mysensor.domain.model.LatLng
 import com.saionji.mysensor.data.MySensor
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
-import com.saionji.mysensor.domain.GetSensorValuesUseCase
 import com.saionji.mysensor.domain.model.GetAddressFromCoordinatesUseCase
-import com.saionji.mysensor.domain.model.LatLngBounds
-import com.saionji.mysensor.domain.model.MapBounds
+import com.saionji.mysensor.ui.map.model.MapBounds
 import com.saionji.mysensor.network.model.MySensorRawData
 import com.saionji.mysensor.ui.map.model.MapMarkerUiModel
-import com.saionji.mysensor.ui.map.model.SelectedMarkerUiState
-import kotlinx.coroutines.Dispatchers
+import com.saionji.mysensor.ui.map.model.SelectedMarkerUi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Locale
 
+@OptIn(FlowPreview::class)
 class MapViewModel(
     private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase,
     private val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase
@@ -55,8 +51,6 @@ class MapViewModel(
     private val _currentLocation = mutableStateOf<LatLng?>(null)
     val currentLocation: State<LatLng?> = _currentLocation
 
-    private val addressCache = mutableMapOf<String, String>()
-
     private val _addresses =
         MutableStateFlow<Map<String, String>>(emptyMap())
 
@@ -69,24 +63,12 @@ class MapViewModel(
 
     private var lastMapSensors: List<MySensorRawData> = emptyList()
 
-    fun loadAddressIfNeeded(
-        lat: Double,
-        lon: Double,
-        onResult: (String) -> Unit
-    ) {
-        val key = "$lat,$lon"
+    private val _selectedMarker = MutableStateFlow<SelectedMarkerUi?>(null)
+    val selectedMarker: StateFlow<SelectedMarkerUi?> = _selectedMarker
 
-        addressCache[key]?.let {
-            onResult(it)
-            return
-        }
-
-        viewModelScope.launch {
-            val address = getAddressFromCoordinatesUseCase(lat, lon)
-            addressCache[key] = address
-            onResult(address)
-        }
-    }
+    private val viewportFlow = MutableSharedFlow<MapBounds>(
+        extraBufferCapacity = 1
+    )
 
     fun ensureAddress(lat: Double, lon: Double) {
         val key = addressKey(lat, lon)
@@ -130,8 +112,41 @@ class MapViewModel(
         }
     }
 
+    fun onMarkerSelected(marker: SelectedMarkerUi) {
+        _selectedMarker.value = marker
+        ensureAddress(marker.lat, marker.lon)
+    }
+
+    fun clearSelectedMarker() {
+        _selectedMarker.value = null
+    }
+
+    fun onViewportChanged(bounds: MapBounds) {
+        viewportFlow.tryEmit(bounds)
+    }
+
+    init {
+        viewModelScope.launch {
+            viewportFlow
+                .debounce(600)
+                .collect { bounds ->
+                    loadSensorsForArea(bounds)
+                }
+        }
+    }
+
     fun loadSensorsForArea(bounds: MapBounds) {
         val valueType = _selectedValueType.value
+        if (bounds.zoom < 6.0) {
+            _mapUiState.value = MapUiState.Idle
+            return
+        }
+
+        if (bounds.north - bounds.south > 40 ||
+            bounds.east - bounds.west > 40
+        ) {
+            return
+        }
 
         viewModelScope.launch {
             _mapUiState.value = MapUiState.Loading
@@ -201,28 +216,6 @@ class MapViewModel(
             }
         }.addOnFailureListener {
             Log.e("Location", "Ошибка при получении текущего местоположения", it)
-        }
-    }
-
-    suspend fun getAddressFromCoordinates(context: Context, lat: Double, lon: Double): String {
-        return withContext(Dispatchers.IO) {
-            try {
-                val geocoder = Geocoder(context, Locale.getDefault())
-                val addresses = geocoder.getFromLocation(lat, lon, 1)
-                if (!addresses.isNullOrEmpty()) {
-                    val address = addresses[0]
-                    listOfNotNull(
-                        address.thoroughfare, // улица
-                        address.subThoroughfare, // номер дома
-                        address.locality, // город
-                        address.countryName // страна
-                    ).joinToString(", ")
-                } else {
-                    "Unknown address"
-                }
-            } catch (e: Exception) {
-                "Error getting address"
-            }
         }
     }
 

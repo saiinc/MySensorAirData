@@ -10,6 +10,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.saionji.mysensor.ui.SensorsApp
 import com.saionji.mysensor.ui.theme.SensorsAppTheme
+import org.maplibre.android.MapLibre
+import org.maplibre.android.WellKnownTileServer
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,6 +19,11 @@ class MainActivity : ComponentActivity() {
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
         super.onCreate(savedInstanceState)
+        MapLibre.getInstance(
+            this,
+            "", // API key НЕ нужен для open-source тайлов
+            WellKnownTileServer.MapLibre
+        )
         setContent {
             SensorsAppTheme {
                 // A surface container using the 'background' color from the theme
