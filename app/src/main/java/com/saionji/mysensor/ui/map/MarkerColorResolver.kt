@@ -6,6 +6,7 @@ import com.saionji.mysensor.domain.PM10_COLOR_RANGES
 import com.saionji.mysensor.domain.PM25_COLOR_RANGES
 import com.saionji.mysensor.domain.PRESSURE_COLOR_RANGES
 import com.saionji.mysensor.domain.TEMPERATURE_COLOR_RANGES
+import com.saionji.mysensor.domain.interpolateColor
 
 object MarkerColorResolver {
 
@@ -23,10 +24,9 @@ object MarkerColorResolver {
             else -> PM25_COLOR_RANGES
         }
 
-        val (_, _, rgb) = ranges.firstOrNull { value in it.first..it.second }
-            ?: return android.graphics.Color.GRAY
-
-        val (r, g, b) = rgb
-        return android.graphics.Color.rgb(r, g, b)
+        return interpolateColor(
+            value = value,
+            ranges = ranges
+        )
     }
 }

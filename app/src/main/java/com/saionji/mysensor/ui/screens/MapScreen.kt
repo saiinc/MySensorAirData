@@ -7,11 +7,18 @@ import android.graphics.Paint
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.location.Geocoder
+import android.util.Log
 import android.util.TypedValue
+import android.view.ViewTreeObserver
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,9 +26,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -29,6 +39,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -37,6 +48,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -46,16 +58,26 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.preference.PreferenceManager
 import com.saionji.mysensor.C
 import com.saionji.mysensor.domain.model.LatLng
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.*
 import com.saionji.mysensor.domain.model.LatLngBounds
-import com.saionji.mysensor.domain.model.MapBounds
+import com.saionji.mysensor.ui.map.model.MapBounds
+import com.saionji.mysensor.ui.map.model.withPadding
 import com.saionji.mysensor.network.model.MySensorRawData
-import com.saionji.mysensor.ui.map.MapMarkerInfoWindow
+import com.saionji.mysensor.ui.map.MapController
 import com.saionji.mysensor.ui.map.MapViewModel
+import com.saionji.mysensor.ui.map.MarkerPopup
+import com.saionji.mysensor.ui.map.controller.MapCameraController
+import com.saionji.mysensor.ui.map.controller.OsmMapCameraController
+import com.saionji.mysensor.ui.map.controller.OsmMapGestureHandler
+import com.saionji.mysensor.ui.map.model.SelectedMarkerUi
+//import com.saionji.mysensor.ui.map.renderer.OsmMarkerRenderer
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapListener
@@ -75,7 +97,7 @@ import org.osmdroid.views.overlay.infowindow.InfoWindow
 import java.util.Locale
 import kotlin.math.abs
 
-@OptIn(FlowPreview::class)
+/*@OptIn(FlowPreview::class)
 @Composable
 fun MapScreen(
     mapViewModel: MapViewModel,
@@ -85,39 +107,37 @@ fun MapScreen(
     onAddToDashboard: (String, String) -> Unit,
     onRemoveFromDashboard: (String) -> Unit
 ) {
-    val coroutineScope = rememberCoroutineScope()
-    val boundingBoxFlow = remember { MutableSharedFlow<BoundingBox>(extraBufferCapacity = 1) }
-    val wasCentered = remember { mutableStateOf(false) }
     val mapView = remember { mutableStateOf<MapView?>(null) }
-
-    var lastRequestedBox by remember { mutableStateOf<BoundingBox?>(null) }
     val valueTypes = listOf("PM2.5", "PM10", "temperature", "humidity", "pressure", "noise LAeq")
-    var selectedValueType by remember { mutableStateOf(valueTypes[0]) }
+    val selectedValueType by mapViewModel.selectedValueType.collectAsState()
     var expanded by remember { mutableStateOf(false) }
     val mapUiState by mapViewModel.mapUiState.collectAsState()
+    val selectedMarker by mapViewModel.selectedMarker.collectAsState()
     val addressMap by mapViewModel.addresses.collectAsState()
+    val mapController = remember { mutableStateOf<MapController?>(null) }
+    val wasCentered = rememberSaveable { mutableStateOf(false) }
+    val markerRenderer = remember { OsmMarkerRenderer() }
+    val gestureHandler = remember { OsmMapGestureHandler(
+            onMapTap = { mapViewModel.clearSelectedMarker() }
+        )
+    }
+    val cameraController = remember { mutableStateOf<MapCameraController?>(null) }
 
     val markers = when (mapUiState) {
         is MapViewModel.MapUiState.Success ->
             (mapUiState as MapViewModel.MapUiState.Success).markers
         else -> emptyList()
     }
+/*
+    LaunchedEffect(mapController.value) {
+        val controller = mapController.value ?: return@LaunchedEffect
 
-    fun BoundingBox.similarTo(other: BoundingBox, threshold: Double = 0.05): Boolean {
-        return abs(this.latNorth - other.latNorth) < threshold &&
-                abs(this.latSouth - other.latSouth) < threshold &&
-                abs(this.lonEast - other.lonEast) < threshold &&
-                abs(this.lonWest - other.lonWest) < threshold
-    }
-
-    fun BoundingBox.withPadding(padding: Double): BoundingBox {
-        return BoundingBox(
-            this.latNorth + padding,
-            this.lonEast + padding,
-            this.latSouth - padding,
-            this.lonWest - padding
-        )
-    }
+        controller.setOnViewportChangedListener { bounds ->
+            mapViewModel.onViewportChanged(
+                bounds.withPadding(0.03)
+            )
+        }
+    }*/
 
     LaunchedEffect(Unit) {
         Configuration.getInstance().load(
@@ -125,31 +145,6 @@ fun MapScreen(
             PreferenceManager.getDefaultSharedPreferences(context)
         )
         Configuration.getInstance().userAgentValue = context.packageName
-    }
-
-    LaunchedEffect(mapView.value) {
-        // Ждём пока карта появится
-        val map = mapView.value ?: return@LaunchedEffect
-        // Делаем задержку на кадр, чтобы boundingBox успел просчитаться
-        snapshotFlow { map.boundingBox }
-            .filterNotNull()
-            .firstOrNull { it.latNorth != 0.0 && it.latSouth != 0.0 }?.let { bbox ->
-                val expandedBox = bbox.withPadding(0.03)
-                lastRequestedBox = expandedBox
-                mapViewModel.loadSensorsForArea(expandedBox.toMapBounds())
-            }
-    }
-
-    LaunchedEffect(Unit) {
-        boundingBoxFlow
-            .debounce(700)
-            .collect { bbox ->
-                val expandedBox = bbox.withPadding(0.03)
-                if (lastRequestedBox == null || !expandedBox.similarTo(lastRequestedBox!!)) {
-                    lastRequestedBox = expandedBox
-                    mapViewModel.loadSensorsForArea(expandedBox.toMapBounds())
-                }
-            }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -165,139 +160,104 @@ fun MapScreen(
         AndroidView(
             factory = { ctx ->
                 MapView(ctx).apply {
+                    mapView.value = this
                     setTileSource(TileSourceFactory.MAPNIK)
                     setTilesScaledToDpi(true) // Улучшает читаемость
-                    setUseDataConnection(true)
                     setMultiTouchControls(true)
                     minZoomLevel = 6.0
                     maxZoomLevel = 18.0
-                    controller.setZoom(10.5)
-                    currentLocation?.let { controller.setCenter(GeoPoint(it.lat, it.lon)) }
-                    mapView.value = this
+
+                    cameraController.value = OsmMapCameraController(this)
                 }
             },
-            update = { view ->
-                if (!wasCentered.value && currentLocation != null) {
-                    view.controller.setCenter(
-                        GeoPoint(
-                            currentLocation.lat,
-                            currentLocation.lon
-                        )
+            update = { mapView ->
+
+                // 1. Центрирование
+                currentLocation?.let {
+                    cameraController.value?.centerOnce(
+                        lat = it.lat,
+                        lon = it.lon,
+                        zoom = 10.5
                     )
-                    wasCentered.value = true
                 }
 
-                // Обновляем InfoWindow при тапе на карту
-                val mapEventsOverlay = MapEventsOverlay(object : MapEventsReceiver {
-                    override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
-                        mapView.value?.let { InfoWindow.closeAllInfoWindowsOn(it) }
-                        return true
-                    }
+                // 2. Жесты карты (tap / long tap)
+                gestureHandler.attach(mapView)
 
-                    override fun longPressHelper(p: GeoPoint?): Boolean = false
-                })
+            },
+            modifier = Modifier.fillMaxSize()
 
-                // Удаляем все оверлеи, затем добавим MapEvents и кластер
-                view.overlays.clear()
-                view.overlays.add(mapEventsOverlay)
+        )
 
-                // Создаём кластерер, который сам отключит кластеризацию при зуме > maxClusteringZoomLevel
-                val clusterer = RadiusMarkerClusterer(context).apply {
-                    val drawable = ContextCompat.getDrawable(context, org.osmdroid.bonuspack.R.drawable.marker_cluster)
-                    val bitmap = (drawable as BitmapDrawable).bitmap
-                    setRadius(150)
-                    setIcon(bitmap)
-                    textPaint.color = android.graphics.Color.WHITE
-                    textPaint.textSize = 24f
-                    mAnchorU = Marker.ANCHOR_CENTER
-                    mAnchorV = Marker.ANCHOR_CENTER
-                    setMaxClusteringZoomLevel(15) // Автоматическое отключение кластеризации
+        val lifecycleOwner = LocalLifecycleOwner.current
+
+        DisposableEffect(lifecycleOwner, mapView.value) {
+            val mv = mapView.value
+
+            val observer = LifecycleEventObserver { _, event ->
+                when (event) {
+                    Lifecycle.Event.ON_RESUME -> mv?.onResume()
+                    Lifecycle.Event.ON_PAUSE -> mv?.onPause()
+                    Lifecycle.Event.ON_DESTROY -> mv?.onDetach()
+                    else -> {}
                 }
+            }
 
-                // Добавляем маркеры (всегда) в кластерер
-                markers.forEach { markerUi ->
-                    val marker = Marker(view).apply {
-                        position = GeoPoint(
-                            markerUi.lat,
-                            markerUi.lon
-                        )
-                        icon = createColoredCircleDrawable(
-                            markerUi.colorInt,
-                            context
-                        )
-                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+            lifecycleOwner.lifecycle.addObserver(observer)
 
-                        setOnMarkerClickListener { m, _ ->
-                            InfoWindow.closeAllInfoWindowsOn(view)
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
 
-                            val infoWindow = MapMarkerInfoWindow(
-                                mapView = view,
+        LaunchedEffect(mapView.value, markers) {
+            val mv = mapView.value ?: return@LaunchedEffect
+            if (markers.isEmpty()) return@LaunchedEffect
+
+            mv.post {
+                markerRenderer.render(
+                    mapView = mv,
+                    markers = markers,
+                    onMarkerClick = { markerUi ->
+                        mapViewModel.onMarkerSelected(
+                            SelectedMarkerUi(
                                 id = markerUi.id,
                                 lat = markerUi.lat,
                                 lon = markerUi.lon,
                                 valueType = markerUi.valueType,
-                                value = markerUi.value.toString(),
-                                isAdded = settingsItems.value.any { it.id == markerUi.id },
-                                isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
-                                addressProvider = { lat, lon ->
-                                    val key = "$lat,$lon"
-                                    addressMap[key]
-                                },
-                                onAddToDashboard = onAddToDashboard,
-                                onRemoveFromDashboard = onRemoveFromDashboard
+                                value = markerUi.value.toString()
                             )
-
-                            m.infoWindow = infoWindow
-                            m.showInfoWindow()
-
-                            mapViewModel.ensureAddress(markerUi.lat, markerUi.lon)
-
-                            true
-                        }
+                        )
                     }
+                )
+            }
+        }
 
-                    clusterer.add(marker)
-                }
+        selectedMarker?.let { marker ->
+            val key = "${marker.lat},${marker.lon}"
+            val address = addressMap[key]
 
-                // Добавляем кластерер как основной слой с маркерами
-                view.overlays.add(clusterer)
+            MarkerPopup(
+                marker = marker,
+                address = address,
+                isAdded = settingsItems.value.any { it.id == marker.id },
+                isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
+                onClose = { mapViewModel.clearSelectedMarker() },
+                onAdd = { onAddToDashboard(marker.id, address ?: "") },
+                onRemove = { onRemoveFromDashboard(marker.id) }
+            )
+        }
 
-                // MapListener для обработки зума и скролла (обновление bbox)
-                view.setMapListener(object : MapListener {
-                    override fun onScroll(event: ScrollEvent?): Boolean {
-                        if (view.zoomLevelDouble < 8.0) return false
-                        view.boundingBox?.let {
-                            coroutineScope.launch { boundingBoxFlow.emit(it) }
-                        }
-                        return false
-                    }
 
-                    override fun onZoom(event: ZoomEvent?): Boolean {
-                        val zoom = view.zoomLevelDouble
-                        if (zoom < 6.0) {
-                            view.controller.setZoom(6.0)
-                            return true
-                        } else if (zoom > 18.0) {
-                            view.controller.setZoom(18.0)
-                            return true
-                        }
-
-                        view.boundingBox?.let {
-                            coroutineScope.launch { boundingBoxFlow.emit(it) }
-                        }
-                        return false
-                    }
-                })
-
-                view.invalidate()
-            },
-            modifier = Modifier.fillMaxSize()
-        )
 
         IconButton(
             onClick = {
                 currentLocation?.let {
-                    mapView.value?.controller?.animateTo(GeoPoint(it.lat, it.lon))
+                    cameraController.value?.moveTo(
+                        lat = it.lat,
+                        lon = it.lon,
+                        //zoom = 14.0
+                    )
                 }
             },
             modifier = Modifier
@@ -356,10 +316,6 @@ fun MapScreen(
                         onClick = {
                             mapViewModel.setSelectedValueType(type)
                             expanded = false
-
-                            lastRequestedBox?.let {
-                                mapViewModel.loadSensorsForArea(lastRequestedBox!!.toMapBounds())
-                            }
                         }
                     )
                 }
@@ -413,11 +369,4 @@ fun createColoredCircleDrawable(color: Int, context: Context): Drawable {
     return BitmapDrawable(context.resources, bitmap)
 }
 
-fun BoundingBox.toMapBounds(): MapBounds =
-    MapBounds(
-        north = latNorth,
-        south = latSouth,
-        east = lonEast,
-        west = lonWest
-    )
-
+*/
