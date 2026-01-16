@@ -1,5 +1,6 @@
 package com.saionji.mysensor.ui.map.renderer
 
+import com.saionji.mysensor.MapFonts
 import com.saionji.mysensor.ui.map.model.MapMarkerUiModel
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.style.expressions.Expression
@@ -70,19 +71,22 @@ class MapLibreMarkerRenderer(
         }
 
         if (style.getLayer(clusterCountLayerId) == null) {
-            style.addLayer(
+            style.addLayerAbove(
                 SymbolLayer(clusterCountLayerId, sourceId).withProperties(
                     PropertyFactory.textField(Expression.get("point_count")),
                     PropertyFactory.textSize(12f),
-                    PropertyFactory.textColor("#FFFFFF")
+                    PropertyFactory.textColor("#FFFFFF"),
+                    PropertyFactory.textAllowOverlap(true),
+                    PropertyFactory.textIgnorePlacement(true),
+                    PropertyFactory.textFont(MapFonts.DEFAULT),
                 ).withFilter(
                     Expression.has("point_count")
-                )
+                ), clusterLayerId
             )
         }
 
         if (style.getLayer(markerLayerId) == null) {
-            style.addLayer(
+            style.addLayerAbove(
                 CircleLayer(markerLayerId, sourceId).withProperties(
                     PropertyFactory.circleRadius(6f),
                     PropertyFactory.circleColor(Expression.get("color")),
@@ -91,7 +95,7 @@ class MapLibreMarkerRenderer(
                     PropertyFactory.circleStrokeWidth(1f)
                 ).withFilter(
                     Expression.not(Expression.has("point_count"))
-                )
+                ), clusterCountLayerId
             )
         }
     }

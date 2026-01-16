@@ -7,9 +7,11 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.saionji.mysensor.C
 import com.saionji.mysensor.ui.map.renderer.MapLibreMarkerRenderer
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
+import kotlin.apply
 
 
 @Composable
@@ -49,32 +51,19 @@ fun MapLibreView(
 
     AndroidView(
         modifier = modifier,
-        factory = { context ->
-            MapView(context).apply {
-                onCreate(null)
-
+        factory = {
+            mapView.apply {
                 getMapAsync { map ->
                     map.setStyle(
-                        Style.Builder().fromUri(
-                            "https://tiles.openfreemap.org/styles/liberty"
-                        )
-                    ) { style ->
-
+                        Style.Builder().fromUri(C.MAP_STYLE_URI)
+                    ) {
                         val controller = MapLibreController(map)
                         val renderer = MapLibreMarkerRenderer(map)
-
                         onMapReady(controller, renderer)
                     }
+
                 }
             }
-        },
-        update = {
-
-        },
-        onRelease = { mapView ->
-            mapView.onPause()
-            mapView.onStop()
-            mapView.onDestroy()
         }
     )
 }
