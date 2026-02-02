@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.unit.dp
 
@@ -24,7 +25,9 @@ fun VerticalColorBar(
     val maxValue = colorRanges.last().second
 
     Box(modifier = modifier) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier
+            .fillMaxSize()
+        ) {
             val brush = Brush.verticalGradient(colors = gradientColors)
             drawRect(brush = brush)
 
@@ -34,10 +37,10 @@ fun VerticalColorBar(
                 val y = size.height * i / 4f
                 drawContext.canvas.nativeCanvas.drawText(
                     String.format("%.0f", maxValue - i * step),
-                    size.width - 10.dp.toPx(), // немного левее
+                    size.width - 11.dp.toPx(), // немного левее
                     y + 5.dp.toPx(), // чуть ниже
                     Paint().apply {
-                        textAlign = android.graphics.Paint.Align.RIGHT
+                        textAlign = Paint.Align.RIGHT
                         textSize = 32f
                     }
                 )

@@ -70,89 +70,32 @@ fun PollutionGridShare(
                 color = MaterialTheme.colorScheme.background,
                 shape = RoundedCornerShape(8.dp)
             )
-            .border(
-                BorderStroke(2.dp, color = MaterialTheme.colorScheme.secondary),
-                shape = RoundedCornerShape(8.dp)
-            )
     ) {
         // Заголовок и id
         Row(
             modifier = Modifier
                 .padding(
                     start = 22.dp,
-                    top = 12.dp,
+                    top = 8.dp,
                     end = 14.dp
                 )
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            data.description?.let {
+            Text(
+                text = data.description,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp
+            )
+            if(!settingsApp.shareId) {
                 Text(
-                    text = it,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
+                    text = data.id,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 6.dp)
                 )
             }
-            if(!settingsApp.shareId) {
-                data.id?.let {
-                    Text(
-                        text = it,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                }
-            }
         }
-
         // Сетка значений
-        FlowRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp),
-        ) {
-            data.deviceSensors.forEach { sensor ->
-                Card(
-                    modifier = Modifier
-                        .padding(start = 28.dp)
-                        .size(145.dp)
-                        .requiredHeight(116.dp),
-                ) {
-                    Box {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.SpaceAround
-                        ) {
-                            sensor.valueType?.let {
-                                Text(
-                                    modifier = Modifier
-                                        .padding(top = 8.dp),
-                                    text = it,
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 21.sp
-                                )
-                            }
-                            sensor.value?.let {
-                                Text(
-                                    modifier = Modifier
-                                        .padding(bottom = 14.dp),
-                                    text = it,
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 21.sp,
-                                )
-                            }
-                        }
-                        Box(
-                            modifier = Modifier
-                                .padding(end = 8.dp, top = 8.dp)
-                                .size(15.dp)
-                                .clip(CircleShape)
-                                .align(TopEnd)
-                                .background(color = sensor.color)
-                        )
-                    }
-                }
-            }
-        }
+        ValuesGrid(data)
     }
 }

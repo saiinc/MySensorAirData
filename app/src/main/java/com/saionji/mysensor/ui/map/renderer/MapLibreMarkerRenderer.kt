@@ -29,6 +29,12 @@ class MapLibreMarkerRenderer(
             Feature.fromGeometry(
                 Point.fromLngLat(it.lon, it.lat)
             ).apply {
+                val r = (it.colorInt shr 16) and 0xFF
+                val g = (it.colorInt shr 8) and 0xFF
+                val b = it.colorInt and 0xFF
+                addNumberProperty("r", r)
+                addNumberProperty("g", g)
+                addNumberProperty("b", b)
                 addStringProperty("id", it.id)
                 addStringProperty("value", it.value.toString())
                 addStringProperty("color", colorIntToHex(it.colorInt))
@@ -43,8 +49,32 @@ class MapLibreMarkerRenderer(
                 collection,
                 GeoJsonOptions()
                     .withCluster(true)
-                    .withClusterRadius(60)
-                    .withClusterMaxZoom(14)
+                    .withClusterRadius(50)
+                    .withClusterMaxZoom(12)
+
+                    // Сумма каналов
+                    .withClusterProperty(
+                        "sum_r",
+                        Expression.literal("+"),
+                        Expression.get("r")
+                    )
+                    .withClusterProperty(
+                        "sum_g",
+                        Expression.literal("+"),
+                        Expression.get("g")
+                    )
+                    .withClusterProperty(
+                        "sum_b",
+                        Expression.literal("+"),
+                        Expression.get("b")
+                    )
+
+                    // Количество точек
+                    .withClusterProperty(
+                        "count",
+                        Expression.literal("+"),
+                        Expression.literal(1)
+                    )
             ).also {
                 style.addSource(it)
             }
@@ -54,7 +84,13 @@ class MapLibreMarkerRenderer(
         if (style.getLayer(clusterLayerId) == null) {
             style.addLayer(
                 CircleLayer(clusterLayerId, sourceId).withProperties(
-                    PropertyFactory.circleColor("#444444"),
+                    PropertyFactory.circleColor(
+                        Expression.rgb(
+                            Expression.division(Expression.get("sum_r"), Expression.get("count")),
+                            Expression.division(Expression.get("sum_g"), Expression.get("count")),
+                            Expression.division(Expression.get("sum_b"), Expression.get("count"))
+                        )
+                    ),
                     PropertyFactory.circleRadius(
                         Expression.step(
                             Expression.get("point_count"),
@@ -76,6 +112,8 @@ class MapLibreMarkerRenderer(
                     PropertyFactory.textField(Expression.get("point_count")),
                     PropertyFactory.textSize(12f),
                     PropertyFactory.textColor("#FFFFFF"),
+                    PropertyFactory.textHaloColor("#444444"),
+                    PropertyFactory.textHaloWidth(1.5f),
                     PropertyFactory.textAllowOverlap(true),
                     PropertyFactory.textIgnorePlacement(true),
                     PropertyFactory.textFont(MapFonts.DEFAULT),
@@ -88,7 +126,7 @@ class MapLibreMarkerRenderer(
         if (style.getLayer(markerLayerId) == null) {
             style.addLayerAbove(
                 CircleLayer(markerLayerId, sourceId).withProperties(
-                    PropertyFactory.circleRadius(6f),
+                    PropertyFactory.circleRadius(9f),
                     PropertyFactory.circleColor(Expression.get("color")),
                     PropertyFactory.circleOpacity(0.9f),
                     PropertyFactory.circleStrokeColor("#404040"),
@@ -100,12 +138,6 @@ class MapLibreMarkerRenderer(
         }
     }
 
-    fun clear() {
-        map.style?.let { style ->
-            style.removeLayer(markerLayerId)
-            style.removeSource(sourceId)
-        }
-    }
     private fun colorIntToHex(colorInt: Int): String {
         val r = (colorInt shr 16) and 0xFF
         val g = (colorInt shr 8) and 0xFF

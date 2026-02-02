@@ -8,9 +8,7 @@ import android.Manifest
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.ViewComfy
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -39,13 +37,11 @@ import com.saionji.mysensor.R
 import com.saionji.mysensor.ui.map.MapViewModel
 import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
-//import com.saionji.mysensor.ui.screens.MapScreen
 import com.saionji.mysensor.ui.map.MapScreen
 import com.saionji.mysensor.ui.screens.ShareScreen
 import com.saionji.mysensor.ui.screens.saveBitmapToCache
 import com.saionji.mysensor.ui.screens.shareUri
 import kotlinx.coroutines.delay
-import org.maplibre.android.geometry.LatLng
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -63,7 +59,7 @@ fun SensorsApp(
     val isRefreshing = mySensorViewModel.isRefreshing.collectAsState().value
     val showError by mySensorViewModel.showErrorMessage.collectAsState()
     val currentScreen by mySensorViewModel.currentScreen.collectAsState()
-    val currentLocation: LatLng? = null
+    val currentLocation by mapViewModel.currentLocation
     val backgroundColor = MaterialTheme.colorScheme.surface.toArgb()
     val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
     val strokeColor = MaterialTheme.colorScheme.outline.toArgb()
@@ -198,17 +194,19 @@ fun SensorsApp(
                             }
                             MapScreen(
                                 mapViewModel = mapViewModel,
-                                currentLocation = currentLocation,
-                                context = context,
                                 settingsItems = settingsItems,
                                 onAddToDashboard = { sensorId, address ->
-                                    mapViewModel.buildSettingsSensorFromMap(sensorId, address) {settingsSensor ->
+                                    mapViewModel.buildSettingsSensorFromMap(
+                                        sensorId,
+                                        address
+                                    ) { settingsSensor ->
                                         mySensorViewModel.addSensorDashboardFromMap(settingsSensor)
                                     }
                                 },
                                 onRemoveFromDashboard = { id ->
                                     mySensorViewModel.removeSensorDashboardFromMap(id)
-                                }
+                                },
+                                currentLocation = currentLocation
                             )
                         }
                     }
