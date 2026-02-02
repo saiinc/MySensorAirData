@@ -4,11 +4,7 @@
 
 package com.saionji.mysensor.ui
 
-import android.R
-import android.annotation.SuppressLint
 import android.app.Application
-import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -18,15 +14,10 @@ import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.AP
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationTokenSource
 import com.saionji.mysensor.MySensorApplication
-import com.saionji.mysensor.data.MySensor
 import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsRepository
 import com.saionji.mysensor.data.SettingsSensor
-import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.domain.GetSensorValuesUseCase
 import com.saionji.mysensor.network.model.MySensorRawData
 import kotlinx.coroutines.Dispatchers
@@ -39,8 +30,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.osmdroid.util.BoundingBox
-import org.osmdroid.util.GeoPoint
 import java.io.IOException
 
 
@@ -155,10 +144,12 @@ class MySensorViewModel(
     }
 
     fun sensorsOptionsLoad() {
-        _sensorsOptions.value = _settingsItems.value
+        if (_settingsItems.value.isEmpty()) {
+            _sensorsOptions.value = listOf(SettingsSensor("", "", emptyList()))
+        } else {
+            _sensorsOptions.value = _settingsItems.value
+        }
     }
-
-    private var lastMapSensors: List<MySensorRawData> = emptyList()
 
     fun addSensorDashboardFromMap(settingsSensor: SettingsSensor) {
         _settingsItems.value += settingsSensor
@@ -202,8 +193,6 @@ class MySensorViewModel(
             settingsRepository.getSettings().collectLatest { mySettings ->
                 if (mySettings.isNotEmpty())
                     _settingsItems.value = mySettings
-                //else
-                //    _settingsItems.value = listOf(SettingsSensor("", "", emptyList()))
                 getDeviceSensors()
             }
         }
@@ -224,10 +213,6 @@ class MySensorViewModel(
 
     fun getDeviceSensors() {
         viewModelScope.launch {
-            //if ((_settingsItems.value.size == 1) and ((_settingsItems.value[0].id == "") and (_settingsItems.value[0].description == ""))) {
-            //    _settingsItems.value[0].description = "Please tap the map icon to add your sensor"
-            //}
-            //if (!((_settingsItems.value.size == 1) and ((_settingsItems.value[0].id == "") and (_settingsItems.value[0].description == "")))) {
             if (_settingsItems.value.isNotEmpty()) {
                 _settingsItems.value.forEach { item ->
                     launch {

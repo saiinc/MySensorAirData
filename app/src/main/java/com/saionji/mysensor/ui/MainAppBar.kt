@@ -63,13 +63,8 @@ fun MainAppBar(
                 onEditSensorId = onEditSensorId,
                 onEditSensorDescription = onEditSensorDescription,
                 onDoneClicked = onDoneClicked,
-                onCloseClicked = onCloseClicked,
-                /*setShowDialog = {
-                showDialog.value = it
-            }*/
-            ) {
-                Log.i("HomePage","HomePage : $it")
-            }
+                onCloseClicked = onCloseClicked
+            )
         }
     }
 }

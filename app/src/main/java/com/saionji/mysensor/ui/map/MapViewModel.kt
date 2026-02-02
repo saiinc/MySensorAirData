@@ -45,6 +45,17 @@ class MapViewModel(
         data class Error(val message: String) : MapUiState
     }
 
+    data class CameraState(
+        val lat: Double,
+        val lon: Double,
+        val zoom: Double,
+        val isProgrammatic: Boolean = false
+    )
+    private val _cameraState = MutableStateFlow<CameraState?>(null)
+    val cameraState: StateFlow<CameraState?> = _cameraState
+
+    private var initialCameraApplied = false
+
     private val _mapUiState = MutableStateFlow<MapUiState>(MapUiState.Idle)
     val mapUiState: StateFlow<MapUiState> = _mapUiState
 
@@ -93,11 +104,6 @@ class MapViewModel(
                 ?.value
                 ?: return@mapNotNull null
 
-            val colorInt = MarkerColorResolver.resolveColorInt(
-                valueType = valueType,
-                value = value
-            )
-
             MapMarkerUiModel(
                 id = sensor.sensor?.id ?: return@mapNotNull null,
                 lat = sensor.location.latitude,
@@ -123,6 +129,35 @@ class MapViewModel(
 
     fun onViewportChanged(bounds: MapBounds) {
         viewportFlow.tryEmit(bounds)
+    }
+
+    fun onLocationUpdated(lat: Double, lon: Double) {
+        _currentLocation.value = LatLng(lat, lon)
+
+        if (!initialCameraApplied) {
+            _cameraState.value = CameraState(
+                lat,
+                lon,
+                zoom = 10.5,
+                isProgrammatic = true
+            )
+            initialCameraApplied = true
+        }
+    }
+
+
+
+    fun onCameraMovedFromUser(bounds: MapBounds) {
+        _cameraState.value = CameraState(
+            lat = (bounds.north + bounds.south) / 2,
+            lon = (bounds.east + bounds.west) / 2,
+            zoom = bounds.zoom,
+            isProgrammatic = false
+        )
+    }
+
+    fun saveCameraState(lat: Double, lon: Double, zoom: Double) {
+        _cameraState.value = CameraState(lat, lon, zoom)
     }
 
     init {
@@ -209,7 +244,7 @@ class MapViewModel(
             CancellationTokenSource().token
         ).addOnSuccessListener { location ->
             if (location != null) {
-                _currentLocation.value = LatLng(
+                onLocationUpdated(
                     lat = location.latitude,
                     lon = location.longitude
                 )
@@ -221,6 +256,11 @@ class MapViewModel(
 
     fun setSelectedValueType(type: String) {
         _selectedValueType.value = type
+
+        if (lastMapSensors.isNotEmpty()) {
+            val markers = mapToUiModels(lastMapSensors, type)
+            _mapUiState.value = MapUiState.Success(markers)
+        }
     }
 
     companion object {

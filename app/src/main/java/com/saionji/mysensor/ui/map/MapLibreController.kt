@@ -9,7 +9,6 @@ class MapLibreController(
     private val map: MapLibreMap
 ) : MapController {
 
-    private var wasCentered = false
     private var viewportListener: ((MapBounds) -> Unit)? = null
 
     override fun moveTo(lat: Double, lon: Double, zoom: Double?) {
@@ -21,11 +20,6 @@ class MapLibreController(
         )
     }
 
-    override fun centerOnce(lat: Double, lon: Double, zoom: Double) {
-        if (wasCentered) return
-        wasCentered = true
-        moveTo(lat, lon, zoom)
-    }
 
     override fun setOnViewportChangedListener(listener: (MapBounds) -> Unit) {
         viewportListener = listener
@@ -53,20 +47,6 @@ class MapLibreController(
     override fun zoomOut() {
         map.animateCamera(
             CameraUpdateFactory.zoomOut()
-        )
-    }
-
-    private var wasInitialCameraSet = false
-
-    override fun setInitialCamera(lat: Double, lon: Double, zoom: Double) {
-        if (wasInitialCameraSet) return
-        wasInitialCameraSet = true
-
-        map.moveCamera(
-            CameraUpdateFactory.newLatLngZoom(
-                LatLng(lat, lon),
-                zoom
-            )
         )
     }
 }

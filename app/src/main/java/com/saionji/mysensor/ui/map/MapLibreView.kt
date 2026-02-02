@@ -17,7 +17,9 @@ import kotlin.apply
 @Composable
 fun MapLibreView(
     modifier: Modifier = Modifier,
-    onMapReady: (MapController, MapLibreMarkerRenderer) -> Unit
+    onMapReady: (MapController, MapLibreMarkerRenderer) -> Unit,
+    onMarkerClick: (String) -> Unit,
+    onMapClick: () -> Unit
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -59,6 +61,26 @@ fun MapLibreView(
                     ) {
                         val controller = MapLibreController(map)
                         val renderer = MapLibreMarkerRenderer(map)
+
+                        // Клик по маркеру
+                        map.addOnMapClickListener { point ->
+                            val screenPoint = map.projection.toScreenLocation(point)
+
+                            val features = map.queryRenderedFeatures(
+                                screenPoint,
+                                "markers-layer" // ID слоя маркеров
+                            )
+
+                            if (features.isNotEmpty()) {
+                                val feature = features.first()
+                                val id = feature.getStringProperty("id")
+                                onMarkerClick(id)
+                                true
+                            } else {
+                                onMapClick()
+                                false
+                            }
+                        }
                         onMapReady(controller, renderer)
                     }
 

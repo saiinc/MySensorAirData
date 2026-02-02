@@ -74,18 +74,13 @@ fun CustomDialog(
     onEditSensorId: (Int, String) -> Unit,
     onEditSensorDescription: (Int, String) -> Unit,
     onDoneClicked: (State<List<SettingsSensor>>, SettingsApp) -> Unit,
-    onCloseClicked: () -> Unit,
-    setShowDialog: (Boolean) -> Unit,
-
+    onCloseClicked: () -> Unit
     ) {
-    if (sensorsOptions.value.isEmpty()) {
-        onAddClicked()
-    }
     //val txtFieldError = remember { mutableStateOf("") }
 
     Dialog(
         properties = DialogProperties(usePlatformDefaultWidth = false),
-        onDismissRequest = { setShowDialog(false) }
+        onDismissRequest = { onCloseClicked() }
     ) {
         Box(
             modifier = Modifier
