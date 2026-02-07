@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -15,13 +16,13 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.saionji.mysensor.MySensorApplication
+import com.saionji.mysensor.data.MapSensor
 import com.saionji.mysensor.domain.model.LatLng
 import com.saionji.mysensor.data.MySensor
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.ui.map.model.MapBounds
-import com.saionji.mysensor.network.model.MySensorRawData
 import com.saionji.mysensor.ui.map.model.MapMarkerUiModel
 import com.saionji.mysensor.ui.map.model.SelectedMarkerUi
 import kotlinx.coroutines.FlowPreview
@@ -65,14 +66,14 @@ class MapViewModel(
     private val _addresses =
         MutableStateFlow<Map<String, String>>(emptyMap())
 
-    private fun addressKey(lat: Double, lon: Double) = "$lat,$lon"
+    private fun addressKey(lat: Double?, lon: Double?) = "$lat,$lon"
 
     val addresses: StateFlow<Map<String, String>> = _addresses
 
     private val _selectedValueType = MutableStateFlow("PM2.5")
     val selectedValueType: StateFlow<String> = _selectedValueType
 
-    private var lastMapSensors: List<MySensorRawData> = emptyList()
+    private var lastMapSensors: List<MapSensor> = emptyList()
 
     private val _selectedMarker = MutableStateFlow<SelectedMarkerUi?>(null)
     val selectedMarker: StateFlow<SelectedMarkerUi?> = _selectedMarker
@@ -81,7 +82,7 @@ class MapViewModel(
         extraBufferCapacity = 1
     )
 
-    fun ensureAddress(lat: Double, lon: Double) {
+    fun ensureAddress(lat: Double?, lon: Double?) {
         val key = addressKey(lat, lon)
 
         if (_addresses.value.containsKey(key)) return
@@ -93,21 +94,21 @@ class MapViewModel(
     }
 
     private fun mapToUiModels(
-        sensors: List<MySensorRawData>,
+        sensors: List<MapSensor>,
         valueType: String
     ): List<MapMarkerUiModel> {
 
         return sensors.mapNotNull { sensor ->
 
-            val value = sensor.sensordatavalues
+            val value = sensor.measurements
                 .find { it.valueType == valueType }
                 ?.value
                 ?: return@mapNotNull null
 
             MapMarkerUiModel(
-                id = sensor.sensor?.id ?: return@mapNotNull null,
-                lat = sensor.location.latitude,
-                lon = sensor.location.longitude,
+                id = sensor.id,
+                lat = sensor.lat,
+                lon = sensor.lon,
                 valueType = valueType,
                 value = value,
                 colorInt = MarkerColorResolver.resolveColorInt(
@@ -213,16 +214,16 @@ class MapViewModel(
         onResult: (SettingsSensor) -> Unit
     ) {
         val rawSensor = lastMapSensors.firstOrNull {
-            it.sensor?.id.toString() == sensorId
+            it.id == sensorId
         } ?: return
 
-        val deviceSensors = rawSensor.sensordatavalues.mapNotNull { data ->
-            val type = data.valueType ?: return@mapNotNull null
+        val deviceSensors = rawSensor.measurements.map { data ->
+            val type = data.valueType
 
             MySensor(
                 valueType = type,
                 value = data.value.toString(),
-                color = data.color
+                color = Color.Transparent
             )
         }
 

@@ -33,12 +33,12 @@ import com.saionji.mysensor.R
 
 @Composable
 fun PollutionDashboard(
-    modfier: Modifier,
+    modifier: Modifier,
     pollutionDataList: State<List<SettingsSensor>>
 ) {
     if (pollutionDataList.value.isEmpty()
     ) {
-        HorizontalDivider(modifier = Modifier.padding(all = 2.dp))
+        HorizontalDivider(modifier = modifier.padding(all = 2.dp))
         Column (
             modifier = Modifier
                 .fillMaxWidth()
@@ -124,15 +124,13 @@ fun ValuesGrid(data: SettingsSensor) {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.SpaceAround
                     ) {
-                        sensor.valueType?.let {
-                            Text(
-                                modifier = Modifier
-                                    .padding(top = 8.dp),
-                                text = it,
-                                textAlign = TextAlign.Center,
-                                fontSize = 21.sp
-                            )
-                        }
+                        Text(
+                            modifier = Modifier
+                                .padding(top = 8.dp),
+                            text = sensor.valueType,
+                            textAlign = TextAlign.Center,
+                            fontSize = 21.sp
+                        )
                         Text(
                             modifier = Modifier
                                 .padding(bottom = 10.dp),

@@ -5,17 +5,30 @@
 
 package com.saionji.mysensor.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
-data class Location (
+@Serializable
+data class Location(
+    @SerialName("longitude")
+    val longitude: Double? = null,
 
-  @SerializedName("longitude"      ) var longitude     : Double = 0.0,
-  @SerializedName("exact_location" ) var exactLocation : Int    = 0,
-  @SerializedName("id"             ) var id            : Int    = 0,
-  @SerializedName("latitude"       ) var latitude      : Double = 0.0,
-  @SerializedName("indoor"         ) var indoor        : Int    = 0,
-  @SerializedName("altitude"       ) var altitude      : String = "",
-  @SerializedName("country"        ) var country       : String = ""
+    @SerialName("exact_location")
+    val exactLocation: Int? = null,
 
+    @SerialName("id")
+    val id: Int? = null,
+
+    @SerialName("latitude")
+    val latitude: Double? = null,
+
+    @SerialName("indoor")
+    val indoor: Int? = null,
+
+    @SerialName("altitude")
+    val altitude: String? = null,
+
+    @SerialName("country")
+    val country: String? = null
 )

@@ -15,7 +15,7 @@ interface MySensorRepository {
         lon1: Double,
         lat2: Double,
         lon2: Double
-    ): List<MySensorRawData>
+    ): List<MapSensor>
 }
 
 class NetworkMySensorRepository(
@@ -27,18 +27,35 @@ class NetworkMySensorRepository(
         lon1: Double,
         lat2: Double,
         lon2: Double
-    ): List<MySensorRawData> {
+    ): List<MapSensor> {
         return try {
             val result = sensorService.getSensorsByArea(lat1, lon1, lat2, lon2)
-            Log.d("MapDebug", "Received ${result.size} sensors")
+            val outdoor = result
+                .distinctBy { it.sensor?.id }
+                .filter { it.location?.indoor == 0 }
 
-            // Удаляем дубликаты по id (или другому уникальному признаку)
-            val distinct = result.distinctBy { it.sensor?.id }
-            val outdoor = distinct.filter { it.location.indoor == 0 }
+            return outdoor.mapNotNull { dto ->
 
-            Log.d("MapDebug", "Filtered to ${distinct.size} unique sensors")
-            outdoor
-        } catch (e: Exception) {
+                val id = dto.sensor?.id ?: return@mapNotNull null
+                val lat = dto.location?.latitude
+                val lon = dto.location?.longitude
+
+                val measurements = dto.sensordatavalues.map { valueDto ->
+                    MapMeasurement(
+                        value = valueDto.value ?: return@mapNotNull null,
+                        valueType = valueDto.valueType ?: return@mapNotNull null
+                    )
+                }
+
+                MapSensor(
+                    id = id.toString(),
+                    lat = lat ?: return@mapNotNull null,
+                    lon = lon ?: return@mapNotNull null,
+                    measurements = measurements
+                )
+            }
+        }
+        catch (e: Exception) {
             Log.e("MapDebug", "Error fetching sensors: ${e.message}", e)
             emptyList()
         }
@@ -48,26 +65,26 @@ class NetworkMySensorRepository(
         senorId: String
     ): List<MySensor> =
         try {
-            sensorService.getVal(senorId.toInt())[0].sensordatavalues.map { it ->
+            sensorService.getVal(senorId.toInt())[0].sensordatavalues.mapNotNull {
                 try {
                     it.value
                     MySensor(
-                        valueType = it.valueType,
+                        valueType = it.valueType ?: return@mapNotNull null,
                         value = it.value.toString()
                     )
-                } catch (e: NumberFormatException) {
+                } catch (_: NumberFormatException) {
                     MySensor(
-                        valueType = it.valueType,
+                        valueType = it.valueType ?: return@mapNotNull null,
                         value = "0"
                     )
                 }
             }
-        } catch (e: IndexOutOfBoundsException) {
+        } catch (_: IndexOutOfBoundsException) {
             listOf(MySensor(
                 valueType = "Sensor \"$senorId\" not found",
                 value = ""
             ))
-        } catch (e: NumberFormatException) {
+        } catch (_: NumberFormatException) {
             listOf(MySensor(
                 valueType = "Sensor \"$senorId\" not found",
                 value = ""

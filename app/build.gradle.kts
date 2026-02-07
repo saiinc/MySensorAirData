@@ -11,6 +11,8 @@ plugins {
 
     // Add the Crashlytics Gradle plugin
     id("com.google.firebase.crashlytics")
+
+    kotlin("plugin.serialization")
 }
 
 android {
@@ -61,6 +63,13 @@ android {
         }
     }
     buildToolsVersion = "35.0.0"
+
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+            force("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
+        }
+    }
 }
 
 dependencies {
@@ -94,9 +103,6 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("com.google.code.gson:gson:2.10.1") // Для сериализации/десериализации объектов в JSON
 
-    // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.2")
     implementation("com.google.firebase:protolite-well-known-types:18.0.0")
 
@@ -108,6 +114,7 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.compose.material3:material3:1.4.0")
     //implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Ktor
     implementation("io.ktor:ktor-client-okhttp:2.3.7")

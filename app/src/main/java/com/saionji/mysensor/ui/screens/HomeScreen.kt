@@ -28,7 +28,7 @@ fun HomeScreen(
         onRefresh = onRefresh,
     ) {
         PollutionDashboard(
-            modfier = Modifier.pullToRefresh(
+            modifier = Modifier.pullToRefresh(
                 isRefreshing = isRefreshing,
                 state = pullRefreshState,
                 threshold = 60.dp,

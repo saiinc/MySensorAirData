@@ -24,10 +24,10 @@ class MapLibreMarkerRenderer(
 
     fun showMarkers(markers: List<MapMarkerUiModel>) {
         val style = map.style ?: return
-
         val features = markers.map {
+
             Feature.fromGeometry(
-                Point.fromLngLat(it.lon, it.lat)
+                Point.fromLngLat(it.lon!!, it.lat!!)
             ).apply {
                 val r = (it.colorInt shr 16) and 0xFF
                 val g = (it.colorInt shr 8) and 0xFF

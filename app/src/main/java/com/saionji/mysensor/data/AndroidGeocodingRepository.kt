@@ -10,21 +10,26 @@ class AndroidGeocodingRepository(
 ) : GeocodingRepository {
 
     override suspend fun getAddress(
-        lat: Double,
-        lon: Double
+        lat: Double?,
+        lon: Double?
     ): String = withContext(Dispatchers.IO) {
 
-        try {
-            val addresses = geocoder.getFromLocation(lat, lon, 1)
-            addresses?.firstOrNull()?.let { addr ->
-                listOfNotNull(
-                    addr.thoroughfare,
-                    addr.subThoroughfare,
-                    addr.locality
-                ).joinToString(", ")
-            } ?: "Адрес не найден"
-        } catch (e: Exception) {
-            "Ошибка геокодинга"
+        if (lat != null && lon != null) {
+            try {
+                val addresses = geocoder.getFromLocation(lat, lon, 1)
+                addresses?.firstOrNull()?.let { addr ->
+                    listOfNotNull(
+                        addr.thoroughfare,
+                        addr.subThoroughfare,
+                        addr.locality
+                    ).joinToString(", ")
+                } ?: "Адрес не найден"
+            } catch (_: Exception) {
+                "Ошибка геокодинга"
+            }
+        }
+        else {
+            return@withContext ""
         }
     }
 }
