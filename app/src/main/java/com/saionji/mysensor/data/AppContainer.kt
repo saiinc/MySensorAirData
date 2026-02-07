@@ -10,15 +10,17 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.domain.GetSensorValuesUseCase
 import com.saionji.mysensor.domain.model.GeocodingRepository
 import com.saionji.mysensor.domain.model.GetAddressFromCoordinatesUseCase
+import com.saionji.mysensor.network.model.KtorSensorService
 import com.saionji.mysensor.network.model.SensorService
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 
 
 // DataStore extension для контекста
@@ -37,25 +39,25 @@ interface AppContainer {
 class DefaultAppContainer(context: Context) : AppContainer{
     private val BASE_URL = "https://data.sensor.community/airrohr/v1/"
 
-    private val gson: Gson = GsonBuilder()
-        .registerTypeAdapter(Double::class.java, SafeDoubleDeserializer())
-        .create()
+    private val client = HttpClient(OkHttp) {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+                coerceInputValues = true
+            })
+        }
+    }
 
-    private val retrofit: Retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create(gson))
-        .baseUrl(BASE_URL)
-        .build()
+    private val sensorService: SensorService by lazy {
+        KtorSensorService(client, BASE_URL)
+    }
 
-    private val retrofitService: SensorService by lazy {
-        retrofit.create(SensorService::class.java)
+    override val mySensorRepository: MySensorRepository by lazy {
+        NetworkMySensorRepository(sensorService)
     }
 
     // DataStore, полученный через контекст
     override val dataStore: DataStore<Preferences> = context.dataStore
-
-    override val mySensorRepository: MySensorRepository by lazy {
-        NetworkMySensorRepository(retrofitService)
-    }
 
     // Репозиторий для работы с настройками
     override val settingsRepository by lazy {

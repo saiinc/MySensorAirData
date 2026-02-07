@@ -19,7 +19,6 @@ import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsRepository
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetSensorValuesUseCase
-import com.saionji.mysensor.network.model.MySensorRawData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -4,13 +4,18 @@
 
 package com.saionji.mysensor.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
-data class Sensor (
+@Serializable
+data class Sensor(
+    @SerialName("sensor_type")
+    val sensorType: SensorType? = null,
 
-  @SerializedName("sensor_type" ) var sensorType : SensorType? = SensorType(),
-  @SerializedName("id"          ) var id         : String?        = null,
-  @SerializedName("pin"         ) var pin        : String?     = null
+    @SerialName("id")
+    val id: Int? = null,
 
+    @SerialName("pin")
+    val pin: String? = null
 )

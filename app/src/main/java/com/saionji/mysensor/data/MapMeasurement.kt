@@ -1,0 +1,6 @@
+package com.saionji.mysensor.data
+
+data class MapMeasurement(
+    var valueType: String,   // PM2.5 / PM10 / temperature
+    var value: Double
+)

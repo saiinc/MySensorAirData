@@ -4,16 +4,26 @@
 
 package com.saionji.mysensor.network.model
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
+data class MySensorRawData(
+    @SerialName("timestamp")
+    val timestamp: String? = null,
 
-data class MySensorRawData (
+    @SerialName("sampling_rate")
+    val samplingRate: String? = null,
 
-  @SerializedName("timestamp"        ) var timestamp        : String?                     = null,
-  @SerializedName("sampling_rate"    ) var samplingRate     : String?                     = null,
-  @SerializedName("id"               ) var id               : String?                        = null,
-  @SerializedName("sensordatavalues" ) var sensordatavalues : ArrayList<Sensordatavalues> = arrayListOf(),
-  @SerializedName("sensor"           ) var sensor           : Sensor?                     = Sensor(),
-  @SerializedName("location"         ) var location         : Location                    = Location()
+    @SerialName("id")
+    val id: Long? = null,
 
+    @SerialName("sensordatavalues")
+    val sensordatavalues: List<Sensordatavalues> = emptyList(),
+
+    @SerialName("sensor")
+    val sensor: Sensor? = null,
+
+    @SerialName("location")
+    val location: Location? = null
 )
