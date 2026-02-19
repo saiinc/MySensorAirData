@@ -25,10 +25,10 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.2.0"
+        versionName = "1.2.1"
 
-        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        testInstrumentationRunner = "com.kaspersky.kaspresso.runner.KaspressoRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        //testInstrumentationRunner = "com.kaspersky.kaspresso.runner.KaspressoRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -83,7 +83,6 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.7.8")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3:1.3.1")
     implementation("androidx.compose.foundation:foundation:1.7.8")
 
     // Import the Firebase BoM
@@ -101,9 +100,8 @@ dependencies {
 
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("com.google.code.gson:gson:2.10.1") // Для сериализации/десериализации объектов в JSON
 
-    implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.2")
+    implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.5")
     implementation("com.google.firebase:protolite-well-known-types:18.0.0")
 
     implementation("androidx.navigation:navigation-compose:2.8.4")
@@ -113,7 +111,6 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("androidx.compose.material3:material3:1.4.0")
-    //implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Ktor
@@ -121,19 +118,20 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
 
+    implementation("androidx.compose.animation:animation-core:1.10.3")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit")
-    //androidTestImplementation("androidx.test.espresso:espresso-core")
+    androidTestImplementation("androidx.test.espresso:espresso-core")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.11.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    implementation ("com.google.android.material:material:1.10.0")
-    androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.6.0") {
-        exclude(module = "protobuf-lite")
-    }
-    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.6.0") {
-        exclude(module = "protobuf-lite")
-    }
+    //androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.6.0") {
+    //    exclude(module = "protobuf-lite")
+    //}
+    //androidTestImplementation("com.kaspersky.android-components:kaspresso:1.6.0") {
+    //    exclude(module = "protobuf-lite")
+    //}
 }

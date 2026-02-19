@@ -4,6 +4,9 @@
 
 package com.saionji.mysensor.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class SettingsApp(
     val shareId: Boolean
 )

@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.saionji.mysensor.C
-import com.saionji.mysensor.data.SettingsSensor
+import com.saionji.mysensor.data.DashboardSensor
 import com.saionji.mysensor.domain.HUMIDITY_COLOR_RANGES
 import com.saionji.mysensor.domain.NOISE_COLOR_RANGES
 import com.saionji.mysensor.domain.PM10_COLOR_RANGES
@@ -35,7 +35,6 @@ import com.saionji.mysensor.domain.PM25_COLOR_RANGES
 import com.saionji.mysensor.domain.PRESSURE_COLOR_RANGES
 import com.saionji.mysensor.domain.TEMPERATURE_COLOR_RANGES
 import com.saionji.mysensor.domain.model.LatLng
-import com.saionji.mysensor.ui.map.model.SelectedMarkerUi
 import com.saionji.mysensor.ui.map.renderer.MapLibreMarkerRenderer
 import com.saionji.mysensor.ui.screens.VerticalColorBar
 
@@ -43,7 +42,7 @@ import com.saionji.mysensor.ui.screens.VerticalColorBar
 fun MapScreen(
     mapViewModel: MapViewModel,
     currentLocation: LatLng?,
-    settingsItems: State<List<SettingsSensor>>,
+    dashboardSensors: State<List<DashboardSensor>>,
     onAddToDashboard: (String, String) -> Unit,
     onRemoveFromDashboard: (String) -> Unit
 ) {
@@ -124,15 +123,7 @@ fun MapScreen(
                     val marker = state.markers.firstOrNull { it.id == markerId }
                         ?: return@MapLibreView
 
-                    mapViewModel.onMarkerSelected(
-                        SelectedMarkerUi(
-                            id = marker.id,
-                            lat = marker.lat,
-                            lon = marker.lon,
-                            value = marker.value.toString(),
-                            valueType = marker.valueType
-                        )
-                    )
+                    mapViewModel.onMarkerSelected(marker)
                 }
             },
             onMapClick = {
@@ -242,14 +233,14 @@ fun MapScreen(
         selectedMarker?.let { marker ->
             val address = addresses["${marker.lat},${marker.lon}"]
             val isAdded = selectedMarker?.let { marker ->
-                settingsItems.value.any { it.id == marker.id }
+                dashboardSensors.value.any { it.id == marker.id }
             } ?: false
 
             MarkerPopup(
                 marker = marker,
                 address = address,
                 isAdded = isAdded,
-                isLimitReached = settingsItems.value.size > C.DASHBOARD_SENSOR_LIMIT,
+                isLimitReached = dashboardSensors.value.size > C.DASHBOARD_SENSOR_LIMIT,
                 onClose = { mapViewModel.clearSelectedMarker() },
                 onAdd = {
                     if (address != null) {

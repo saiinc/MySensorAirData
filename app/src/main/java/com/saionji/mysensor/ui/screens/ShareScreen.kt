@@ -33,8 +33,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.FileProvider
+import com.saionji.mysensor.data.DashboardSensor
 import com.saionji.mysensor.data.SettingsApp
-import com.saionji.mysensor.data.SettingsSensor
 import java.io.File
 import java.io.FileOutputStream
 
@@ -42,7 +42,7 @@ import java.io.FileOutputStream
 @Composable
 fun ShareScreen(
     settingsApp: SettingsApp,
-    settingsItems: State<List<SettingsSensor>>,
+    settingsItems: State<List<DashboardSensor>>,
     onBitmapGenerated: (Bitmap?) -> Unit
 ) {
     var graphicsLayer = rememberGraphicsLayer()

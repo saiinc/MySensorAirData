@@ -54,7 +54,7 @@ fun SensorsApp(
         viewModel(factory = MapViewModel.Factory)
     val optionsBoxState = mySensorViewModel.optionsBoxState
     val settingsApp = mySensorViewModel.settingsApp.value
-    val settingsItems = mySensorViewModel.settingsItems.collectAsState()
+    val settingsItems = mySensorViewModel.dashboardItems.collectAsState()
     val sensorsOptions = mySensorViewModel.sensorsOptions.collectAsState()
     val isRefreshing = mySensorViewModel.isRefreshing.collectAsState().value
     val showError by mySensorViewModel.showErrorMessage.collectAsState()
@@ -120,7 +120,6 @@ fun SensorsApp(
                             mySensorViewModel.saveAppSettings(settingsApp)
                             val updatedSensors = sensorsOptions.value.map { it.copy() }
                             mySensorViewModel.saveSensors(updatedSensors)
-                            mySensorViewModel.sensorsLoad(updatedSensors)
                             mySensorViewModel.getDeviceSensors()
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.CLOSED)
                         },
@@ -172,7 +171,7 @@ fun SensorsApp(
                 ) {
                     when (currentScreen) {
                         Screen.Dashboard -> HomeScreen(
-                            settingsItems = settingsItems,
+                            dashboardSensor = settingsItems,
                             isRefreshing = isRefreshing,
                             onRefresh = mySensorViewModel::refresh
                         )
@@ -194,7 +193,7 @@ fun SensorsApp(
                             }
                             MapScreen(
                                 mapViewModel = mapViewModel,
-                                settingsItems = settingsItems,
+                                dashboardSensors = settingsItems,
                                 onAddToDashboard = { sensorId, address ->
                                     mapViewModel.buildSettingsSensorFromMap(
                                         sensorId,

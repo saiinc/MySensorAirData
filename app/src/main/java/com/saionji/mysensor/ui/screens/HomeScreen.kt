@@ -7,17 +7,17 @@ package com.saionji.mysensor.ui.screens
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import com.saionji.mysensor.data.SettingsSensor
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.saionji.mysensor.data.DashboardSensor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    settingsItems: State<List<SettingsSensor>>,
+    dashboardSensor: State<List<DashboardSensor>>,
     isRefreshing: Boolean,
     onRefresh: () -> Unit
 ) {
@@ -34,7 +34,7 @@ fun HomeScreen(
                 threshold = 60.dp,
                 onRefresh = onRefresh
             ),
-            pollutionDataList = settingsItems
+            pollutionDataList = dashboardSensor
         )
     }
 }
