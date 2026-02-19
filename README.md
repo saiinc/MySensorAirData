@@ -18,8 +18,8 @@
 
 ### 📊 Local Air Quality Dashboard / Сводка общего состояния качества воздуха
 You can use the app as a **dashboard** to monitor air quality in your area.  
-Вы можете использовать приложение как **дашборд** для мониторинга качества воздуха в вашем регионе.  
-![mysensor_dashboard](https://github.com/user-attachments/assets/7fb954e1-6c6f-4087-8a61-7c44aebe6c36)  
+Вы можете использовать приложение как **дашборд** для мониторинга качества воздуха в вашем регионе.   
+<img width="502" height="893" alt="dashboard_mysensor" src="https://github.com/user-attachments/assets/252986df-96e6-4298-9440-9454bb5c0317" />
 
 ### 🏠 Personal Sensor Monitoring / Мониторинг персонального сенсора
 The app allows you to monitor **a specific sensor** in real-time.  
