@@ -4,10 +4,13 @@
 
 package com.saionji.mysensor.data
 
-import androidx.compose.ui.graphics.Color
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
+@Serializable
 data class MySensor(
     var valueType: String,
     var value: String,
-    var color: Color = Color.Transparent
+    @Transient
+    var color: Int = 0
 )

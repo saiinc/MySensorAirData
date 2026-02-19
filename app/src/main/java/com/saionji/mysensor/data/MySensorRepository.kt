@@ -5,7 +5,6 @@
 package com.saionji.mysensor.data
 
 import android.util.Log
-import com.saionji.mysensor.network.model.MySensorRawData
 import com.saionji.mysensor.network.model.SensorService
 
 interface MySensorRepository {

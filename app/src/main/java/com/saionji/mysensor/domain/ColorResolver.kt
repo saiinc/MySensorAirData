@@ -1,15 +1,6 @@
-package com.saionji.mysensor.ui.map
+package com.saionji.mysensor.domain
 
-import com.saionji.mysensor.domain.HUMIDITY_COLOR_RANGES
-import com.saionji.mysensor.domain.NOISE_COLOR_RANGES
-import com.saionji.mysensor.domain.PM10_COLOR_RANGES
-import com.saionji.mysensor.domain.PM25_COLOR_RANGES
-import com.saionji.mysensor.domain.PRESSURE_COLOR_RANGES
-import com.saionji.mysensor.domain.TEMPERATURE_COLOR_RANGES
-import com.saionji.mysensor.domain.interpolateColor
-
-object MarkerColorResolver {
-
+object ColorResolver {
     fun resolveColorInt(
         valueType: String,
         value: Double

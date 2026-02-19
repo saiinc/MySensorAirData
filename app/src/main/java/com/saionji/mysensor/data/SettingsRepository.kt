@@ -6,31 +6,34 @@ package com.saionji.mysensor.data
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
+class SettingsRepository(
+    private val dataStore: DataStore<Preferences>
+) {
 
-class SettingsRepository(private val dataStore: DataStore<Preferences>) {
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
 
-    private val gson = Gson()
     private val MY_OBJECTS_KEY = stringPreferencesKey("my_objects_key")
-    private val APP_SETTINGS = stringPreferencesKey("app_settings")
+    private val APP_SETTINGS_KEY = stringPreferencesKey("app_settings")
 
-    suspend fun saveAppSettings(myObjects: SettingsApp) {
-        val jsonString = gson.toJson(myObjects) // Преобразуем список объектов в JSON
+    suspend fun saveAppSettings(settings: SettingsApp) {
+        val jsonString = json.encodeToString(settings)
         dataStore.edit { preferences ->
-            preferences[APP_SETTINGS] = jsonString
+            preferences[APP_SETTINGS_KEY] = jsonString
         }
     }
 
-    // Функция для сохранения списка объектов
-    suspend fun saveSettings(myObjects: List<SettingsSensor>) {
-        val jsonString = gson.toJson(myObjects)
+    suspend fun saveSettings(sensors: List<SettingsSensor>) {
+        val jsonString = json.encodeToString(sensors)
         dataStore.edit { preferences ->
             preferences[MY_OBJECTS_KEY] = jsonString
         }
@@ -38,27 +41,32 @@ class SettingsRepository(private val dataStore: DataStore<Preferences>) {
 
     fun getAppSettings(): Flow<SettingsApp> {
         return dataStore.data.map { preferences ->
-            val jsonString = preferences[APP_SETTINGS] ?: ""
+            val jsonString = preferences[APP_SETTINGS_KEY] ?: ""
             if (jsonString.isNotEmpty()) {
-                val type = object : TypeToken<SettingsApp>() {}.type
-                gson.fromJson(jsonString, type)
-            }
-            else {
+                try {
+                    json.decodeFromString<SettingsApp>(jsonString)
+                } catch (e: Exception) {
+                    // Если старый формат — сбрасываем
+                    SettingsApp(true)
+                }
+            } else {
                 SettingsApp(true)
             }
         }
     }
 
-    // Функция для загрузки списка объектов
     fun getSettings(): Flow<List<SettingsSensor>> {
         return dataStore.data.map { preferences ->
             val jsonString = preferences[MY_OBJECTS_KEY] ?: ""
             if (jsonString.isNotEmpty()) {
-                val type = object : TypeToken<List<SettingsSensor>>() {}.type
-                gson.fromJson(jsonString, type) // Преобразуем JSON обратно в список объектов
-            }
-            else {
-                emptyList() // Возвращаем пустой список, если данных нет
+                try {
+                    json.decodeFromString<List<SettingsSensor>>(jsonString)
+                } catch (e: Exception) {
+                    // Старый Gson-формат или старый Color
+                    emptyList()
+                }
+            } else {
+                emptyList()
             }
         }
     }

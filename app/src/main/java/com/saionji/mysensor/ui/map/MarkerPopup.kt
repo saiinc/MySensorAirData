@@ -23,11 +23,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.saionji.mysensor.ui.map.model.SelectedMarkerUi
+import com.saionji.mysensor.domain.model.MapMarker
 
 @Composable
 fun MarkerPopup(
-    marker: SelectedMarkerUi,
+    marker: MapMarker,
     address: String?,
     isAdded: Boolean,
     isLimitReached: Boolean,
@@ -55,6 +55,7 @@ fun MarkerPopup(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(marker.valueType, style = MaterialTheme.typography.titleMedium)
+                    Text("id: ${marker.id}", style = MaterialTheme.typography.titleSmall)
                     IconButton(onClick = onClose) {
                         Icon(Icons.Default.Close, contentDescription = null)
                     }

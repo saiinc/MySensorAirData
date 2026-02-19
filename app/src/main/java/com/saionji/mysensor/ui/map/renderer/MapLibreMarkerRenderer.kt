@@ -1,7 +1,7 @@
 package com.saionji.mysensor.ui.map.renderer
 
 import com.saionji.mysensor.MapFonts
-import com.saionji.mysensor.ui.map.model.MapMarkerUiModel
+import com.saionji.mysensor.domain.model.MapMarker
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.CircleLayer
@@ -22,12 +22,12 @@ class MapLibreMarkerRenderer(
     private val clusterLayerId = "clusters-layer"
     private val clusterCountLayerId = "clusters-count-layer"
 
-    fun showMarkers(markers: List<MapMarkerUiModel>) {
+    fun showMarkers(markers: List<MapMarker>) {
         val style = map.style ?: return
         val features = markers.map {
 
             Feature.fromGeometry(
-                Point.fromLngLat(it.lon!!, it.lat!!)
+                Point.fromLngLat(it.lon, it.lat)
             ).apply {
                 val r = (it.colorInt shr 16) and 0xFF
                 val g = (it.colorInt shr 8) and 0xFF
@@ -36,7 +36,7 @@ class MapLibreMarkerRenderer(
                 addNumberProperty("g", g)
                 addNumberProperty("b", b)
                 addStringProperty("id", it.id)
-                addStringProperty("value", it.value.toString())
+                addStringProperty("value", it.value)
                 addStringProperty("color", colorIntToHex(it.colorInt))
             }
         }

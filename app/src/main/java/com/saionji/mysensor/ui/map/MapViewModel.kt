@@ -22,9 +22,8 @@ import com.saionji.mysensor.data.MySensor
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.domain.model.GetAddressFromCoordinatesUseCase
+import com.saionji.mysensor.domain.model.MapMarker
 import com.saionji.mysensor.ui.map.model.MapBounds
-import com.saionji.mysensor.ui.map.model.MapMarkerUiModel
-import com.saionji.mysensor.ui.map.model.SelectedMarkerUi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +41,7 @@ class MapViewModel(
     sealed interface MapUiState {
         object Idle : MapUiState
         object Loading : MapUiState
-        data class Success(val markers: List<MapMarkerUiModel>) : MapUiState
+        data class Success(val markers: List<MapMarker>) : MapUiState
         data class Error(val message: String) : MapUiState
     }
 
@@ -65,18 +64,20 @@ class MapViewModel(
 
     private val _addresses =
         MutableStateFlow<Map<String, String>>(emptyMap())
+    val addresses: StateFlow<Map<String, String>> = _addresses
 
     private fun addressKey(lat: Double?, lon: Double?) = "$lat,$lon"
-
-    val addresses: StateFlow<Map<String, String>> = _addresses
 
     private val _selectedValueType = MutableStateFlow("PM2.5")
     val selectedValueType: StateFlow<String> = _selectedValueType
 
-    private var lastMapSensors: List<MapSensor> = emptyList()
+    private var lastBounds: MapBounds? = null
 
-    private val _selectedMarker = MutableStateFlow<SelectedMarkerUi?>(null)
-    val selectedMarker: StateFlow<SelectedMarkerUi?> = _selectedMarker
+    private val _selectedMarker =
+        MutableStateFlow<MapMarker?>(null)
+
+    val selectedMarker: StateFlow<MapMarker?> =
+        _selectedMarker
 
     private val viewportFlow = MutableSharedFlow<MapBounds>(
         extraBufferCapacity = 1
@@ -93,33 +94,7 @@ class MapViewModel(
         }
     }
 
-    private fun mapToUiModels(
-        sensors: List<MapSensor>,
-        valueType: String
-    ): List<MapMarkerUiModel> {
-
-        return sensors.mapNotNull { sensor ->
-
-            val value = sensor.measurements
-                .find { it.valueType == valueType }
-                ?.value
-                ?: return@mapNotNull null
-
-            MapMarkerUiModel(
-                id = sensor.id,
-                lat = sensor.lat,
-                lon = sensor.lon,
-                valueType = valueType,
-                value = value,
-                colorInt = MarkerColorResolver.resolveColorInt(
-                    valueType,
-                    value
-                )
-            )
-        }
-    }
-
-    fun onMarkerSelected(marker: SelectedMarkerUi) {
+    fun onMarkerSelected(marker: MapMarker) {
         _selectedMarker.value = marker
         ensureAddress(marker.lat, marker.lon)
     }
@@ -157,10 +132,6 @@ class MapViewModel(
         )
     }
 
-    fun saveCameraState(lat: Double, lon: Double, zoom: Double) {
-        _cameraState.value = CameraState(lat, lon, zoom)
-    }
-
     init {
         viewModelScope.launch {
             viewportFlow
@@ -172,7 +143,7 @@ class MapViewModel(
     }
 
     fun loadSensorsForArea(bounds: MapBounds) {
-        val valueType = _selectedValueType.value
+        lastBounds = bounds
         if (bounds.zoom < 6.0) {
             _mapUiState.value = MapUiState.Idle
             return
@@ -187,17 +158,13 @@ class MapViewModel(
         viewModelScope.launch {
             _mapUiState.value = MapUiState.Loading
             try {
-                val sensors = getSensorValuesByAreaUseCase(
+                val markers = getSensorValuesByAreaUseCase(
                     bounds.north,
                     bounds.west,
                     bounds.south,
-                    bounds.east
+                    bounds.east,
+                    _selectedValueType.value
                 )
-
-                lastMapSensors = sensors
-
-                val markers = mapToUiModels(sensors, valueType)
-                _mapUiState.value = MapUiState.Success(markers)
 
                 _mapUiState.value = MapUiState.Success(markers)
             } catch (e: Exception) {
@@ -213,24 +180,11 @@ class MapViewModel(
         address: String,
         onResult: (SettingsSensor) -> Unit
     ) {
-        val rawSensor = lastMapSensors.firstOrNull {
-            it.id == sensorId
-        } ?: return
-
-        val deviceSensors = rawSensor.measurements.map { data ->
-            val type = data.valueType
-
-            MySensor(
-                valueType = type,
-                value = data.value.toString(),
-                color = Color.Transparent
-            )
-        }
 
         val settingsSensor = SettingsSensor(
             id = sensorId,
-            description = address,
-            deviceSensors = deviceSensors
+            description = address
+
         )
 
         onResult(settingsSensor)
@@ -256,11 +210,13 @@ class MapViewModel(
     }
 
     fun setSelectedValueType(type: String) {
+
+        if (_selectedValueType.value == type) return
+
         _selectedValueType.value = type
 
-        if (lastMapSensors.isNotEmpty()) {
-            val markers = mapToUiModels(lastMapSensors, type)
-            _mapUiState.value = MapUiState.Success(markers)
+        lastBounds?.let {
+            viewportFlow.tryEmit(it)
         }
     }
 

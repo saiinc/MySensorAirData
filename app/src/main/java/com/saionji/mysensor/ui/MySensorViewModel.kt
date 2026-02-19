@@ -15,6 +15,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.saionji.mysensor.MySensorApplication
+import com.saionji.mysensor.data.DashboardSensor
 import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsRepository
 import com.saionji.mysensor.data.SettingsSensor
@@ -92,8 +93,9 @@ class MySensorViewModel(
         mutableStateOf(value = SettingsApp(true))
     val settingsApp: State<SettingsApp> = _settingsApp
 
-    private val _settingsItems = MutableStateFlow<List<SettingsSensor>>(emptyList())
-    val settingsItems: StateFlow<List<SettingsSensor>> get() = _settingsItems
+    private val _dashboardItems =
+        MutableStateFlow<List<DashboardSensor>>(emptyList())
+    val dashboardItems: StateFlow<List<DashboardSensor>> = _dashboardItems
 
     private val _sensorsOptions = MutableStateFlow<List<SettingsSensor>>(emptyList())
     val sensorsOptions: StateFlow<List<SettingsSensor>> get() = _sensorsOptions
@@ -137,31 +139,52 @@ class MySensorViewModel(
         }
     }
 
-    fun sensorsLoad(sensors: List<SettingsSensor>) {
-        _settingsItems.value = sensors
-        _sensorsOptions.value = emptyList()
-    }
-
     fun sensorsOptionsLoad() {
-        if (_settingsItems.value.isEmpty()) {
-            _sensorsOptions.value = listOf(SettingsSensor("", "", emptyList()))
+        if (dashboardItems.value.isEmpty()) {
+            _sensorsOptions.value = listOf(SettingsSensor("", ""))
         } else {
-            _sensorsOptions.value = _settingsItems.value
+            _sensorsOptions.value = dashboardItems.value.map {
+                SettingsSensor(
+                    id = it.id,
+                    description = it.description
+                )
+            }
         }
     }
 
     fun addSensorDashboardFromMap(settingsSensor: SettingsSensor) {
-        _settingsItems.value += settingsSensor
+        val fromMapItem = DashboardSensor(
+            id = settingsSensor.id,
+            description = settingsSensor.description,
+            deviceSensors = emptyList()
+        )
+        _dashboardItems.value += fromMapItem
+        saveSensors(
+            dashboardItems.value.map {
+                SettingsSensor(
+                    id = it.id,
+                    description = it.description
+                )
+            }
+        )
     }
 
     fun removeSensorDashboardFromMap(id: String) {
-        _settingsItems.value.find { it.id == id }?.let { foundItem ->
-            _settingsItems.value -= foundItem
+        _dashboardItems.value.find { it.id == id }?.let { foundItem ->
+            _dashboardItems.value -= foundItem
         }
+        saveSensors(
+            dashboardItems.value.map {
+                SettingsSensor(
+                    id = it.id,
+                    description = it.description
+                )
+            }
+        )
     }
 
     fun addSensorOptions() {
-        _sensorsOptions.value += SettingsSensor(id = "", description = "", emptyList())
+        _sensorsOptions.value += SettingsSensor(id = "", description = "")
     }
 
     fun removeSensorOptions(settingsSensorItem: SettingsSensor) {
@@ -188,14 +211,29 @@ class MySensorViewModel(
         initLoad()
     }
     private fun initLoad() {
-        viewModelScope.launch(Dispatchers.Main) {
-            settingsRepository.getSettings().collectLatest { mySettings ->
-                if (mySettings.isNotEmpty())
-                    _settingsItems.value = mySettings
+        viewModelScope.launch {
+            settingsRepository.getSettings().collectLatest { savedSettings ->
+
+                if (savedSettings.isEmpty()) return@collectLatest
+
+                // создаём runtime-объекты без сенсоров
+                val dashboard = savedSettings.map {
+                    DashboardSensor(
+                        id = it.id,
+                        description = it.description,
+                        deviceSensors = emptyList(),
+                        isLoading = true
+                    )
+                }
+
+                _dashboardItems.value = dashboard
+
+                // загружаем данные один раз
                 getDeviceSensors()
             }
         }
-        viewModelScope.launch(Dispatchers.Main) {
+
+        viewModelScope.launch {
             settingsRepository.getAppSettings().collectLatest {
                 _settingsApp.value = it
             }
@@ -212,42 +250,47 @@ class MySensorViewModel(
 
     fun getDeviceSensors() {
         viewModelScope.launch {
-            if (_settingsItems.value.isNotEmpty()) {
-                _settingsItems.value.forEach { item ->
-                    launch {
-                        try {
-                            val updatedSensors = getSensorValuesUseCase(item)
-                            _settingsItems.update { currentList ->
-                                currentList.map { currentItem ->
-                                    if (currentItem.id == item.id) {
-                                        currentItem.copy(deviceSensors = updatedSensors)
-                                    } else {
-                                        currentItem
-                                    }
-                                }
+
+            val current = _dashboardItems.value
+
+            if (current.isEmpty()) return@launch
+
+            current.forEach { item ->
+
+                launch {
+                    try {
+                        val updatedSensors = getSensorValuesUseCase(
+                            SettingsSensor(item.id, item.description)
+                        )
+
+                        _dashboardItems.update { list ->
+                            list.map { existing ->
+                                if (existing.id == item.id) {
+                                    existing.copy(
+                                        deviceSensors = updatedSensors,
+                                        isLoading = false)
+                                } else existing
                             }
-                        } catch (_: IOException) {
-                            setShowErrorMessage(true)
-                            _settingsItems.update { currentList ->
-                                currentList.map { currentItem ->
-                                    if (currentItem.id == item.id) {
-                                        currentItem.copy(deviceSensors = item.deviceSensors.map { sensorItem ->
-                                            sensorItem.copy(
-                                                value = "—",
-                                                valueType = sensorItem.valueType
-                                            )
-                                        }
-                                        )
-                                    } else {
-                                        currentItem
-                                    }
-                                }
+                        }
+
+                    } catch (_: IOException) {
+
+                        setShowErrorMessage(true)
+
+                        _dashboardItems.update { list ->
+                            list.map { existing ->
+                                if (existing.id == item.id) {
+                                    existing.copy(
+                                        deviceSensors = existing.deviceSensors.map {
+                                            it.copy(value = "—")
+                                        },
+                                        isLoading = false
+                                    )
+                                } else existing
                             }
                         }
                     }
                 }
-                delay(5000)
-                saveSensors(settingsItems.value.map { it.copy() })
             }
         }
     }
