@@ -19,5 +19,7 @@
 
     <string name="error_loading">Loading error</string>
 
+    <string name="error_unknown">Unknown error</string>
+
     <string name="add_sensor">Please tap the map icon to add your sensor</string>
 </resources>

@@ -1,7 +1,8 @@
-package com.saionji.mysensor.ui.screens
 /*
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
+
+package com.saionji.mysensor.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
