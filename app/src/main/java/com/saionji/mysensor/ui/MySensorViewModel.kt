@@ -8,6 +8,7 @@ import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -78,11 +79,20 @@ class MySensorViewModel(
         _isRefreshing.update { false }
     }
 
-    private val _showErrorMessage = MutableStateFlow(false)
-    val showErrorMessage: StateFlow<Boolean> = _showErrorMessage
+    enum class ErrorType {
+        Network,
+        Unknown
+    }
 
-    fun setShowErrorMessage(value: Boolean) {
-        _showErrorMessage.value = value
+    private val _error = MutableStateFlow<ErrorType?>(null)
+    val error: StateFlow<ErrorType?> = _error
+
+    fun showError(type: ErrorType) {
+        _error.value = type
+    }
+
+    fun clearError() {
+        _error.value = null
     }
 
     private val _sensorIdTextState: MutableState<String> =
@@ -272,10 +282,11 @@ class MySensorViewModel(
                                 } else existing
                             }
                         }
+                        clearError()
 
                     } catch (_: IOException) {
 
-                        setShowErrorMessage(true)
+                        showError(ErrorType.Network)
 
                         _dashboardItems.update { list ->
                             list.map { existing ->

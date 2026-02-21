@@ -4,10 +4,6 @@
 
 package com.saionji.mysensor.ui.screens
 
-import android.content.Context
-import android.content.Intent
-import android.graphics.Bitmap
-import android.net.Uri
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredWidth
@@ -23,7 +19,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
@@ -32,18 +27,16 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.FileProvider
+import androidx.compose.ui.graphics.ImageBitmap
 import com.saionji.mysensor.data.DashboardSensor
 import com.saionji.mysensor.data.SettingsApp
-import java.io.File
-import java.io.FileOutputStream
 
 
 @Composable
 fun ShareScreen(
     settingsApp: SettingsApp,
     settingsItems: State<List<DashboardSensor>>,
-    onBitmapGenerated: (Bitmap?) -> Unit
+    onImageGenerated: (ImageBitmap?) -> Unit
 ) {
     var graphicsLayer = rememberGraphicsLayer()
     val coroutineScope = rememberCoroutineScope()
@@ -91,26 +84,8 @@ fun ShareScreen(
     // Сохраняем Bitmap при загрузке экрана
     LaunchedEffect(Unit) {
         coroutineScope.launch {
-            val myImageBitmap = graphicsLayer.toImageBitmap()
-            val bitmap = myImageBitmap.asAndroidBitmap()
-            onBitmapGenerated(bitmap)
+            val image = graphicsLayer.toImageBitmap()
+            onImageGenerated(image)
         }
     }
-}
-
-fun saveBitmapToCache(context: Context, bitmap: Bitmap): Uri? {
-    val file = File(context.cacheDir, "captured_image.png")
-    FileOutputStream(file).use { output ->
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)
-    }
-    return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-}
-
-fun shareUri(context: Context, uri: Uri) {
-    val shareIntent = Intent(Intent.ACTION_SEND).apply {
-        type = "image/png"
-        putExtra(Intent.EXTRA_STREAM, uri)
-        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-    }
-    context.startActivity(Intent.createChooser(shareIntent, "Поделиться изображением"))
 }

@@ -20,8 +20,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,9 +39,6 @@ import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
 import com.saionji.mysensor.ui.map.MapScreen
 import com.saionji.mysensor.ui.screens.ShareScreen
-import com.saionji.mysensor.ui.screens.saveBitmapToCache
-import com.saionji.mysensor.ui.screens.shareUri
-import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -57,13 +54,9 @@ fun SensorsApp(
     val settingsItems = mySensorViewModel.dashboardItems.collectAsState()
     val sensorsOptions = mySensorViewModel.sensorsOptions.collectAsState()
     val isRefreshing = mySensorViewModel.isRefreshing.collectAsState().value
-    val showError by mySensorViewModel.showErrorMessage.collectAsState()
+    val error by mySensorViewModel.error.collectAsState()
     val currentScreen by mySensorViewModel.currentScreen.collectAsState()
     val currentLocation by mapViewModel.currentLocation
-    val backgroundColor = MaterialTheme.colorScheme.surface.toArgb()
-    val textColor = MaterialTheme.colorScheme.onSurface.toArgb()
-    val strokeColor = MaterialTheme.colorScheme.outline.toArgb()
-    val errorMessage = stringResource(R.string.error_loading)
 
     val context = LocalContext.current
 
@@ -74,6 +67,7 @@ fun SensorsApp(
         )
     )
     val allPermissionsGranted = locationPermissionsState.permissions.all { it.status.isGranted }
+    val shareManager = remember { AndroidShareManager(context) }
 
     val navController = rememberNavController()
 
@@ -84,19 +78,16 @@ fun SensorsApp(
         }
     }
 
-    LaunchedEffect(showError) {
-        if (showError) {
-            errorPopUp(
-                context = context,
-                message = errorMessage,
-                backgroundColor = backgroundColor,
-                textColor = textColor,
-                strokeColor = strokeColor
-            )
-            delay(3000)
-            mySensorViewModel.setShowErrorMessage(false)
-        }
+    val errorMessage = when (error) {
+        MySensorViewModel.ErrorType.Network -> stringResource(R.string.error_loading)
+        MySensorViewModel.ErrorType.Unknown -> stringResource(R.string.error_unknown)
+        null -> null
     }
+
+    if (errorMessage != null) {
+        ErrorBanner(message = errorMessage)
+    }
+
     NavHost(navController = navController, startDestination = "main") {
         composable("main") {
             Scaffold(
@@ -222,12 +213,10 @@ fun SensorsApp(
         ShareScreen(
             settingsApp = mySensorViewModel.settingsApp.value,
             settingsItems = settingsItems,
-            onBitmapGenerated = { bitmap ->
-                if (bitmap != null) {
-                    saveBitmapToCache(context, bitmap)?.let { uri ->
-                        shareUri(context, uri)
+            onImageGenerated = { image ->
+                if (image != null) {
+                    shareManager.share(image)
                     }
-                }
                 mySensorViewModel.setShowShareScreen(false) // Закрываем ShareScreen
             }
         )
