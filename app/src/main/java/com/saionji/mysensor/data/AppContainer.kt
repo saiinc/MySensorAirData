@@ -15,7 +15,6 @@ import com.saionji.mysensor.domain.GetSensorValuesUseCase
 import com.saionji.mysensor.domain.model.GeocodingRepository
 import com.saionji.mysensor.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.network.model.KtorSensorService
-import com.saionji.mysensor.network.model.SensorService
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -29,61 +28,68 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "my
 interface AppContainer {
     val mySensorRepository: MySensorRepository
     val settingsRepository: SettingsRepository
-    val dataStore: DataStore<Preferences>
     val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase
     val getSensorValuesUseCase: GetSensorValuesUseCase // Добавляем UseCase
-
     val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase
 }
 
-class DefaultAppContainer(context: Context) : AppContainer{
-    private val BASE_URL = "https://data.sensor.community/airrohr/v1/"
+class AndroidAppContainer(
+    private val context: Context
+) : AppContainer {
 
-    private val client = HttpClient(OkHttp) {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                coerceInputValues = true
-            })
-        }
+    private companion object {
+        const val BASE_URL = "https://data.sensor.community/airrohr/v1/"
     }
 
-    private val sensorService: SensorService by lazy {
-        KtorSensorService(client, BASE_URL)
+    private val httpClient by lazy { createHttpClient() }
+
+    private val sensorService by lazy {
+        KtorSensorService(httpClient, BASE_URL)
     }
 
-    override val mySensorRepository: MySensorRepository by lazy {
+    private val repository by lazy {
         NetworkMySensorRepository(sensorService)
     }
 
-    // DataStore, полученный через контекст
-    override val dataStore: DataStore<Preferences> = context.dataStore
+    override val mySensorRepository: MySensorRepository
+        get() = repository
 
-    // Репозиторий для работы с настройками
     override val settingsRepository by lazy {
-        SettingsRepository(context.dataStore)
+        AndroidSettingsRepository(context.dataStore)
     }
 
-    override val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase by lazy {
-        GetSensorValuesByAreaUseCase(mySensorRepository)
+    private val geocodingRepository by lazy {
+        createGeocodingRepository(context)
     }
 
-    override val getSensorValuesUseCase: GetSensorValuesUseCase by lazy {
-        GetSensorValuesUseCase(mySensorRepository) // Передаем репозиторий в UseCase
+    override val getSensorValuesUseCase by lazy {
+        GetSensorValuesUseCase(repository)
     }
 
-    // --- Android stuff ---
-    private val geocoder = Geocoder(
-        context.applicationContext,
-        Locale.current.platformLocale
-    )
+    override val getSensorValuesByAreaUseCase by lazy {
+        GetSensorValuesByAreaUseCase(repository)
+    }
 
-    // --- Data ---
-    private val geocodingRepository: GeocodingRepository =
-        AndroidGeocodingRepository(geocoder)
-
-    // --- Domain ---
-    override val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase by lazy {
+    override val getAddressFromCoordinatesUseCase by lazy {
         GetAddressFromCoordinatesUseCase(geocodingRepository)
+    }
+
+    private fun createHttpClient(): HttpClient {
+        return HttpClient(OkHttp) {
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    coerceInputValues = true
+                })
+            }
+        }
+    }
+
+    private fun createGeocodingRepository(context: Context): GeocodingRepository {
+        val geocoder = Geocoder(
+            context.applicationContext,
+            Locale.current.platformLocale
+        )
+        return AndroidGeocodingRepository(geocoder)
     }
 }

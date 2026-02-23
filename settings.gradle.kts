@@ -20,4 +20,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "MySensor"
 include(":app")
- 
+include(":shared")
