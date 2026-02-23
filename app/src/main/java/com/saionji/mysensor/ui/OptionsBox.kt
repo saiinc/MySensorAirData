@@ -62,7 +62,6 @@ import com.saionji.mysensor.R
 import com.saionji.mysensor.data.SettingsApp
 import com.saionji.mysensor.data.SettingsSensor
 
-@SuppressLint("MutableCollectionMutableState")
 @Composable
 fun CustomDialog(
     sensorsOptions: State<List<SettingsSensor>>,
@@ -120,7 +119,7 @@ fun CustomDialog(
                         Icon(
                             imageVector = Icons.Filled.Cancel,
                             contentDescription = "Cancel",
-                            tint = colorResource(android.R.color.darker_gray),
+                            tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier
                                 .width(30.dp)
                                 .height(30.dp)
@@ -190,7 +189,7 @@ fun CustomDialog(
                                 .border(
                                     BorderStroke(
                                         width = 2.dp,
-                                        color = colorResource(android.R.color.holo_green_light)
+                                        color = MaterialTheme.colorScheme.primary
                                     ),
                                     shape = RoundedCornerShape(15)
                                 ),
@@ -209,7 +208,7 @@ fun CustomDialog(
                                 .border(
                                     BorderStroke(
                                         width = 2.dp,
-                                        color = colorResource(android.R.color.holo_green_light)
+                                        color = MaterialTheme.colorScheme.primary
                                     ),
                                     shape = RoundedCornerShape(15)
                                 ),
@@ -299,7 +298,7 @@ fun Input(
                 .border(
                     BorderStroke(
                         width = 2.dp,
-                        color = colorResource(id = android.R.color.holo_green_light) /* if (onTextChange.toString().isEmpty()) R.color.holo_green_light else R.color.holo_red_dark) */
+                        color = MaterialTheme.colorScheme.primary /* if (onTextChange.toString().isEmpty()) R.color.holo_green_light else R.color.holo_red_dark) */
                     ),
                     shape = RoundedCornerShape(25)
                 ),
@@ -328,7 +327,7 @@ fun Input(
                 .border(
                     BorderStroke(
                         width = 2.dp,
-                        color = colorResource(id = android.R.color.holo_green_light) /* if (onTextChange.toString().isEmpty()) R.color.holo_green_light else R.color.holo_red_dark) */
+                        color = MaterialTheme.colorScheme.primary /* if (onTextChange.toString().isEmpty()) R.color.holo_green_light else R.color.holo_red_dark) */
                     ),
                     shape = RoundedCornerShape(25)
                 ),
