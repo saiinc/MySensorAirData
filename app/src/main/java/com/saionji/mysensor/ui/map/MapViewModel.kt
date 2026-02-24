@@ -5,7 +5,6 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -16,13 +15,11 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.saionji.mysensor.MySensorApplication
-import com.saionji.mysensor.data.MapSensor
-import com.saionji.mysensor.domain.model.LatLng
-import com.saionji.mysensor.data.MySensor
+import com.saionji.mysensor.shared.domain.model.LatLng
 import com.saionji.mysensor.data.SettingsSensor
 import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
-import com.saionji.mysensor.domain.model.GetAddressFromCoordinatesUseCase
-import com.saionji.mysensor.domain.model.MapMarker
+import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
+import com.saionji.mysensor.shared.domain.model.MapMarker
 import com.saionji.mysensor.ui.map.model.MapBounds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow

@@ -34,7 +34,7 @@ import com.saionji.mysensor.domain.PM10_COLOR_RANGES
 import com.saionji.mysensor.domain.PM25_COLOR_RANGES
 import com.saionji.mysensor.domain.PRESSURE_COLOR_RANGES
 import com.saionji.mysensor.domain.TEMPERATURE_COLOR_RANGES
-import com.saionji.mysensor.domain.model.LatLng
+import com.saionji.mysensor.shared.domain.model.LatLng
 import com.saionji.mysensor.ui.map.renderer.MapLibreMarkerRenderer
 import com.saionji.mysensor.ui.screens.VerticalColorBar
 

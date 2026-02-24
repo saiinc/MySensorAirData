@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.saionji.mysensor.domain.model.MapMarker
+import com.saionji.mysensor.shared.domain.model.MapMarker
 
 @Composable
 fun MarkerPopup(
