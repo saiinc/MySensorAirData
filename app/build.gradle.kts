@@ -126,6 +126,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    implementation(project(":shared")) // Теперь app видит всё из shared
+
     //androidTestImplementation("com.kaspersky.android-components:kaspresso-compose-support:1.6.0") {
     //    exclude(module = "protobuf-lite")
     //}

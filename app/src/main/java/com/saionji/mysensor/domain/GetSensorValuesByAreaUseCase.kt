@@ -1,7 +1,7 @@
 package com.saionji.mysensor.domain
 
 import com.saionji.mysensor.data.MySensorRepository
-import com.saionji.mysensor.domain.model.MapMarker
+import com.saionji.mysensor.shared.domain.model.MapMarker
 import kotlin.math.roundToInt
 
 class GetSensorValuesByAreaUseCase(

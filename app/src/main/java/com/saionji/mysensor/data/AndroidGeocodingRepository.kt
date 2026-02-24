@@ -1,7 +1,7 @@
 package com.saionji.mysensor.data
 
 import android.location.Geocoder
-import com.saionji.mysensor.domain.model.GeocodingRepository
+import com.saionji.mysensor.shared.domain.model.GeocodingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
