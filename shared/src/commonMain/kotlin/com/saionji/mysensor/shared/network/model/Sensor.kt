@@ -1,12 +1,7 @@
-/*
- * Copyright © Anton Sorokin 2025. All rights reserved
- */
-
-package com.saionji.mysensor.network.model
+package com.saionji.mysensor.shared.network.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 data class Sensor(

@@ -1,10 +1,10 @@
-package com.saionji.mysensor.data
+package com.saionji.mysensor.shared.data.repository
 
-import com.saionji.mysensor.network.model.SensorService
 import com.saionji.mysensor.shared.data.MySensor
 import com.saionji.mysensor.shared.domain.model.MapMeasurement
 import com.saionji.mysensor.shared.domain.model.MapSensor
 import com.saionji.mysensor.shared.domain.repository.MySensorRepository
+import com.saionji.mysensor.shared.network.service.SensorService
 
 class NetworkMySensorRepository(
     private val sensorService: SensorService

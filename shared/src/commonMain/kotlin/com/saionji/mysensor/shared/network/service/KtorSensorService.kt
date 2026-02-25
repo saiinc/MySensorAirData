@@ -1,5 +1,6 @@
-package com.saionji.mysensor.network.model
+package com.saionji.mysensor.shared.network.service
 
+import com.saionji.mysensor.shared.network.model.MySensorRawData
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get

@@ -28,7 +28,7 @@
 -dontwarn org.osmdroid.**
 
 # Твои модели, если они участвуют в парсинге
--keep class com.saionji.mysensor.network.model.MySensorRawData { *; }
+-keep class com.saionji.mysensor.shared.network.model.MySensorRawData { *; }
 
 # Retrofit + Gson
 -keepattributes Signature

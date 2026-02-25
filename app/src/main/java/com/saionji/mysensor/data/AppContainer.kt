@@ -10,12 +10,14 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
+import com.saionji.mysensor.shared.data.repository.NetworkMySensorRepository
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
 import com.saionji.mysensor.shared.domain.model.GeocodingRepository
 import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
-import com.saionji.mysensor.network.model.KtorSensorService
+import com.saionji.mysensor.shared.network.service.KtorSensorService
 import com.saionji.mysensor.shared.domain.repository.MySensorRepository
+import com.saionji.mysensor.shared.network.service.HttpClientFactory
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -42,10 +44,8 @@ class AndroidAppContainer(
         const val BASE_URL = "https://data.sensor.community/airrohr/v1/"
     }
 
-    private val httpClient by lazy { createHttpClient() }
-
     private val sensorService by lazy {
-        KtorSensorService(httpClient, BASE_URL)
+        KtorSensorService(HttpClientFactory.createHttpClient(), BASE_URL)
     }
 
     private val repository by lazy {
@@ -73,17 +73,6 @@ class AndroidAppContainer(
 
     override val getAddressFromCoordinatesUseCase by lazy {
         GetAddressFromCoordinatesUseCase(geocodingRepository)
-    }
-
-    private fun createHttpClient(): HttpClient {
-        return HttpClient(OkHttp) {
-            install(ContentNegotiation) {
-                json(Json {
-                    ignoreUnknownKeys = true
-                    coerceInputValues = true
-                })
-            }
-        }
     }
 
     private fun createGeocodingRepository(context: Context): GeocodingRepository {
