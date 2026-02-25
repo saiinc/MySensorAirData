@@ -6,6 +6,7 @@ package com.saionji.mysensor.data
 
 import android.util.Log
 import com.saionji.mysensor.network.model.SensorService
+import com.saionji.mysensor.shared.data.MySensor
 
 interface MySensorRepository {
     suspend fun getSensor(senorId: String) : List<MySensor>
@@ -79,14 +80,18 @@ class NetworkMySensorRepository(
                 }
             }
         } catch (_: IndexOutOfBoundsException) {
-            listOf(MySensor(
-                valueType = "Sensor \"$senorId\" not found",
-                value = ""
-            ))
+            listOf(
+                MySensor(
+                    valueType = "Sensor \"$senorId\" not found",
+                    value = ""
+                )
+            )
         } catch (_: NumberFormatException) {
-            listOf(MySensor(
-                valueType = "Sensor \"$senorId\" not found",
-                value = ""
-            ))
+            listOf(
+                MySensor(
+                    valueType = "Sensor \"$senorId\" not found",
+                    value = ""
+                )
+            )
         }
 }

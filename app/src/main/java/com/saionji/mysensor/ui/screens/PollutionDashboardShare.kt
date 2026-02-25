@@ -18,8 +18,8 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.saionji.mysensor.data.DashboardSensor
-import com.saionji.mysensor.data.SettingsApp
+import com.saionji.mysensor.shared.data.model.DashboardSensor
+import com.saionji.mysensor.shared.data.model.SettingsApp
 
 @Composable
 fun PollutionDashboardShare(

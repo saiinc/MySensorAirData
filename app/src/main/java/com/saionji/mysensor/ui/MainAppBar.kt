@@ -18,8 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.ui.res.stringResource
 import com.saionji.mysensor.R
-import com.saionji.mysensor.data.SettingsApp
-import com.saionji.mysensor.data.SettingsSensor
+import com.saionji.mysensor.shared.data.model.SettingsApp
+import com.saionji.mysensor.shared.data.model.SettingsSensor
 
 
 @Composable

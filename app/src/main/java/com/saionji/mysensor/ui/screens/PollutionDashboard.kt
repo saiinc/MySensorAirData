@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.saionji.mysensor.R
-import com.saionji.mysensor.data.DashboardSensor
+import com.saionji.mysensor.shared.data.model.DashboardSensor
 
 @Composable
 fun PollutionDashboard(

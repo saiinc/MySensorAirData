@@ -1,4 +1,6 @@
-package com.saionji.mysensor.data
+package com.saionji.mysensor.shared.data.model
+
+import com.saionji.mysensor.shared.data.MySensor
 
 data class DashboardSensor(
     val id: String,
