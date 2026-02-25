@@ -1,8 +1,6 @@
-/*
- * Copyright © Anton Sorokin 2025. All rights reserved
- */
+package com.saionji.mysensor.shared.network.service
 
-package com.saionji.mysensor.network.model
+import com.saionji.mysensor.shared.network.model.MySensorRawData
 
 interface SensorService {
     suspend fun getVal(sensorId: Int): List<MySensorRawData>
