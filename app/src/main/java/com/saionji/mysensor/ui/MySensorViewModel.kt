@@ -20,7 +20,7 @@ import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.shared.data.model.SettingsApp
 import com.saionji.mysensor.data.SettingsRepository
 import com.saionji.mysensor.shared.data.model.SettingsSensor
-import com.saionji.mysensor.domain.GetSensorValuesUseCase
+import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

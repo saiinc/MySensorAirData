@@ -1,6 +1,6 @@
 package com.saionji.mysensor.ui.map.renderer
 
-import com.saionji.mysensor.MapFonts
+import com.saionji.mysensor.shared.domain.MapFonts
 import com.saionji.mysensor.shared.domain.model.MapMarker
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.style.expressions.Expression

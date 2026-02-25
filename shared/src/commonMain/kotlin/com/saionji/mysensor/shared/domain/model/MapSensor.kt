@@ -1,4 +1,4 @@
-package com.saionji.mysensor.data
+package com.saionji.mysensor.shared.domain.model
 
 data class MapSensor(
     val id: String,

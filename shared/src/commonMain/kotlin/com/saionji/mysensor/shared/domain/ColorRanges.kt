@@ -1,4 +1,4 @@
-package com.saionji.mysensor.domain
+package com.saionji.mysensor.shared.domain
 
 val PM25_COLOR_RANGES = listOf(
     Triple(0.0, 12.09, Triple(0x00, 0xE4, 0x00)),    // 0-12: зеленый (#00E400)

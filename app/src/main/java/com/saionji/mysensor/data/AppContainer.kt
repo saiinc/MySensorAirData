@@ -10,11 +10,12 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
-import com.saionji.mysensor.domain.GetSensorValuesUseCase
+import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
+import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
 import com.saionji.mysensor.shared.domain.model.GeocodingRepository
 import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.network.model.KtorSensorService
+import com.saionji.mysensor.shared.domain.repository.MySensorRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

@@ -1,4 +1,4 @@
-package com.saionji.mysensor
+package com.saionji.mysensor.shared.domain
 
 object C {
     const val DASHBOARD_SENSOR_LIMIT = 6
