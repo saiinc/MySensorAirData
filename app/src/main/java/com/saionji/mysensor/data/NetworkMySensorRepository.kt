@@ -1,22 +1,10 @@
-/*
- * Copyright © Anton Sorokin 2025. All rights reserved
- */
-
 package com.saionji.mysensor.data
 
-import android.util.Log
 import com.saionji.mysensor.network.model.SensorService
 import com.saionji.mysensor.shared.data.MySensor
-
-interface MySensorRepository {
-    suspend fun getSensor(senorId: String) : List<MySensor>
-    suspend fun getSensorDataByArea(
-        lat1: Double,
-        lon1: Double,
-        lat2: Double,
-        lon2: Double
-    ): List<MapSensor>
-}
+import com.saionji.mysensor.shared.domain.model.MapMeasurement
+import com.saionji.mysensor.shared.domain.model.MapSensor
+import com.saionji.mysensor.shared.domain.repository.MySensorRepository
 
 class NetworkMySensorRepository(
     private val sensorService: SensorService
@@ -55,8 +43,7 @@ class NetworkMySensorRepository(
                 )
             }
         }
-        catch (e: Exception) {
-            Log.e("MapDebug", "Error fetching sensors: ${e.message}", e)
+        catch (_: Exception) {
             emptyList()
         }
     }

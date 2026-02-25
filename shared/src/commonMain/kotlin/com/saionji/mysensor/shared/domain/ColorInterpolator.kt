@@ -1,4 +1,4 @@
-package com.saionji.mysensor.domain
+package com.saionji.mysensor.shared.domain
 
 import kotlin.math.roundToInt
 
