@@ -28,8 +28,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
-import com.saionji.mysensor.data.DashboardSensor
-import com.saionji.mysensor.data.SettingsApp
+import com.saionji.mysensor.shared.data.model.DashboardSensor
+import com.saionji.mysensor.shared.data.model.SettingsApp
 
 
 @Composable

@@ -59,8 +59,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.saionji.mysensor.C
 import com.saionji.mysensor.R
-import com.saionji.mysensor.data.SettingsApp
-import com.saionji.mysensor.data.SettingsSensor
+import com.saionji.mysensor.shared.data.model.SettingsApp
+import com.saionji.mysensor.shared.data.model.SettingsSensor
 
 @Composable
 fun CustomDialog(

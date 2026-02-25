@@ -2,6 +2,7 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.kotlin.multiplatform.library")
     id("com.android.lint")
+    kotlin("plugin.serialization")
 }
 
 kotlin {

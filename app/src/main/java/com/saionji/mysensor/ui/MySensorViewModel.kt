@@ -16,10 +16,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.saionji.mysensor.MySensorApplication
-import com.saionji.mysensor.data.DashboardSensor
-import com.saionji.mysensor.data.SettingsApp
+import com.saionji.mysensor.shared.data.model.DashboardSensor
+import com.saionji.mysensor.shared.data.model.SettingsApp
 import com.saionji.mysensor.data.SettingsRepository
-import com.saionji.mysensor.data.SettingsSensor
+import com.saionji.mysensor.shared.data.model.SettingsSensor
 import com.saionji.mysensor.domain.GetSensorValuesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

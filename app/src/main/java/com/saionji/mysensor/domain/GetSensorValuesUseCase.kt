@@ -1,8 +1,8 @@
 package com.saionji.mysensor.domain
 
-import com.saionji.mysensor.data.MySensor
+import com.saionji.mysensor.shared.data.MySensor
 import com.saionji.mysensor.data.MySensorRepository
-import com.saionji.mysensor.data.SettingsSensor
+import com.saionji.mysensor.shared.data.model.SettingsSensor
 import kotlin.math.roundToInt
 
 class GetSensorValuesUseCase(

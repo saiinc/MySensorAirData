@@ -16,7 +16,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.saionji.mysensor.MySensorApplication
 import com.saionji.mysensor.shared.domain.model.LatLng
-import com.saionji.mysensor.data.SettingsSensor
+import com.saionji.mysensor.shared.data.model.SettingsSensor
 import com.saionji.mysensor.domain.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.shared.domain.model.MapMarker

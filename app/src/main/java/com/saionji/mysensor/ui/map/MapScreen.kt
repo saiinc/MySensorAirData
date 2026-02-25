@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.saionji.mysensor.C
-import com.saionji.mysensor.data.DashboardSensor
+import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.domain.HUMIDITY_COLOR_RANGES
 import com.saionji.mysensor.domain.NOISE_COLOR_RANGES
 import com.saionji.mysensor.domain.PM10_COLOR_RANGES

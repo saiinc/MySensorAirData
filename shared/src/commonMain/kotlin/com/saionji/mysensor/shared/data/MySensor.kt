@@ -1,8 +1,4 @@
-/*
- * Copyright © Anton Sorokin 2025. All rights reserved
- */
-
-package com.saionji.mysensor.data
+package com.saionji.mysensor.shared.data
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
