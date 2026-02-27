@@ -8,7 +8,6 @@ import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -18,7 +17,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.saionji.mysensor.MySensorApplication
 import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.shared.data.model.SettingsApp
-import com.saionji.mysensor.data.SettingsRepository
+import com.saionji.mysensor.shared.data.repository.SettingsRepository
 import com.saionji.mysensor.shared.data.model.SettingsSensor
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
 import kotlinx.coroutines.Dispatchers

@@ -1,11 +1,5 @@
 package com.saionji.mysensor.ui
 
-import android.content.Context
-import android.graphics.drawable.GradientDrawable
-import android.view.Gravity
-import android.widget.TextView
-import android.widget.Toast
-import android.util.TypedValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
