@@ -11,6 +11,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.saionji.mysensor.shared.data.repository.NetworkMySensorRepository
+import com.saionji.mysensor.shared.data.repository.SettingsRepository
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
 import com.saionji.mysensor.shared.domain.model.GeocodingRepository
@@ -18,11 +19,8 @@ import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.shared.network.service.KtorSensorService
 import com.saionji.mysensor.shared.domain.repository.MySensorRepository
 import com.saionji.mysensor.shared.network.service.HttpClientFactory
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
+import com.russhwolf.settings.Settings
+import com.saionji.mysensor.shared.data.repository.SettingsRepositoryImpl
 
 
 // DataStore extension для контекста
@@ -55,8 +53,12 @@ class AndroidAppContainer(
     override val mySensorRepository: MySensorRepository
         get() = repository
 
+    private val multiplatformSettings by lazy {
+        Settings()
+    }
+
     override val settingsRepository by lazy {
-        AndroidSettingsRepository(context.dataStore)
+        SettingsRepositoryImpl(multiplatformSettings)
     }
 
     private val geocodingRepository by lazy {

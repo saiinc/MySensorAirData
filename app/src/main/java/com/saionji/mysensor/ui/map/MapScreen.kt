@@ -36,7 +36,6 @@ import com.saionji.mysensor.shared.domain.PRESSURE_COLOR_RANGES
 import com.saionji.mysensor.shared.domain.TEMPERATURE_COLOR_RANGES
 import com.saionji.mysensor.shared.domain.model.LatLng
 import com.saionji.mysensor.ui.map.renderer.MapLibreMarkerRenderer
-import com.saionji.mysensor.ui.screens.VerticalColorBar
 
 @Composable
 fun MapScreen(

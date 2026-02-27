@@ -1,4 +1,4 @@
-package com.saionji.mysensor.ui.screens
+package com.saionji.mysensor.ui.map
 
 import android.graphics.Paint
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.Canvas
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.unit.dp
 

@@ -67,6 +67,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-core:2.3.7")
                 implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+                implementation("com.russhwolf:multiplatform-settings:1.1.1")
             }
         }
 
@@ -82,6 +83,7 @@ kotlin {
                 // commonMain by default and will correctly pull the Android artifacts of any KMP
                 // dependencies declared in commonMain.
                 implementation("io.ktor:ktor-client-okhttp:2.3.7")
+                implementation("androidx.datastore:datastore-preferences:1.1.1")
             }
         }
 

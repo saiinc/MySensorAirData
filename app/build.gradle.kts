@@ -108,6 +108,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
     implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
     implementation("androidx.compose.material3:material3:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
