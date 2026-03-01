@@ -1,4 +1,4 @@
-package com.saionji.mysensor.ui
+package com.saionji.mysensor.shared.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -34,6 +34,7 @@ fun ErrorBanner(message: String) {
                 text = message,
                 color = MaterialTheme.colorScheme.onErrorContainer
             )
+            Text(message)
         }
     }
 }

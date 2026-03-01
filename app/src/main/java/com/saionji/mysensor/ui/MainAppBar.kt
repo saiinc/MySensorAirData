@@ -4,7 +4,6 @@
 
 package com.saionji.mysensor.ui
 
-import android.util.Log
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
@@ -20,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import com.saionji.mysensor.R
 import com.saionji.mysensor.shared.data.model.SettingsApp
 import com.saionji.mysensor.shared.data.model.SettingsSensor
+import com.saionji.mysensor.shared.ui.components.CustomDialog
 
 
 @Composable

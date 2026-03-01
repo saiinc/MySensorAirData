@@ -1,8 +1,25 @@
+import com.android.utils.withResources
+
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("com.android.kotlin.multiplatform.library")
-    id("com.android.lint")
+    id("com.android.library")
     kotlin("plugin.serialization")
+    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.compose") version "1.6.11"
+}
+
+android {
+    namespace = "com.saionji.mysensor.shared"
+    compileSdk = 36
+
+    defaultConfig {
+        minSdk = 24
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
 
 kotlin {
@@ -10,19 +27,14 @@ kotlin {
     // Target declarations - add or remove as needed below. These define
     // which platforms this KMP module supports.
     // See: https://kotlinlang.org/docs/multiplatform-discover-project.html#targets
-    androidLibrary {
-        namespace = "com.saionji.mysensor.shared"
-        compileSdk = 36
-        minSdk = 24
 
-        withHostTestBuilder {
-        }
-
-        withDeviceTestBuilder {
-            sourceSetTreeName = "test"
-        }.configure {
-            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        }
+    
+    // Apply Compose compiler plugin to all targets
+    applyDefaultHierarchyTemplate()
+    
+    // Configure Compose for all targets
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xexpect-actual-classes")
     }
 
     // For iOS targets, this is also where you should
@@ -33,6 +45,12 @@ kotlin {
     // project can be found here:
     // https://developer.android.com/kotlin/multiplatform/migrate
     val xcfName = "sharedKit"
+
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
 
     iosX64 {
         binaries.framework {
@@ -68,6 +86,12 @@ kotlin {
                 implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
                 implementation("com.russhwolf:multiplatform-settings:1.1.1")
+                // Compose Multiplatform
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
             }
         }
 
@@ -84,16 +108,19 @@ kotlin {
                 // dependencies declared in commonMain.
                 implementation("io.ktor:ktor-client-okhttp:2.3.7")
                 implementation("androidx.datastore:datastore-preferences:1.1.1")
+                // Android Compose dependencies
+                implementation(compose.uiTooling)
+                implementation(compose.preview)
             }
         }
 
-        getByName("androidDeviceTest") {
-            dependencies {
-                implementation("androidx.test:runner:1.5.2")
-                implementation("androidx.test:core:1.5.0")
-                implementation("androidx.test.ext:junit:1.3.0")
-            }
-        }
+//        getByName("androidDeviceTest") {
+//            dependencies {
+//                implementation("androidx.test:runner:1.5.2")
+//                implementation("androidx.test:core:1.5.0")
+//                implementation("androidx.test.ext:junit:1.3.0")
+//            }
+//        }
 
         iosMain {
             dependencies {
@@ -103,8 +130,17 @@ kotlin {
                 // on common by default and will correctly pull the iOS artifacts of any
                 // KMP dependencies declared in commonMain.
                 implementation("io.ktor:ktor-client-darwin:2.3.7")
+                // iOS Compose dependencies
+                implementation("org.jetbrains.compose.ui:ui-tooling:1.6.11")
             }
         }
     }
 
+}
+
+compose {
+    resources {
+        publicResClass = true
+        packageOfResClass = "com.saionji.mysensor.shared.generated.resources"
+    }
 }
