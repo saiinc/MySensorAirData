@@ -34,6 +34,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.saionji.mysensor.R
+import com.saionji.mysensor.shared.ui.components.ErrorBanner
 import com.saionji.mysensor.ui.map.MapViewModel
 import com.saionji.mysensor.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen

@@ -2,7 +2,7 @@
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
-package com.saionji.mysensor.ui
+package com.saionji.mysensor.shared.ui.components
 
 
 
@@ -22,13 +22,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -56,9 +56,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.saionji.mysensor.shared.domain.C
-import com.saionji.mysensor.R
 import com.saionji.mysensor.shared.data.model.SettingsApp
 import com.saionji.mysensor.shared.data.model.SettingsSensor
+import com.saionji.mysensor.shared.generated.resources.Res
+import com.saionji.mysensor.shared.generated.resources.settings_button
+import com.saionji.mysensor.shared.generated.resources.settings_header
+import com.saionji.mysensor.shared.generated.resources.settings_sensor_description
+import com.saionji.mysensor.shared.generated.resources.settings_sensor_id
+import com.saionji.mysensor.shared.generated.resources.settings_switch
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun CustomDialog(
@@ -107,7 +113,7 @@ fun CustomDialog(
                     ) {
                         Text(
                             textAlign = TextAlign.Center,
-                            text = stringResource(id = R.string.settings_header),
+                            text = stringResource(Res.string.settings_header),
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontFamily = FontFamily.Default,
@@ -115,12 +121,13 @@ fun CustomDialog(
                             )
                         )
                         Icon(
-                            imageVector = Icons.Filled.Cancel,
+                            imageVector = Icons.Filled.Close,
                             contentDescription = "Cancel",
-                            tint = MaterialTheme.colorScheme.secondary,
+                            tint = MaterialTheme.colorScheme.inversePrimary,
                             modifier = Modifier
                                 .width(30.dp)
                                 .height(30.dp)
+                                .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
                                 .clickable {
                                     //setShowDialog(false)
                                     onCloseClicked()
@@ -148,7 +155,7 @@ fun CustomDialog(
                                     fontSize = 18.sp,
                                     fontFamily = FontFamily.Default
                                 ),
-                                text = stringResource(id = R.string.settings_switch)
+                                text = stringResource(Res.string.settings_switch)
                             )
                             Switch(
                                 checked = settingsApp.shareId,
@@ -243,7 +250,7 @@ fun CustomDialog(
                                     .fillMaxWidth()
                                     .height(50.dp)
                             ) {
-                                Text(text = stringResource(id = R.string.settings_button))
+                                Text(text = stringResource(Res.string.settings_button))
                             }
                         } else {
                             Button(
@@ -254,7 +261,7 @@ fun CustomDialog(
                                     .fillMaxWidth()
                                     .height(50.dp)
                             ) {
-                                Text(text = stringResource(id = R.string.settings_button))
+                                Text(text = stringResource(Res.string.settings_button))
                             }
                         }
                     }
@@ -305,7 +312,7 @@ fun Input(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
             ),
-            placeholder = { Text(text = stringResource(id = R.string.settings_sensor_id)) },
+            placeholder = { Text(text = stringResource(Res.string.settings_sensor_id)) },
             maxLines = 2,
             value = sensorIdObject.id,
             keyboardOptions = KeyboardOptions(
@@ -334,7 +341,7 @@ fun Input(
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            placeholder = {Text(text = stringResource(id = R.string.settings_sensor_description))},
+            placeholder = {Text(text = stringResource(Res.string.settings_sensor_description))},
             maxLines = 3,
             value = sensorIdObject.description,
             onValueChange = { value ->
@@ -349,7 +356,7 @@ fun Input(
         if ((sensorsOptions.value.size == 1)) {
             IconButton(
                 modifier = Modifier
-                    .padding(vertical = 2.dp)
+                    .align(Alignment.CenterVertically)
                     .size(36.dp),
                 onClick = { onRemoveClicked() },
                 enabled = false) {
@@ -362,7 +369,7 @@ fun Input(
         } else {
             IconButton(
                 modifier = Modifier
-                    .padding(vertical = 2.dp)
+                    .align(Alignment.CenterVertically)
                     .size(36.dp),
                 onClick = { onRemoveClicked() },
                 enabled = true) {

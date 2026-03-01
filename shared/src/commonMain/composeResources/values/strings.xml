@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">My Sensor</string>
+
+    <string name="retry">Retry</string>
+
+    <string name="loading">Loading</string>
+
+    <string name="content_description">Sensor</string>
+
+    <string name="settings_header">Set sensor ID</string>
+
+    <string name="settings_switch">Hide sensor ID when using the 'Share' feature</string>
+
+    <string name="settings_button">Done</string>
+
+    <string name="settings_sensor_id">Enter id</string>
+
+    <string name="settings_sensor_description">Description (optional)</string>
+
+    <string name="error_loading">Loading error</string>
+
+    <string name="error_unknown">Unknown error</string>
+
+    <string name="add_sensor">Please tap the map icon to add your sensor</string>
+</resources>
