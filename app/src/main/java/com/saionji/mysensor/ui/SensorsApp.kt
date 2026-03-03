@@ -35,8 +35,10 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.saionji.mysensor.R
 import com.saionji.mysensor.shared.ui.components.ErrorBanner
+import com.saionji.mysensor.shared.ui.components.MainAppBar
+import com.saionji.mysensor.shared.ui.components.OptionsBoxState
 import com.saionji.mysensor.ui.map.MapViewModel
-import com.saionji.mysensor.ui.screens.AboutScreen
+import com.saionji.mysensor.shared.ui.screens.AboutScreen
 import com.saionji.mysensor.ui.screens.HomeScreen
 import com.saionji.mysensor.ui.map.MapScreen
 import com.saionji.mysensor.ui.screens.ShareScreen
@@ -122,10 +124,16 @@ fun SensorsApp(
                             mySensorViewModel.removeSensorOptions(it)
                         },
                         onEditSensorId = { index, settingsSensorItemId ->
-                            mySensorViewModel.updateSensorOptionsItemId(index = index, settingsSensorItemId = settingsSensorItemId)
+                            mySensorViewModel.updateSensorOptionsItemId(
+                                index = index,
+                                settingsSensorItemId = settingsSensorItemId
+                            )
                         },
-                        onEditSensorDescription = { index, settingsSensorItemDescription->
-                            mySensorViewModel.updateSensorOptionsItemDescription(index = index, settingsSensorItemDescription = settingsSensorItemDescription)
+                        onEditSensorDescription = { index, settingsSensorItemDescription ->
+                            mySensorViewModel.updateSensorOptionsItemDescription(
+                                index = index,
+                                settingsSensorItemDescription = settingsSensorItemDescription
+                            )
                         },
                         onOptionsBoxTriggered = {
                             mySensorViewModel.sensorsOptionsLoad()

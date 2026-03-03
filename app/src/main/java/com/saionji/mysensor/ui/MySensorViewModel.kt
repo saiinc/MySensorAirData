@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
+import com.saionji.mysensor.shared.ui.components.OptionsBoxState
 
 
 sealed class Screen {
@@ -320,9 +321,4 @@ class MySensorViewModel(
             }
         }
     }
-}
-
-enum class OptionsBoxState {
-    OPENED,
-    CLOSED
 }

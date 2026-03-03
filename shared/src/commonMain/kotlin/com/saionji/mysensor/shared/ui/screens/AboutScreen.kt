@@ -1,4 +1,4 @@
-package com.saionji.mysensor.ui.screens
+package com.saionji.mysensor.shared.ui.screens
 /*
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -30,17 +31,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withLink
+import androidx.compose.ui.text.withAnnotation
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
 fun AboutScreen(onBackClicked: () -> Unit) {
+    val uriHandler = LocalUriHandler.current
+    val annotatedText = buildAnnotatedString {
+        withStyle(
+            SpanStyle(
+                color = MaterialTheme.colorScheme.onBackground
+            )
+        ) {
+            append("Build your DIY sensor and become part of the worldwide, opendata & civictech network. With airRohr you can measure air pollution yourself: ")
+
+            withStyle(SpanStyle(color = Color.Blue)) {
+                withAnnotation("url", "https://sensor.community/en/sensors/airrohr/") {
+                    append("https://sensor.community/en/sensors/airrohr/")
+                }
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -156,19 +175,16 @@ fun AboutScreen(onBackClicked: () -> Unit) {
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                Text(
-                    text = buildAnnotatedString{
-                        append("Build your DIY sensor and become part of the worldwide, opendata & civictech network. With airRohr you can measure air pollution yourself: ")
-                        withLink(
-                            LinkAnnotation.Url(
-                                "https://sensor.community/en/sensors/airrohr/",
-                                TextLinkStyles(style = SpanStyle(color = Color.Blue)))
-                        ) {
-                            append("https://sensor.community/en/sensors/airrohr/")
-                        }
-                    },
+                ClickableText(
+                    text = annotatedText,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    onClick = { offset ->
+                        annotatedText.getStringAnnotations("url", offset, offset)
+                            .firstOrNull()?.let { annotation ->
+                                uriHandler.openUri(annotation.item)
+                            }
+                    }
                 )
             }
         }
