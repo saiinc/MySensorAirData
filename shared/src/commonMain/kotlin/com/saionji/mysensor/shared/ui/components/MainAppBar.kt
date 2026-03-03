@@ -2,7 +2,7 @@
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
-package com.saionji.mysensor.ui
+package com.saionji.mysensor.shared.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
@@ -15,11 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.ui.res.stringResource
-import com.saionji.mysensor.R
 import com.saionji.mysensor.shared.data.model.SettingsApp
 import com.saionji.mysensor.shared.data.model.SettingsSensor
-import com.saionji.mysensor.shared.ui.components.CustomDialog
+import com.saionji.mysensor.shared.generated.resources.Res
+import com.saionji.mysensor.shared.generated.resources.app_name
+import org.jetbrains.compose.resources.stringResource
 
 
 @Composable
@@ -80,7 +80,7 @@ fun ClosedAppBar(
     TopAppBar(
         title = {
             Text(
-                text = stringResource(id = R.string.app_name)
+                text = stringResource(Res.string.app_name)
             )
         },
         actions = {
