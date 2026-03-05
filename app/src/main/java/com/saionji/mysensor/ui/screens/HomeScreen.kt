@@ -13,6 +13,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.saionji.mysensor.shared.data.model.DashboardSensor
+import com.saionji.mysensor.shared.ui.screens.PollutionDashboard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
