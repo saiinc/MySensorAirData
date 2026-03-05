@@ -1,7 +1,7 @@
 /*
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
-package com.saionji.mysensor.ui.screens
+package com.saionji.mysensor.shared.ui.screens
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -31,13 +31,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.saionji.mysensor.R
 import com.saionji.mysensor.shared.data.model.DashboardSensor
+import com.saionji.mysensor.shared.generated.resources.Res
+import com.saionji.mysensor.shared.generated.resources.add_sensor
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PollutionDashboard(
@@ -53,7 +54,7 @@ fun PollutionDashboard(
                 .padding(horizontal = 16.dp)
         ) {
             Text(
-                text = stringResource(R.string.add_sensor),
+                text = stringResource(Res.string.add_sensor),
             )
         }
     } else {
@@ -111,6 +112,7 @@ fun PollutionGrid(data: DashboardSensor) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ValuesGrid(data: DashboardSensor) {
     FlowRow(

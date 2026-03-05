@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.shared.data.model.SettingsApp
+import com.saionji.mysensor.shared.ui.screens.PollutionDashboardShare
 
 
 @Composable

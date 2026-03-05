@@ -84,16 +84,18 @@ fun ClosedAppBar(
             )
         },
         actions = {
-            IconButton(
-                onClick = {
-                    onShareClicked()
+            // Кнопка шаринга только на Android
+            if (PlatformFeatures.shouldShowShareButton) {
+                IconButton(
+                    onClick = {
+                        onShareClicked()
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Share,
+                        contentDescription = "ShareIcon"
+                    )
                 }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Share,
-                    contentDescription = "ShareIcon"
-
-                )
             }
             IconButton(
                 onClick = { onAboutClicked() }
