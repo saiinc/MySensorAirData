@@ -39,7 +39,7 @@ import com.saionji.mysensor.shared.ui.components.MainAppBar
 import com.saionji.mysensor.shared.ui.components.OptionsBoxState
 import com.saionji.mysensor.ui.map.MapViewModel
 import com.saionji.mysensor.shared.ui.screens.AboutScreen
-import com.saionji.mysensor.ui.screens.HomeScreen
+import com.saionji.mysensor.shared.ui.screens.HomeScreen
 import com.saionji.mysensor.ui.map.MapScreen
 import com.saionji.mysensor.ui.screens.ShareScreen
 
