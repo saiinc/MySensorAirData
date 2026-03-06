@@ -1,16 +1,15 @@
-import com.android.utils.withResources
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.compose") version "1.6.11"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+    id("org.jetbrains.compose") version "1.7.1"
 }
 
 android {
     namespace = "com.saionji.mysensor.shared"
-    compileSdk = 36
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -92,6 +91,7 @@ kotlin {
                 implementation(compose.material3)
                 implementation(compose.ui)
                 implementation(compose.components.resources)
+                implementation(compose.materialIconsExtended)
             }
         }
 
@@ -111,6 +111,7 @@ kotlin {
                 // Android Compose dependencies
                 implementation(compose.uiTooling)
                 implementation(compose.preview)
+                implementation("androidx.activity:activity-compose:1.9.0")
             }
         }
 
@@ -131,7 +132,7 @@ kotlin {
                 // KMP dependencies declared in commonMain.
                 implementation("io.ktor:ktor-client-darwin:2.3.7")
                 // iOS Compose dependencies
-                implementation("org.jetbrains.compose.ui:ui-tooling:1.6.11")
+                implementation(compose.uiTooling)
             }
         }
     }

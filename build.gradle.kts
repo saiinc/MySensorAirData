@@ -17,8 +17,9 @@ plugins {
 
     // Add the dependency for the Crashlytics Gradle plugin
     id("com.google.firebase.crashlytics") version "3.0.2" apply false
+
     id("org.jetbrains.kotlin.multiplatform") version "2.0.0" apply false
     id("com.android.kotlin.multiplatform.library") version "8.8.0" apply false
     id("com.android.lint") version "8.8.0" apply false
-    id("com.android.library") version "8.5.2" apply false
+    id("com.android.library") version "8.8.0" apply false
 }
