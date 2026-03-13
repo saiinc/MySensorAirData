@@ -1,10 +1,19 @@
-package com.saionji.mysensor.data
+/*
+ * Copyright © Anton Sorokin 2025. All rights reserved
+ */
+
+package com.saionji.mysensor.shared.data.repository
 
 import android.location.Geocoder
 import com.saionji.mysensor.shared.domain.model.GeocodingRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/**
+ * Android-реализация репозитория геокодинга
+ * 
+ * Использует Android Geocoder API для получения адреса по координатам
+ */
 class AndroidGeocodingRepository(
     private val geocoder: Geocoder
 ) : GeocodingRepository {

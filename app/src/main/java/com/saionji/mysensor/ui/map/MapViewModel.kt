@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.saionji.mysensor.MySensorApplication
 import com.saionji.mysensor.shared.domain.model.LatLng
 import com.saionji.mysensor.shared.data.model.SettingsSensor
+import com.saionji.mysensor.shared.di.SharedContainer
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.shared.domain.model.MapMarker
@@ -221,10 +222,10 @@ class MapViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as MySensorApplication)
-                val container = application.container
+                val sharedContainer = application.container as SharedContainer
                 MapViewModel(
-                    getSensorValuesByAreaUseCase = container.getSensorValuesByAreaUseCase,
-                    getAddressFromCoordinatesUseCase = container.getAddressFromCoordinatesUseCase
+                    getSensorValuesByAreaUseCase = sharedContainer.getSensorValuesByAreaUseCase,
+                    getAddressFromCoordinatesUseCase = sharedContainer.getAddressFromCoordinatesUseCase
                 )
             }
         }
