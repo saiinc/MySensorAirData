@@ -19,6 +19,7 @@ import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.shared.data.model.SettingsApp
 import com.saionji.mysensor.shared.data.repository.SettingsRepository
 import com.saionji.mysensor.shared.data.model.SettingsSensor
+import com.saionji.mysensor.shared.di.SharedContainer
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.IOException
 import com.saionji.mysensor.shared.ui.components.OptionsBoxState
+import com.saionji.mysensor.shared.ui.viewmodel.ThrottleExecutor
 
 
 sealed class Screen {
@@ -310,12 +312,11 @@ class MySensorViewModel(
         val Factory: ViewModelProvider.Factory = viewModelFactory {
             initializer {
                 val application = (this[APPLICATION_KEY] as MySensorApplication)
-                val settingsRepository = application.container.settingsRepository
-                val getSensorValuesUseCase = application.container.getSensorValuesUseCase
+                val sharedContainer = application.container as SharedContainer
 
                 MySensorViewModel(
-                    settingsRepository = settingsRepository,
-                    getSensorValuesUseCase = getSensorValuesUseCase,
+                    settingsRepository = sharedContainer.settingsRepository,
+                    getSensorValuesUseCase = sharedContainer.getSensorValuesUseCase,
                     application = application
                 )
             }

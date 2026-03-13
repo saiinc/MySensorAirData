@@ -85,6 +85,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
                 implementation("com.russhwolf:multiplatform-settings:1.1.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
                 // Compose Multiplatform
                 implementation(compose.runtime)
                 implementation(compose.foundation)

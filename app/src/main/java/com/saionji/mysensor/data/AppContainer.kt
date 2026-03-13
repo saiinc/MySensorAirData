@@ -5,83 +5,67 @@
 package com.saionji.mysensor.data
 
 import android.content.Context
-import android.location.Geocoder
-import androidx.compose.ui.text.intl.Locale
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
-import com.saionji.mysensor.shared.data.repository.NetworkMySensorRepository
-import com.saionji.mysensor.shared.data.repository.SettingsRepository
-import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
-import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
-import com.saionji.mysensor.shared.domain.model.GeocodingRepository
-import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
-import com.saionji.mysensor.shared.network.service.KtorSensorService
-import com.saionji.mysensor.shared.domain.repository.MySensorRepository
-import com.saionji.mysensor.shared.network.service.HttpClientFactory
 import com.russhwolf.settings.Settings
-import com.saionji.mysensor.shared.data.repository.SettingsRepositoryImpl
+import com.saionji.mysensor.shared.di.SharedContainer
+import com.saionji.mysensor.shared.di.SharedContainerImpl
+import com.saionji.mysensor.shared.di.AndroidPlatformDependencies
 
+/**
+ * Интерфейс контейнера зависимостей для совместимости
+ *
+ * Наследует SharedContainer для сохранения обратной совместимости
+ */
+interface AppContainer : SharedContainer
 
-// DataStore extension для контекста
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "my_datastore")
-
-interface AppContainer {
-    val mySensorRepository: MySensorRepository
-    val settingsRepository: SettingsRepository
-    val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase
-    val getSensorValuesUseCase: GetSensorValuesUseCase // Добавляем UseCase
-    val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase
-}
-
+/**
+ * Android-реализация контейнера зависимостей
+ *
+ * Создает платформенные зависимости и делегирует остальное в SharedContainerImpl
+ */
 class AndroidAppContainer(
     private val context: Context
 ) : AppContainer {
 
-    private companion object {
-        const val BASE_URL = "https://data.sensor.community/airrohr/v1/"
+    /**
+     * Платформенные зависимости (GeocodingRepository)
+     */
+    private val platformDependencies = AndroidPlatformDependencies()
+
+    /**
+     * Общий контейнер зависимостей
+     *
+     * Содержит всю бизнес-логику и репозитории
+     */
+    private val sharedContainer by lazy {
+        val geocodingRepository = platformDependencies.createGeocodingRepository(context)
+        val settings = Settings()
+        SharedContainerImpl(geocodingRepository, settings)
     }
 
-    private val sensorService by lazy {
-        KtorSensorService(HttpClientFactory.createHttpClient(), BASE_URL)
-    }
+    // ==================== ДЕЛЕГИРОВАНИЕ В SHARED CONTAINER ====================
 
-    private val repository by lazy {
-        NetworkMySensorRepository(sensorService)
-    }
+    /**
+     * Репозиторий для работы с данными сенсоров
+     */
+    override val mySensorRepository get() = sharedContainer.mySensorRepository
 
-    override val mySensorRepository: MySensorRepository
-        get() = repository
+    /**
+     * Репозиторий для хранения настроек
+     */
+    override val settingsRepository get() = sharedContainer.settingsRepository
 
-    private val multiplatformSettings by lazy {
-        Settings()
-    }
+    /**
+     * UseCase для получения данных сенсора по ID
+     */
+    override val getSensorValuesUseCase get() = sharedContainer.getSensorValuesUseCase
 
-    override val settingsRepository by lazy {
-        SettingsRepositoryImpl(multiplatformSettings)
-    }
+    /**
+     * UseCase для получения сенсоров по области
+     */
+    override val getSensorValuesByAreaUseCase get() = sharedContainer.getSensorValuesByAreaUseCase
 
-    private val geocodingRepository by lazy {
-        createGeocodingRepository(context)
-    }
-
-    override val getSensorValuesUseCase by lazy {
-        GetSensorValuesUseCase(repository)
-    }
-
-    override val getSensorValuesByAreaUseCase by lazy {
-        GetSensorValuesByAreaUseCase(repository)
-    }
-
-    override val getAddressFromCoordinatesUseCase by lazy {
-        GetAddressFromCoordinatesUseCase(geocodingRepository)
-    }
-
-    private fun createGeocodingRepository(context: Context): GeocodingRepository {
-        val geocoder = Geocoder(
-            context.applicationContext,
-            Locale.current.platformLocale
-        )
-        return AndroidGeocodingRepository(geocoder)
-    }
+    /**
+     * UseCase для получения адреса по координатам
+     */
+    override val getAddressFromCoordinatesUseCase get() = sharedContainer.getAddressFromCoordinatesUseCase
 }
