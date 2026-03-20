@@ -34,22 +34,25 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.saionji.mysensor.R
+import com.saionji.mysensor.shared.ui.ShareManager
 import com.saionji.mysensor.shared.ui.components.ErrorBanner
 import com.saionji.mysensor.shared.ui.components.MainAppBar
 import com.saionji.mysensor.shared.ui.components.OptionsBoxState
 import com.saionji.mysensor.ui.map.MapViewModel
 import com.saionji.mysensor.shared.ui.screens.AboutScreen
 import com.saionji.mysensor.shared.ui.screens.HomeScreen
+import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
+import com.saionji.mysensor.shared.ui.viewmodel.Screen
 import com.saionji.mysensor.ui.map.MapScreen
-import com.saionji.mysensor.ui.screens.ShareScreen
+import com.saionji.mysensor.shared.ui.screens.ShareScreen
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun SensorsApp(
     modifier: Modifier = Modifier
 ) {
-    val mySensorViewModel: MySensorViewModel =
-        viewModel(factory = MySensorViewModel.Factory)
+    val mySensorViewModel: AndroidMySensorViewModel =
+        viewModel(factory = AndroidMySensorViewModel.Factory)
     val mapViewModel: MapViewModel =
         viewModel(factory = MapViewModel.Factory)
     val optionsBoxState = mySensorViewModel.optionsBoxState
@@ -70,7 +73,7 @@ fun SensorsApp(
         )
     )
     val allPermissionsGranted = locationPermissionsState.permissions.all { it.status.isGranted }
-    val shareManager = remember { AndroidShareManager(context) }
+    val shareManager = remember { ShareManager(context) }
 
     val navController = rememberNavController()
 

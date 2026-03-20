@@ -2,7 +2,7 @@
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
-package com.saionji.mysensor.ui.screens
+package com.saionji.mysensor.shared.ui.screens
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.shared.data.model.SettingsApp
-import com.saionji.mysensor.shared.ui.screens.PollutionDashboardShare
 
 
 @Composable
@@ -44,9 +43,8 @@ fun ShareScreen(
     var contentHeight by remember { mutableIntStateOf(0) }
 
     Box(modifier = Modifier
-        .size(0.dp) // size 0 so that no space is used in the UI
+        .size(0.dp)
         .drawWithCache {
-            // draw to graphics layer
             graphicsLayer = obtainGraphicsLayer().apply {
                 record(
                     size = IntSize(
@@ -57,21 +55,17 @@ fun ShareScreen(
                     drawContent()
                 }
             }
-            // leave blank to skip drawing on the screen
             onDrawWithContent { }
         }) {
         Box(
-            // override the parent size with desired size of the recording
             modifier = Modifier
                 .wrapContentHeight(unbounded = true, align = Alignment.Top)
                 .wrapContentWidth(unbounded = true, align = Alignment.Start)
                 .requiredWidth(400.dp)
         ) {
-            // The content being recorded
             Surface(modifier = Modifier
                 .fillMaxSize()
                 .onGloballyPositioned { layoutCoordinates ->
-                    // Измеряем высоту содержимого
                     contentHeight = layoutCoordinates.size.height
                 }
             ){
