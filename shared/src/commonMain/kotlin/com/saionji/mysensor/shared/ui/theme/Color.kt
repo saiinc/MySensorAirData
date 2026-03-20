@@ -2,7 +2,7 @@
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
 
-package com.saionji.mysensor.ui.theme
+package com.saionji.mysensor.shared.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
