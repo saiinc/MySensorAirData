@@ -9,7 +9,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.saionji.mysensor.ui.SensorsApp
-import com.saionji.mysensor.ui.theme.SensorsAppTheme
+import com.saionji.mysensor.shared.ui.theme.SensorsAppTheme
 import org.maplibre.android.MapLibre
 import org.maplibre.android.WellKnownTileServer
 
