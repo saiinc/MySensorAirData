@@ -1,27 +1,14 @@
-/*
- * Copyright © Anton Sorokin 2025. All rights reserved
- */
+package com.saionji.mysensor.shared.ui.viewmodel
 
-package com.saionji.mysensor.ui
-
-import android.app.Application
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.saionji.mysensor.MySensorApplication
+import androidx.lifecycle.ViewModel
 import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.shared.data.model.SettingsApp
 import com.saionji.mysensor.shared.data.repository.SettingsRepository
 import com.saionji.mysensor.shared.data.model.SettingsSensor
-import com.saionji.mysensor.shared.di.SharedContainer
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,9 +18,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.IOException
 import com.saionji.mysensor.shared.ui.components.OptionsBoxState
-import com.saionji.mysensor.shared.ui.viewmodel.ThrottleExecutor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 
 sealed class Screen {
@@ -42,10 +31,10 @@ sealed class Screen {
 }
 
 class MySensorViewModel(
-    application: Application,
     private val settingsRepository: SettingsRepository,
     private val getSensorValuesUseCase: GetSensorValuesUseCase,
-) : AndroidViewModel(application) {
+    private val scope: CoroutineScope  // ✅ Передается извне
+) : ViewModel() {
 
     private val _optionsBoxState: MutableState<OptionsBoxState> =
         mutableStateOf(value = OptionsBoxState.CLOSED)
@@ -54,7 +43,7 @@ class MySensorViewModel(
     private val dashboardThrottle = ThrottleExecutor(delayMillis = 5_000)
 
     private fun onDashboardOpened() {
-        viewModelScope.launch {
+        scope.launch {
             dashboardThrottle.run {
                 getDeviceSensors()
             }
@@ -74,7 +63,7 @@ class MySensorViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    fun refresh() = viewModelScope.launch {
+    fun refresh() = scope.launch {
         _isRefreshing.update { true }
         getDeviceSensors()
         delay(1500)
@@ -116,7 +105,7 @@ class MySensorViewModel(
     val navigationEvent = _navigationEvent.asSharedFlow()
 
     fun navigateTo(screen: String) {
-        viewModelScope.launch {
+        scope.launch {
             _navigationEvent.emit(screen)
         }
     }
@@ -140,13 +129,13 @@ class MySensorViewModel(
     }
 
     fun saveAppSettings(settingsApp: SettingsApp) {
-        viewModelScope.launch {
+        scope.launch {
             settingsRepository.saveAppSettings(settingsApp)
         }
     }
 
     fun saveSensors(sensors: List<SettingsSensor>) {
-        viewModelScope.launch {
+        scope.launch {
             settingsRepository.saveSettings(sensors)
         }
     }
@@ -223,29 +212,30 @@ class MySensorViewModel(
         initLoad()
     }
     private fun initLoad() {
-        viewModelScope.launch {
-            settingsRepository.getSettings().collectLatest { savedSettings ->
+        scope.launch {
+            settingsRepository.getSettings()
+                .distinctUntilChanged()
+                .collectLatest { savedSettings ->
 
-                if (savedSettings.isEmpty()) return@collectLatest
+                    if (savedSettings.isEmpty()) return@collectLatest
 
-                // создаём runtime-объекты без сенсоров
-                val dashboard = savedSettings.map {
-                    DashboardSensor(
-                        id = it.id,
-                        description = it.description,
-                        deviceSensors = emptyList(),
-                        isLoading = true
-                    )
+                    val dashboard = savedSettings.map {
+                        DashboardSensor(
+                            id = it.id,
+                            description = it.description,
+                            deviceSensors = emptyList(),
+                            isLoading = true
+                        )
+                    }
+
+                    if (_dashboardItems.value.map { it.id } != dashboard.map { it.id }) {
+                        _dashboardItems.value = dashboard
+                        getDeviceSensors()
+                    }
                 }
-
-                _dashboardItems.value = dashboard
-
-                // загружаем данные один раз
-                getDeviceSensors()
-            }
         }
 
-        viewModelScope.launch {
+        scope.launch {
             settingsRepository.getAppSettings().collectLatest {
                 _settingsApp.value = it
             }
@@ -253,7 +243,7 @@ class MySensorViewModel(
     }
 
     fun resetAppSettings() {
-        viewModelScope.launch(Dispatchers.Main) {
+        scope.launch {
             settingsRepository.getAppSettings().collectLatest {
                 _settingsApp.value = it
             }
@@ -261,64 +251,46 @@ class MySensorViewModel(
     }
 
     fun getDeviceSensors() {
-        viewModelScope.launch {
+        scope.launch {
 
             val current = _dashboardItems.value
-
             if (current.isEmpty()) return@launch
 
-            current.forEach { item ->
+            val results = current.map { item ->
 
-                launch {
+                async {
                     try {
-                        val updatedSensors = getSensorValuesUseCase(
+
+                        val sensors = getSensorValuesUseCase(
                             SettingsSensor(item.id, item.description)
                         )
 
-                        _dashboardItems.update { list ->
-                            list.map { existing ->
-                                if (existing.id == item.id) {
-                                    existing.copy(
-                                        deviceSensors = updatedSensors,
-                                        isLoading = false)
-                                } else existing
-                            }
-                        }
-                        clearError()
+                        item.copy(
+                            deviceSensors = sensors,
+                            isLoading = false
+                        ) to false
 
-                    } catch (_: IOException) {
+                    } catch (e: Exception) {
 
-                        showError(ErrorType.Network)
-
-                        _dashboardItems.update { list ->
-                            list.map { existing ->
-                                if (existing.id == item.id) {
-                                    existing.copy(
-                                        deviceSensors = existing.deviceSensors.map {
-                                            it.copy(value = "—")
-                                        },
-                                        isLoading = false
-                                    )
-                                } else existing
-                            }
-                        }
+                        item.copy(
+                            deviceSensors = item.deviceSensors.map {
+                                it.copy(value = "—")
+                            },
+                            isLoading = false
+                        ) to true
                     }
                 }
-            }
-        }
-    }
 
-    companion object{
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as MySensorApplication)
-                val sharedContainer = application.container as SharedContainer
+            }.awaitAll()
 
-                MySensorViewModel(
-                    settingsRepository = sharedContainer.settingsRepository,
-                    getSensorValuesUseCase = sharedContainer.getSensorValuesUseCase,
-                    application = application
-                )
+            _dashboardItems.value = results.map { it.first }
+
+            val hasError = results.any { it.second }
+
+            if (hasError) {
+                showError(ErrorType.Network)
+            } else {
+                clearError()
             }
         }
     }

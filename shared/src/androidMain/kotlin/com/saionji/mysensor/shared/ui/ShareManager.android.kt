@@ -1,8 +1,4 @@
-/*
- * Copyright © Anton Sorokin 2025. All rights reserved
- */
-
-package com.saionji.mysensor.ui
+package com.saionji.mysensor.shared.ui
 
 import android.content.Context
 import android.content.Intent
@@ -14,11 +10,10 @@ import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 
-class AndroidShareManager(
+actual class ShareManager(
     private val context: Context
 ) {
-
-    fun share(imageBitmap: ImageBitmap) {
+    actual fun share(imageBitmap: ImageBitmap) {
         val bitmap = imageBitmap.asAndroidBitmap()
         val uri = saveBitmapToCache(bitmap)
         shareUri(uri)

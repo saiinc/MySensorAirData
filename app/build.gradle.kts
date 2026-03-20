@@ -12,8 +12,6 @@ plugins {
 
     // Add the Crashlytics Gradle plugin
     id("com.google.firebase.crashlytics")
-
-    kotlin("plugin.serialization")
 }
 
 android {
@@ -64,7 +62,6 @@ android {
 
     configurations.all {
         resolutionStrategy {
-            force("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
             force("org.jetbrains.kotlinx:kotlinx-serialization-core:1.6.3")
         }
     }
@@ -90,7 +87,6 @@ dependencies {
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
 
-
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
     implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.5")
@@ -103,19 +99,12 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.foundation:foundation")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.compose.ui:ui-tooling-preview")
-
-    // Ktor
-    implementation("io.ktor:ktor-client-okhttp:2.3.7")
-    implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
-
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit")
