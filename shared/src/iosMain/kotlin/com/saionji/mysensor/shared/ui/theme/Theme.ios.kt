@@ -14,3 +14,12 @@ actual fun getPlatformColorScheme(
         LightColorScheme
     }
 }
+
+@Composable
+actual fun setupStatusBar(
+    colorScheme: androidx.compose.material3.ColorScheme,
+    darkTheme: Boolean
+) {
+    // iOS не требует явного управления статус баром
+    // Система автоматически адаптирует цвет
+}
