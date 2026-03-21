@@ -45,12 +45,19 @@ expect fun getPlatformColorScheme(
 ): androidx.compose.material3.ColorScheme
 
 @Composable
+expect fun setupStatusBar(
+    colorScheme: androidx.compose.material3.ColorScheme,
+    darkTheme: Boolean
+)
+
+@Composable
 fun SensorsAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val colorScheme = getPlatformColorScheme(darkTheme)
 
+    setupStatusBar(colorScheme, darkTheme)
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
