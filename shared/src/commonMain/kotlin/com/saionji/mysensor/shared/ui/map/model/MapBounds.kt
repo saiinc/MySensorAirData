@@ -1,4 +1,4 @@
-package com.saionji.mysensor.ui.map.model
+package com.saionji.mysensor.shared.ui.map.model
 
 data class MapBounds(
     val north: Double,

@@ -1,6 +1,6 @@
 package com.saionji.mysensor.ui.map
 
-import com.saionji.mysensor.ui.map.model.MapBounds
+import com.saionji.mysensor.shared.ui.map.model.MapBounds
 
 interface MapController {
 
