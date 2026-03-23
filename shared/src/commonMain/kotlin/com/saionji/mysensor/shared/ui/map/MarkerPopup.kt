@@ -1,4 +1,4 @@
-package com.saionji.mysensor.ui.map
+package com.saionji.mysensor.shared.ui.map
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

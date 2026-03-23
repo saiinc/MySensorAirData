@@ -24,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.saionji.mysensor.shared.domain.C
 import com.saionji.mysensor.shared.data.model.DashboardSensor
@@ -35,6 +34,8 @@ import com.saionji.mysensor.shared.domain.PM25_COLOR_RANGES
 import com.saionji.mysensor.shared.domain.PRESSURE_COLOR_RANGES
 import com.saionji.mysensor.shared.domain.TEMPERATURE_COLOR_RANGES
 import com.saionji.mysensor.shared.domain.model.LatLng
+import com.saionji.mysensor.shared.ui.map.MarkerPopup
+import com.saionji.mysensor.shared.ui.map.VerticalColorBar
 import com.saionji.mysensor.ui.map.renderer.MapLibreMarkerRenderer
 
 @Composable
@@ -164,12 +165,8 @@ fun MapScreen(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(end = 8.dp, bottom = 8.dp)
-                .width(10.dp)
-                .height(180.dp)
-                .background(
-                    Color.White.copy(alpha = 0.85f),
-                    shape = RoundedCornerShape(6.dp)
-                )
+                .width(30.dp)
+                .height(180.dp),
         )
 
         // Кнопка текущего местоположения

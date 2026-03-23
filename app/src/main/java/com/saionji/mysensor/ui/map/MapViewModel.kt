@@ -21,7 +21,7 @@ import com.saionji.mysensor.shared.di.SharedContainer
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.shared.domain.model.MapMarker
-import com.saionji.mysensor.ui.map.model.MapBounds
+import com.saionji.mysensor.shared.ui.map.model.MapBounds
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
