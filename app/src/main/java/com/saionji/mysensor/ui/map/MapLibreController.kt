@@ -1,5 +1,6 @@
 package com.saionji.mysensor.ui.map
 
+import com.saionji.mysensor.shared.ui.map.MapController
 import com.saionji.mysensor.shared.ui.map.model.MapBounds
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng

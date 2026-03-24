@@ -8,6 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.saionji.mysensor.shared.domain.C
+import com.saionji.mysensor.shared.ui.map.MapController
 import com.saionji.mysensor.ui.map.renderer.MapLibreMarkerRenderer
 import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
