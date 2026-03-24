@@ -33,7 +33,7 @@ sealed class Screen {
 class MySensorViewModel(
     private val settingsRepository: SettingsRepository,
     private val getSensorValuesUseCase: GetSensorValuesUseCase,
-    private val scope: CoroutineScope  // ✅ Передается извне
+    private val scope: CoroutineScope  // ✅ Пе
 ) : ViewModel() {
 
     private val _optionsBoxState: MutableState<OptionsBoxState> =
