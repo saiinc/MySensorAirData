@@ -38,10 +38,11 @@ import com.saionji.mysensor.shared.ui.map.MapController
 import com.saionji.mysensor.shared.ui.map.MarkerPopup
 import com.saionji.mysensor.shared.ui.map.VerticalColorBar
 import com.saionji.mysensor.ui.map.renderer.MapLibreMarkerRenderer
+import com.saionji.mysensor.shared.ui.map.MapUiState
 
 @Composable
 fun MapScreen(
-    mapViewModel: MapViewModel,
+    mapViewModel: AndroidMapViewModel,
     currentLocation: LatLng?,
     dashboardSensors: State<List<DashboardSensor>>,
     onAddToDashboard: (String, String) -> Unit,
@@ -86,9 +87,9 @@ fun MapScreen(
     LaunchedEffect(mapUiState) {
         val renderer = markerRenderer.value ?: return@LaunchedEffect
 
-        if (mapUiState is MapViewModel.MapUiState.Success) {
+        if (mapUiState is MapUiState.Success) {
             renderer.showMarkers(
-                (mapUiState as MapViewModel.MapUiState.Success).markers
+                (mapUiState as MapUiState.Success).markers
             )
         }
     }
@@ -120,7 +121,7 @@ fun MapScreen(
             },
             onMarkerClick = { markerId ->
                 val state = mapUiState
-                if (state is MapViewModel.MapUiState.Success) {
+                if (state is MapUiState.Success) {
                     val marker = state.markers.firstOrNull { it.id == markerId }
                         ?: return@MapLibreView
 

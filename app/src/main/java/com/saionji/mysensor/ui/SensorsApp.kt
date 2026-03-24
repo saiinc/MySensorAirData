@@ -38,7 +38,7 @@ import com.saionji.mysensor.shared.ui.ShareManager
 import com.saionji.mysensor.shared.ui.components.ErrorBanner
 import com.saionji.mysensor.shared.ui.components.MainAppBar
 import com.saionji.mysensor.shared.ui.components.OptionsBoxState
-import com.saionji.mysensor.ui.map.MapViewModel
+import com.saionji.mysensor.ui.map.AndroidMapViewModel
 import com.saionji.mysensor.shared.ui.screens.AboutScreen
 import com.saionji.mysensor.shared.ui.screens.HomeScreen
 import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
@@ -53,8 +53,8 @@ fun SensorsApp(
 ) {
     val mySensorViewModel: AndroidMySensorViewModel =
         viewModel(factory = AndroidMySensorViewModel.Factory)
-    val mapViewModel: MapViewModel =
-        viewModel(factory = MapViewModel.Factory)
+    val mapViewModel: AndroidMapViewModel =
+        viewModel(factory = AndroidMapViewModel.Factory)
     val optionsBoxState = mySensorViewModel.optionsBoxState
     val settingsApp = mySensorViewModel.settingsApp.value
     val settingsItems = mySensorViewModel.dashboardItems.collectAsState()
@@ -184,14 +184,14 @@ fun SensorsApp(
                                 if (!allPermissionsGranted) {
                                     locationPermissionsState.launchMultiplePermissionRequest()
                                 } else {
-                                    mapViewModel.updateCurrentLocation(context)
+                                    mapViewModel.updateCurrentLocation()
                                 }
                             }
 
                             // Если статус разрешений изменился
                             LaunchedEffect(locationPermissionsState.permissions) {
                                 if (allPermissionsGranted) {
-                                    mapViewModel.updateCurrentLocation(context)
+                                    mapViewModel.updateCurrentLocation()
                                 }
                             }
                             MapScreen(

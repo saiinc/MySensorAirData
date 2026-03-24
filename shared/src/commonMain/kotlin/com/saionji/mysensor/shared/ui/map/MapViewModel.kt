@@ -1,27 +1,14 @@
-package com.saionji.mysensor.ui.map
+package com.saionji.mysensor.shared.ui.map
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationTokenSource
-import com.saionji.mysensor.MySensorApplication
-import com.saionji.mysensor.shared.domain.model.LatLng
 import com.saionji.mysensor.shared.data.model.SettingsSensor
-import com.saionji.mysensor.shared.di.SharedContainer
+import com.saionji.mysensor.shared.domain.model.LatLng
+import com.saionji.mysensor.shared.domain.model.MapMarker
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
-import com.saionji.mysensor.shared.domain.model.MapMarker
 import com.saionji.mysensor.shared.ui.map.model.MapBounds
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,18 +18,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @OptIn(FlowPreview::class)
-class MapViewModel(
+class SharedMapViewModel(
     private val getAddressFromCoordinatesUseCase: GetAddressFromCoordinatesUseCase,
-    private val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase
-) : ViewModel() {
-
-    sealed interface MapUiState {
-        object Idle : MapUiState
-        object Loading : MapUiState
-        data class Success(val markers: List<MapMarker>) : MapUiState
-        data class Error(val message: String) : MapUiState
-    }
-
+    private val getSensorValuesByAreaUseCase: GetSensorValuesByAreaUseCase,
+    private val locationService: LocationService,
+    private val scope: CoroutineScope
+) {
     data class CameraState(
         val lat: Double,
         val lon: Double,
@@ -86,7 +67,7 @@ class MapViewModel(
 
         if (_addresses.value.containsKey(key)) return
 
-        viewModelScope.launch {
+        scope.launch {
             val address = getAddressFromCoordinatesUseCase(lat, lon)
             _addresses.update { it + (key to address) }
         }
@@ -119,8 +100,6 @@ class MapViewModel(
         }
     }
 
-
-
     fun onCameraMovedFromUser(bounds: MapBounds) {
         _cameraState.value = CameraState(
             lat = (bounds.north + bounds.south) / 2,
@@ -131,7 +110,7 @@ class MapViewModel(
     }
 
     init {
-        viewModelScope.launch {
+        scope.launch {
             viewportFlow
                 .debounce(600)
                 .collect { bounds ->
@@ -153,7 +132,7 @@ class MapViewModel(
             return
         }
 
-        viewModelScope.launch {
+        scope.launch {
             _mapUiState.value = MapUiState.Loading
             try {
                 val markers = getSensorValuesByAreaUseCase(
@@ -178,56 +157,30 @@ class MapViewModel(
         address: String,
         onResult: (SettingsSensor) -> Unit
     ) {
-
         val settingsSensor = SettingsSensor(
             id = sensorId,
             description = address
-
         )
-
         onResult(settingsSensor)
     }
 
-    @SuppressLint("MissingPermission")
-    fun updateCurrentLocation(context: Context) {
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
-
-        fusedLocationClient.getCurrentLocation(
-            Priority.PRIORITY_HIGH_ACCURACY,
-            CancellationTokenSource().token
-        ).addOnSuccessListener { location ->
-            if (location != null) {
-                onLocationUpdated(
-                    lat = location.latitude,
-                    lon = location.longitude
-                )
+    fun updateCurrentLocation() {
+        scope.launch {
+            locationService.getCurrentLocation { latLng ->
+                if (latLng != null) {
+                    onLocationUpdated(latLng.lat, latLng.lon)
+                }
             }
-        }.addOnFailureListener {
-            Log.e("Location", "Ошибка при получении текущего местоположения", it)
         }
     }
 
     fun setSelectedValueType(type: String) {
-
         if (_selectedValueType.value == type) return
 
         _selectedValueType.value = type
 
         lastBounds?.let {
             viewportFlow.tryEmit(it)
-        }
-    }
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as MySensorApplication)
-                val sharedContainer = application.container as SharedContainer
-                MapViewModel(
-                    getSensorValuesByAreaUseCase = sharedContainer.getSensorValuesByAreaUseCase,
-                    getAddressFromCoordinatesUseCase = sharedContainer.getAddressFromCoordinatesUseCase
-                )
-            }
         }
     }
 }
