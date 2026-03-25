@@ -50,13 +50,10 @@ class AndroidMapViewModel(
 
     // ==================== METHODS PROXY ====================
 
-    fun ensureAddress(lat: Double?, lon: Double?) = sharedViewModel.ensureAddress(lat, lon)
     fun onMarkerSelected(marker: com.saionji.mysensor.shared.domain.model.MapMarker) = sharedViewModel.onMarkerSelected(marker)
     fun clearSelectedMarker() = sharedViewModel.clearSelectedMarker()
     fun onViewportChanged(bounds: com.saionji.mysensor.shared.ui.map.model.MapBounds) = sharedViewModel.onViewportChanged(bounds)
-    fun onLocationUpdated(lat: Double, lon: Double) = sharedViewModel.onLocationUpdated(lat, lon)
     fun onCameraMovedFromUser(bounds: com.saionji.mysensor.shared.ui.map.model.MapBounds) = sharedViewModel.onCameraMovedFromUser(bounds)
-    fun loadSensorsForArea(bounds: com.saionji.mysensor.shared.ui.map.model.MapBounds) = sharedViewModel.loadSensorsForArea(bounds)
     fun buildSettingsSensorFromMap(sensorId: String, address: String, onResult: (com.saionji.mysensor.shared.data.model.SettingsSensor) -> Unit) = sharedViewModel.buildSettingsSensorFromMap(sensorId, address, onResult)
     fun updateCurrentLocation() = sharedViewModel.updateCurrentLocation()
     fun setSelectedValueType(type: String) = sharedViewModel.setSelectedValueType(type)

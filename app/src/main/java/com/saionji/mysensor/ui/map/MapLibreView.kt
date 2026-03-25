@@ -8,6 +8,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.saionji.mysensor.shared.domain.C
+import com.saionji.mysensor.shared.domain.model.MapMarker
+import com.saionji.mysensor.shared.ui.map.AndroidMapLibreController
 import com.saionji.mysensor.shared.ui.map.MapController
 import com.saionji.mysensor.ui.map.renderer.MapLibreMarkerRenderer
 import org.maplibre.android.maps.MapView
@@ -18,7 +20,8 @@ import kotlin.apply
 @Composable
 fun MapLibreView(
     modifier: Modifier = Modifier,
-    onMapReady: (MapController, MapLibreMarkerRenderer) -> Unit,
+    markers: List<MapMarker>,
+    onMapReady: (MapController) -> Unit,
     onMarkerClick: (String) -> Unit,
     onMapClick: () -> Unit
 ) {
@@ -30,6 +33,14 @@ fun MapLibreView(
         MapView(context).apply {
             onCreate(null)
         }
+    }
+
+    // Renderer теперь внутри, недоступен снаружи
+    val markerRenderer = remember { mutableStateOf<MapLibreMarkerRenderer?>(null) }
+
+    // ✅ Реактивное обновление маркеров
+    LaunchedEffect(markers) {
+        markerRenderer.value?.showMarkers(markers)
     }
 
     // 🔁 синхронизация lifecycle
@@ -60,8 +71,14 @@ fun MapLibreView(
                     map.setStyle(
                         Style.Builder().fromUri(C.MAP_STYLE_URI)
                     ) {
-                        val controller = MapLibreController(map)
+                        val controller = AndroidMapLibreController(map)
+
+                        // ✅ Создаём renderer внутри
                         val renderer = MapLibreMarkerRenderer(map)
+                        markerRenderer.value = renderer
+
+                        // ✅ Показываем начальные маркеры
+                        renderer.showMarkers(markers)
 
                         // Клик по маркеру
                         map.addOnMapClickListener { point ->
@@ -82,7 +99,8 @@ fun MapLibreView(
                                 false
                             }
                         }
-                        onMapReady(controller, renderer)
+                        // ✅ Возвращаем только контроллер
+                        onMapReady(controller)
                     }
 
                 }
