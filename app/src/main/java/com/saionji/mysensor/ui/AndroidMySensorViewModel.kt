@@ -19,6 +19,7 @@ import com.saionji.mysensor.shared.di.SharedContainer
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesUseCase
 import com.saionji.mysensor.shared.ui.components.OptionsBoxState
 import com.saionji.mysensor.shared.ui.viewmodel.Screen
+import com.saionji.mysensor.shared.ui.navigation.NavigationDestination
 
 /**
  * Android wrapper для Shared ViewModel
@@ -59,9 +60,7 @@ class AndroidMySensorViewModel(
 
     fun switchToScreen(screen: Screen) = sharedViewModel.switchToScreen(screen)
     fun refresh() = sharedViewModel.refresh()
-    fun showError(type: SharedMySensorViewModel.ErrorType) = sharedViewModel.showError(type)
-    fun clearError() = sharedViewModel.clearError()
-    fun navigateTo(screen: String) = sharedViewModel.navigateTo(screen)
+    fun navigateTo(destination: NavigationDestination) = sharedViewModel.navigateTo(destination)
     fun setShowShareScreen(value: Boolean) = sharedViewModel.setShowShareScreen(value)
     fun updateSettingsAppState(newValue: SettingsApp) = sharedViewModel.updateSettingsAppState(newValue)
     fun updateOptionsBoxState(newValue: OptionsBoxState) = sharedViewModel.updateOptionsBoxState(newValue)
