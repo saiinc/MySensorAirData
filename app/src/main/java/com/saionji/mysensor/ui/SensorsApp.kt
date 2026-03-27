@@ -23,8 +23,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.painterResource
+import com.saionji.mysensor.shared.generated.resources.Res
+import com.saionji.mysensor.shared.generated.resources.lists_24px
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
@@ -33,7 +34,8 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.saionji.mysensor.R
+import com.saionji.mysensor.shared.generated.resources.error_loading
+import com.saionji.mysensor.shared.generated.resources.error_unknown
 import com.saionji.mysensor.shared.ui.ShareManager
 import com.saionji.mysensor.shared.ui.components.ErrorBanner
 import com.saionji.mysensor.shared.ui.components.MainAppBar
@@ -45,6 +47,8 @@ import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
 import com.saionji.mysensor.shared.ui.viewmodel.Screen
 import com.saionji.mysensor.ui.map.MapScreen
 import com.saionji.mysensor.shared.ui.screens.ShareScreen
+import org.jetbrains.compose.resources.stringResource
+import com.saionji.mysensor.shared.ui.navigation.NavigationDestination
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -78,15 +82,15 @@ fun SensorsApp(
     val navController = rememberNavController()
 
     // Подписка на навигационные события
-    LaunchedEffect(mySensorViewModel.navigationEvent) {
-        mySensorViewModel.navigationEvent.collect { screen ->
-            navController.navigate(screen)
+    LaunchedEffect(Unit) {
+        mySensorViewModel.navigationEvent.collect { destination ->
+            navController.navigate(destination.toRoute())
         }
     }
 
     val errorMessage = when (error) {
-        MySensorViewModel.ErrorType.Network -> stringResource(R.string.error_loading)
-        MySensorViewModel.ErrorType.Unknown -> stringResource(R.string.error_unknown)
+        MySensorViewModel.ErrorType.Network -> stringResource(Res.string.error_loading)
+        MySensorViewModel.ErrorType.Unknown -> stringResource(Res.string.error_unknown)
         null -> null
     }
 
@@ -143,7 +147,7 @@ fun SensorsApp(
                             mySensorViewModel.updateOptionsBoxState(newValue = OptionsBoxState.OPENED)
                         },
                         onAboutClicked = {
-                            mySensorViewModel.navigateTo("about")
+                            mySensorViewModel.navigateTo(NavigationDestination.About)
                         },
                         onShareClicked = { mySensorViewModel.setShowShareScreen(true) },
                     )
@@ -153,7 +157,7 @@ fun SensorsApp(
                         NavigationBarItem(
                             selected = currentScreen is Screen.Dashboard,
                             onClick = { mySensorViewModel.switchToScreen(Screen.Dashboard) },
-                            icon = { Icon(painter = painterResource(id = R.drawable.lists_24px), contentDescription = "Dashboard") },
+                            icon = { Icon(painter = painterResource(Res.drawable.lists_24px), contentDescription = "Dashboard") },
                             label = { Text("Dashboard") }
                         )
                         NavigationBarItem(
