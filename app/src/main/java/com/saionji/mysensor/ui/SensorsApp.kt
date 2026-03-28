@@ -32,10 +32,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.saionji.mysensor.shared.generated.resources.error_loading
 import com.saionji.mysensor.shared.generated.resources.error_unknown
+import com.saionji.mysensor.shared.platform.PermissionService
 import com.saionji.mysensor.shared.ui.ShareManager
 import com.saionji.mysensor.shared.ui.components.ErrorBanner
 import com.saionji.mysensor.shared.ui.components.MainAppBar
@@ -70,13 +70,15 @@ fun SensorsApp(
 
     val context = LocalContext.current
 
+    val permissionService = remember { PermissionService() }
+
     val locationPermissionsState = rememberMultiplePermissionsState(
         permissions = listOf(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
         )
     )
-    val allPermissionsGranted = locationPermissionsState.permissions.all { it.status.isGranted }
+    val allPermissionsGranted = locationPermissionsState.allPermissionsGranted
     val shareManager = remember { ShareManager(context) }
 
     val navController = rememberNavController()
@@ -183,18 +185,16 @@ fun SensorsApp(
                             onRefresh = mySensorViewModel::refresh
                         )
                         Screen.Map -> {
-                            // Первый запуск: если не даны — запрашиваем
+                            // Запрос разрешений при первом открытии
                             LaunchedEffect(Unit) {
-                                if (!allPermissionsGranted) {
+                                if (!locationPermissionsState.allPermissionsGranted) {
                                     locationPermissionsState.launchMultiplePermissionRequest()
-                                } else {
-                                    mapViewModel.updateCurrentLocation()
                                 }
                             }
 
-                            // Если статус разрешений изменился
-                            LaunchedEffect(locationPermissionsState.permissions) {
-                                if (allPermissionsGranted) {
+                            // Обновление местоположения при получении разрешений
+                            LaunchedEffect(locationPermissionsState.allPermissionsGranted) {
+                                if (locationPermissionsState.allPermissionsGranted) {
                                     mapViewModel.updateCurrentLocation()
                                 }
                             }

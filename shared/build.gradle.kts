@@ -96,6 +96,8 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.components.resources)
                 implementation(compose.materialIconsExtended)
+                // Multiplatform Navigation Compose
+                implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.2")
             }
         }
 
