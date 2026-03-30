@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.shared.data.model.SettingsApp
 import com.saionji.mysensor.shared.data.repository.SettingsRepository
@@ -19,7 +20,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.saionji.mysensor.shared.ui.components.OptionsBoxState
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -32,8 +32,7 @@ sealed class Screen {
 
 class MySensorViewModel(
     private val settingsRepository: SettingsRepository,
-    private val getSensorValuesUseCase: GetSensorValuesUseCase,
-    private val scope: CoroutineScope
+    private val getSensorValuesUseCase: GetSensorValuesUseCase
 ) : ViewModel() {
 
     private val _optionsBoxState: MutableState<OptionsBoxState> =
@@ -43,7 +42,7 @@ class MySensorViewModel(
     private val dashboardThrottle = ThrottleExecutor(delayMillis = 5_000)
 
     private fun onDashboardOpened() {
-        scope.launch {
+        viewModelScope.launch {
             dashboardThrottle.run {
                 getDeviceSensors()
             }
@@ -63,7 +62,7 @@ class MySensorViewModel(
     private val _isRefreshing = MutableStateFlow(false)
     val isRefreshing = _isRefreshing.asStateFlow()
 
-    fun refresh() = scope.launch {
+    fun refresh() = viewModelScope.launch {
         _isRefreshing.update { true }
         getDeviceSensors()
         delay(1500)
@@ -105,7 +104,7 @@ class MySensorViewModel(
     val navigationEvent = _navigationEvent.asSharedFlow()
 
     fun navigateTo(destination: Any) {
-        scope.launch {
+        viewModelScope.launch {
             _navigationEvent.emit(destination)
         }
     }
@@ -129,13 +128,13 @@ class MySensorViewModel(
     }
 
     fun saveAppSettings(settingsApp: SettingsApp) {
-        scope.launch {
+        viewModelScope.launch {
             settingsRepository.saveAppSettings(settingsApp)
         }
     }
 
     fun saveSensors(sensors: List<SettingsSensor>) {
-        scope.launch {
+        viewModelScope.launch {
             settingsRepository.saveSettings(sensors)
         }
     }
@@ -212,7 +211,7 @@ class MySensorViewModel(
         initLoad()
     }
     private fun initLoad() {
-        scope.launch {
+        viewModelScope.launch {
             settingsRepository.getSettings()
                 .distinctUntilChanged()
                 .collectLatest { savedSettings ->
@@ -235,7 +234,7 @@ class MySensorViewModel(
                 }
         }
 
-        scope.launch {
+        viewModelScope.launch {
             settingsRepository.getAppSettings().collectLatest {
                 _settingsApp.value = it
             }
@@ -243,7 +242,7 @@ class MySensorViewModel(
     }
 
     fun resetAppSettings() {
-        scope.launch {
+        viewModelScope.launch {
             settingsRepository.getAppSettings().collectLatest {
                 _settingsApp.value = it
             }
@@ -251,7 +250,7 @@ class MySensorViewModel(
     }
 
     fun getDeviceSensors() {
-        scope.launch {
+        viewModelScope.launch {
 
             val current = _dashboardItems.value
             if (current.isEmpty()) return@launch
@@ -295,3 +294,24 @@ class MySensorViewModel(
         }
     }
 }
+
+/**
+ * Фабричная функция для создания MySensorViewModel
+ * 
+ * Используется в Android:
+ * ```
+ * val viewModel: MySensorViewModel = viewModel {
+ *     createMySensorViewModel(
+ *         settingsRepository = container.settingsRepository,
+ *         getSensorValuesUseCase = container.getSensorValuesUseCase
+ *     )
+ * }
+ * ```
+ */
+fun createMySensorViewModel(
+    settingsRepository: SettingsRepository,
+    getSensorValuesUseCase: GetSensorValuesUseCase
+): MySensorViewModel = MySensorViewModel(
+    settingsRepository = settingsRepository,
+    getSensorValuesUseCase = getSensorValuesUseCase
+)
