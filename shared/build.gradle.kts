@@ -87,8 +87,6 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings:1.1.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
                 implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-                implementation("com.google.android.gms:play-services-location:21.3.0")
-                implementation("org.maplibre.gl:android-sdk:11.8.0")
                 // Compose Multiplatform
                 implementation(compose.runtime)
                 implementation(compose.foundation)
@@ -118,6 +116,8 @@ kotlin {
                 implementation(compose.uiTooling)
                 implementation(compose.preview)
                 implementation("androidx.activity:activity-compose:1.9.0")
+                implementation("com.google.android.gms:play-services-location:21.3.0")
+                implementation("org.maplibre.gl:android-sdk:11.8.0")
             }
         }
 
