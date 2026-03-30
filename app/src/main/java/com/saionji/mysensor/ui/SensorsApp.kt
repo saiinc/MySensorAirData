@@ -15,8 +15,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.saionji.mysensor.MySensorApplication
+import com.saionji.mysensor.shared.di.SharedContainer
 import com.saionji.mysensor.shared.ui.ShareManager
 import com.saionji.mysensor.shared.ui.app.SensorsAppContent
+import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
+import com.saionji.mysensor.shared.ui.viewmodel.createMySensorViewModel
 import com.saionji.mysensor.ui.map.AndroidMapViewModel
 import com.saionji.mysensor.ui.map.MapScreen
 
@@ -36,14 +40,20 @@ import com.saionji.mysensor.ui.map.MapScreen
 fun SensorsApp(
     modifier: Modifier = Modifier
 ) {
+    // === ANDROID-SPECIFIC: Context & DI ===
+    val context = LocalContext.current
+    val application = context.applicationContext as MySensorApplication
+    val container = application.container as SharedContainer
+
     // === ANDROID-SPECIFIC: ViewModel creation ===
-    val mySensorViewModel: AndroidMySensorViewModel =
-        viewModel(factory = AndroidMySensorViewModel.Factory)
+    val mySensorViewModel: MySensorViewModel = viewModel {
+        createMySensorViewModel(
+            settingsRepository = container.settingsRepository,
+            getSensorValuesUseCase = container.getSensorValuesUseCase
+        )
+    }
     val mapViewModel: AndroidMapViewModel =
         viewModel(factory = AndroidMapViewModel.Factory)
-
-    // === ANDROID-SPECIFIC: Context ===
-    val context = LocalContext.current
 
     // === ANDROID-SPECIFIC: Permissions ===
     val locationPermissionsState = rememberMultiplePermissionsState(
@@ -58,11 +68,11 @@ fun SensorsApp(
 
     // === ANDROID-SPECIFIC: Map state ===
     val currentLocation by mapViewModel.currentLocation
-    val settingsItems = mySensorViewModel.sharedViewModel.dashboardItems.collectAsState()
+    val settingsItems = mySensorViewModel.dashboardItems.collectAsState()
 
     // === Используем SensorsAppContent с ViewModel напрямую ===
     SensorsAppContent(
-        mySensorViewModel = mySensorViewModel.sharedViewModel,  // ✅ Передаём ViewModel
+        mySensorViewModel = mySensorViewModel,
         mapScreen = {
             // === ANDROID-SPECIFIC: MapScreen (MapLibre) ===
             MapScreen(
@@ -70,11 +80,11 @@ fun SensorsApp(
                 dashboardSensors = settingsItems,
                 onAddToDashboard = { sensorId, address ->
                     mapViewModel.buildSettingsSensorFromMap(sensorId, address) { settingsSensor ->
-                        mySensorViewModel.sharedViewModel.addSensorDashboardFromMap(settingsSensor)
+                        mySensorViewModel.addSensorDashboardFromMap(settingsSensor)
                     }
                 },
                 onRemoveFromDashboard = { id ->
-                    mySensorViewModel.sharedViewModel.removeSensorDashboardFromMap(id)
+                    mySensorViewModel.removeSensorDashboardFromMap(id)
                 },
                 currentLocation = currentLocation
             )
