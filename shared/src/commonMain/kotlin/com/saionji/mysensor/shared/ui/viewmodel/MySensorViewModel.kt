@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.saionji.mysensor.shared.ui.components.OptionsBoxState
-import com.saionji.mysensor.shared.ui.navigation.NavigationDestination
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -102,10 +101,10 @@ class MySensorViewModel(
     private val _sensorsOptions = MutableStateFlow<List<SettingsSensor>>(emptyList())
     val sensorsOptions: StateFlow<List<SettingsSensor>> get() = _sensorsOptions
 
-    private val _navigationEvent = MutableSharedFlow<NavigationDestination>()
+    private val _navigationEvent = MutableSharedFlow<Any>()
     val navigationEvent = _navigationEvent.asSharedFlow()
 
-    fun navigateTo(destination: NavigationDestination) {
+    fun navigateTo(destination: Any) {
         scope.launch {
             _navigationEvent.emit(destination)
         }

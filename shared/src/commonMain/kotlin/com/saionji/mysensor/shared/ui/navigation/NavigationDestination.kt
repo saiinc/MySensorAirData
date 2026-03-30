@@ -1,22 +1,22 @@
 package com.saionji.mysensor.shared.ui.navigation
 
-/**
- * Роуты навигации для приложения
- * 
- * Используется sealed class для типобезопасности.
- * Совместим с AndroidX Navigation (строковые роуты).
- */
-sealed class NavigationDestination {
-    
-    /**
-     * Экран "О приложении"
-     */
-    object About : NavigationDestination()
+import kotlinx.serialization.Serializable
 
-    /**
-     * Преобразование в строковый роут для AndroidX Navigation
-     */
-    fun toRoute(): String = when (this) {
-        About -> "about"
-    }
-}
+/**
+ * Роуты навигации для Multiplatform Navigation Compose
+ *
+ * Каждый роут — это @Serializable объект.
+ * Типобезопасная навигация без строковых ключей.
+ */
+
+/**
+ * Главный экран (Dashboard + Map)
+ */
+@Serializable
+object Main
+
+/**
+ * Экран "О приложении"
+ */
+@Serializable
+object About
