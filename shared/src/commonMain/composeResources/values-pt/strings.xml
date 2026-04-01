@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_header">Definir ID do sensor</string>
+    <string name="settings_switch">Ocultar ID do sensor ao compartilhar</string>
+    <string name="settings_button">Concluído</string>
+    <string name="settings_sensor_id">Digitar ID</string>
+    <string name="settings_sensor_description">Descrição (opcional)</string>
+    <string name="error_loading">Erro ao carregar</string>
+    <string name="error_unknown">Erro desconhecido</string>
+    <string name="add_sensor">Toque no ícone do mapa para adicionar seu sensor</string>
+    <string name="dashboard_add">Adicionar ao painel</string>
+    <string name="dashboard_remove">Remover do painel</string>
+</resources>

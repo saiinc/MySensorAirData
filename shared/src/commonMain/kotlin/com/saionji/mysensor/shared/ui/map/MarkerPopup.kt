@@ -24,6 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.saionji.mysensor.shared.domain.model.MapMarker
+import com.saionji.mysensor.shared.generated.resources.Res
+import com.saionji.mysensor.shared.generated.resources.dashboard_add
+import com.saionji.mysensor.shared.generated.resources.dashboard_remove
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun MarkerPopup(
@@ -80,8 +84,8 @@ fun MarkerPopup(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        if (isAdded) "Удалить из дашборда"
-                        else "Добавить в дашборд"
+                        if (isAdded) stringResource(Res.string.dashboard_remove)
+                        else stringResource(Res.string.dashboard_add)
                     )
                 }
             }

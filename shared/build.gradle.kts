@@ -1,4 +1,4 @@
-
+import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
@@ -44,6 +44,7 @@ kotlin {
     // project can be found here:
     // https://developer.android.com/kotlin/multiplatform/migrate
     val xcfName = "sharedKit"
+    val xcf = XCFramework()
 
     androidTarget {
         compilerOptions {
@@ -51,21 +52,14 @@ kotlin {
         }
     }
 
-    iosX64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
-    iosArm64 {
-        binaries.framework {
-            baseName = xcfName
-        }
-    }
-
-    iosSimulatorArm64 {
-        binaries.framework {
-            baseName = xcfName
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "ComposeApp"
+            isStatic = true
+            xcf.add(this)
         }
     }
 
@@ -138,7 +132,6 @@ kotlin {
                 // KMP dependencies declared in commonMain.
                 implementation("io.ktor:ktor-client-darwin:2.3.7")
                 // iOS Compose dependencies
-                implementation(compose.uiTooling)
             }
         }
     }

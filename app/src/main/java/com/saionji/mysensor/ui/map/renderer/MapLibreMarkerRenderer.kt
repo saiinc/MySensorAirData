@@ -49,7 +49,7 @@ class MapLibreMarkerRenderer(
                 collection,
                 GeoJsonOptions()
                     .withCluster(true)
-                    .withClusterRadius(50)
+                    .withClusterRadius(40)
                     .withClusterMaxZoom(12)
 
                     // Сумма каналов
@@ -126,7 +126,7 @@ class MapLibreMarkerRenderer(
         if (style.getLayer(markerLayerId) == null) {
             style.addLayerAbove(
                 CircleLayer(markerLayerId, sourceId).withProperties(
-                    PropertyFactory.circleRadius(9f),
+                    PropertyFactory.circleRadius(11f),
                     PropertyFactory.circleColor(Expression.get("color")),
                     PropertyFactory.circleOpacity(0.9f),
                     PropertyFactory.circleStrokeColor("#404040"),

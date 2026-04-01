@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_header">センサーIDを設定</string>
+    <string name="settings_switch">共有時にセンサーIDを非表示</string>
+    <string name="settings_button">完了</string>
+    <string name="settings_sensor_id">IDを入力</string>
+    <string name="settings_sensor_description">説明（任意）</string>
+    <string name="error_loading">読み込みエラー</string>
+    <string name="error_unknown">不明なエラー</string>
+    <string name="add_sensor">地図アイコンをタップしてセンサーを追加</string>
+    <string name="dashboard_add">ダッシュボードに追加</string>
+    <string name="dashboard_remove">ダッシュボードから削除</string>
+</resources>

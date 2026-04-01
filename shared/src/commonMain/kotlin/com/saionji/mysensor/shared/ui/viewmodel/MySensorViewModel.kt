@@ -213,7 +213,6 @@ class MySensorViewModel(
     private fun initLoad() {
         viewModelScope.launch {
             settingsRepository.getSettings()
-                .distinctUntilChanged()
                 .collectLatest { savedSettings ->
 
                     if (savedSettings.isEmpty()) return@collectLatest
@@ -226,11 +225,8 @@ class MySensorViewModel(
                             isLoading = true
                         )
                     }
-
-                    if (_dashboardItems.value.map { it.id } != dashboard.map { it.id }) {
-                        _dashboardItems.value = dashboard
-                        getDeviceSensors()
-                    }
+                    _dashboardItems.value = dashboard
+                    getDeviceSensors()
                 }
         }
 

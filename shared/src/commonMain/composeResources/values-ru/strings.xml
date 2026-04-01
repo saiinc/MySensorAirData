@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_header">Настройка ID сенсора</string>
+    <string name="settings_switch">Скрыть ID сенсора при использовании функции «Поделиться»</string>
+    <string name="settings_button">Готово</string>
+    <string name="settings_sensor_id">Введите ID</string>
+    <string name="settings_sensor_description">Описание (необязательно)</string>
+    <string name="error_loading">Ошибка загрузки</string>
+    <string name="error_unknown">Неизвестная ошибка</string>
+    <string name="add_sensor">Пожалуйста, нажмите на значок карты, чтобы добавить ваш сенсор</string>
+    <string name="dashboard_add">Добавить в дашборд</string>
+    <string name="dashboard_remove">Удалить из дашборда</string>
+</resources>

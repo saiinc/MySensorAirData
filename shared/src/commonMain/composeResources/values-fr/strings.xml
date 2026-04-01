@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_header">Définir l'ID du capteur</string>
+    <string name="settings_switch">Masquer l'ID du capteur lors du partage</string>
+    <string name="settings_button">Terminé</string>
+    <string name="settings_sensor_id">Entrer l'ID</string>
+    <string name="settings_sensor_description">Description (facultatif)</string>
+    <string name="error_loading">Erreur de chargement</string>
+    <string name="error_unknown">Erreur inconnue</string>
+    <string name="add_sensor">Appuyez sur l'icône de carte pour ajouter votre capteur</string>
+    <string name="dashboard_add">Ajouter au tableau de bord</string>
+    <string name="dashboard_remove">Retirer du tableau de bord</string>
+</resources>

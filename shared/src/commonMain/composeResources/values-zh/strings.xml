@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_header">设置传感器ID</string>
+    <string name="settings_switch">分享时隐藏传感器ID</string>
+    <string name="settings_button">完成</string>
+    <string name="settings_sensor_id">输入ID</string>
+    <string name="settings_sensor_description">描述（可选）</string>
+    <string name="error_loading">加载错误</string>
+    <string name="error_unknown">未知错误</string>
+    <string name="add_sensor">点击地图图标添加您的传感器</string>
+    <string name="dashboard_add">添加到仪表板</string>
+    <string name="dashboard_remove">从仪表板移除</string>
+</resources>
