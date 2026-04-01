@@ -22,4 +22,8 @@
     <string name="error_unknown">Unknown error</string>
 
     <string name="add_sensor">Please tap the map icon to add your sensor</string>
+
+    <string name="dashboard_add">Add to dashboard</string>
+
+    <string name="dashboard_remove">Remove from dashboard</string>
 </resources>

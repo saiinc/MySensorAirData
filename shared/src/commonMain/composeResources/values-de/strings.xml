@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_header">Sensor-ID festlegen</string>
+    <string name="settings_switch">Sensor-ID bei Nutzung der „Teilen“-Funktion ausblenden</string>
+    <string name="settings_button">Fertig</string>
+    <string name="settings_sensor_id">ID eingeben</string>
+    <string name="settings_sensor_description">Beschreibung (optional)</string>
+    <string name="error_loading">Fehler beim Laden</string>
+    <string name="error_unknown">Unbekannter Fehler</string>
+    <string name="add_sensor">Tippen Sie auf das Kartensymbol, um Ihren Sensor hinzuzufügen</string>
+    <string name="dashboard_add">Zum Dashboard hinzufügen</string>
+    <string name="dashboard_remove">Aus Dashboard entfernen</string>
+</resources>

@@ -93,7 +93,7 @@ fun PollutionGrid(data: DashboardSensor) {
             Text(
                 text = data.description,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 modifier = Modifier
                     .weight(1f)  // Занимает оставшееся место
                     .padding(end = 8.dp),
@@ -128,7 +128,7 @@ fun ValuesGrid(data: DashboardSensor) {
             data.deviceSensors.forEach { sensor ->
                 Card(
                     modifier = Modifier
-                        .padding(start = 22.dp, bottom = 6.dp)
+                        .padding(start = 22.dp, bottom = 12.dp)
                         .requiredWidth(155.dp)
                         .requiredHeight(102.dp),
                 ) {
