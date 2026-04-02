@@ -95,7 +95,17 @@ kotlin {
 
         commonTest {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-test:2.0.0")
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+                implementation("app.cash.turbine:turbine:1.0.0")
+            }
+        }
+
+        val androidUnitTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+                implementation("app.cash.turbine:turbine:1.0.0")
             }
         }
 
