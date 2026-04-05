@@ -3,7 +3,7 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
     id("org.jetbrains.compose") version "1.7.1"
 }
 
@@ -71,7 +71,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib:2.0.0")
+                implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
                 // Add KMP dependencies here
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
                 // Ktor для KMP
