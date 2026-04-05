@@ -3,8 +3,8 @@ plugins {
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
-    id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
-    id("org.jetbrains.compose") version "1.7.1"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.2.20"
+    id("org.jetbrains.compose") version "1.9.3"
 }
 
 android {
@@ -71,7 +71,7 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib:2.1.0")
+                implementation("org.jetbrains.kotlin:kotlin-stdlib:2.2.20")
                 // Add KMP dependencies here
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
                 // Ktor для KMP
@@ -80,7 +80,7 @@ kotlin {
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
                 implementation("com.russhwolf:multiplatform-settings:1.1.1")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
-                implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+                implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.6")
                 // Compose Multiplatform
                 implementation(compose.runtime)
                 implementation(compose.foundation)
