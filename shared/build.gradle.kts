@@ -43,7 +43,6 @@ kotlin {
     // A step-by-step guide on how to include this library in an XCode
     // project can be found here:
     // https://developer.android.com/kotlin/multiplatform/migrate
-    val xcfName = "sharedKit"
     val xcf = XCFramework()
 
     androidTarget {
@@ -79,7 +78,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
                 implementation("com.russhwolf:multiplatform-settings:1.1.1")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.7.0")
                 implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.9.6")
                 // Compose Multiplatform
                 implementation(compose.runtime)

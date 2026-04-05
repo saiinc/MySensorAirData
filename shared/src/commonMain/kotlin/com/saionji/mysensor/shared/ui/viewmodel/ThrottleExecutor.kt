@@ -1,17 +1,19 @@
 package com.saionji.mysensor.shared.ui.viewmodel
 
-import kotlinx.datetime.Clock
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
 
 class ThrottleExecutor(
     private val delayMillis: Long
 ) {
-    private var lastExecuted = 0L
+    private var lastExecutedMark: TimeSource.Monotonic.ValueTimeMark? = null
 
     suspend fun run(block: suspend () -> Unit) {
-        val now = Clock.System.now().toEpochMilliseconds()
+        val now = TimeSource.Monotonic.markNow()
+        val lastMark = lastExecutedMark
 
-        if (now - lastExecuted >= delayMillis) {
-            lastExecuted = now
+        if (lastMark == null || lastMark.elapsedNow() >= delayMillis.milliseconds) {
+            lastExecutedMark = now
             block()
         }
     }
