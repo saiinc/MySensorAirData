@@ -2,34 +2,36 @@
 
 package com.saionji.mysensor.shared
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.ComposeUIViewController
-// platform.UIKit распознаётся только на macOS с Xcode
-// На Windows IDE покажет "Unresolved reference" - это нормально
+import com.saionji.mysensor.shared.di.IosContainer
+import com.saionji.mysensor.shared.ui.app.SensorsAppContent
+import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
 import platform.UIKit.UIViewController
 
-/**
- * Entry point для iOS приложения
- *
- * Вызывается из ContentView.swift:
- * MainViewControllerKt.MainViewController()
- */
+private lateinit var iosContainer: IosContainer
+
 @Suppress("unused")
 fun MainViewController(): UIViewController {
-    return ComposeUIViewController {
-        // TODO: Подключить DI контейнер
-        // Пока используем заглушку
+    iosContainer = IosContainer()
 
-        // Простой текст для проверки - по центру экрана
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("MySensor iOS - Compose работает!")
-        }
+    return ComposeUIViewController {
+        val viewModel = MySensorViewModel(
+            settingsRepository = iosContainer.settingsRepository,
+            getSensorValuesUseCase = iosContainer.getSensorValuesUseCase
+        )
+
+        SensorsAppContent(
+            mySensorViewModel = viewModel,
+            mapScreen = {
+                // Заглушка - карта позже
+                androidx.compose.material3.Text("Map coming soon...")
+            },
+            permissionHandler = {
+                // Заглушка - permissions позже
+            },
+            onShare = {
+                // Заглушка - sharing позже
+            }
+        )
     }
 }
