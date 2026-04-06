@@ -140,6 +140,7 @@ kotlin {
                 // on common by default and will correctly pull the iOS artifacts of any
                 // KMP dependencies declared in commonMain.
                 implementation("io.ktor:ktor-client-darwin:2.3.7")
+                implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
                 // iOS Compose dependencies
             }
         }
