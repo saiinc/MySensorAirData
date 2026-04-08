@@ -1,8 +1,5 @@
 package com.saionji.mysensor.shared.platform
 
-import kotlinx.serialization.builtins.serializer
-import platform.CoreLocation.CLAuthorizationStatus
-import platform.CoreLocation.CLAuthorizationStatusVar
 import platform.CoreLocation.CLLocationManager
 
 actual class PermissionService {
@@ -12,7 +9,7 @@ actual class PermissionService {
         // CLAuthorizationStatus числовые значения:
         // 0 = NotDetermined, 1 = Restricted, 2 = Denied
         // 3 = AuthorizedWhenInUse, 4 = AuthorizedAlways
-        val statusValue = status.toInt()
+        val statusValue = status
         return statusValue == 3 || statusValue == 4
 
     }
