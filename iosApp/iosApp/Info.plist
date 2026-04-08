@@ -11,5 +11,9 @@
         <key>NSAllowsArbitraryLoads</key>
         <true/>
     </dict>
+
+    <!-- Геолокация -->
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>MySensor needs your location to show nearby air quality sensors</string>
 </dict>
 </plist>
