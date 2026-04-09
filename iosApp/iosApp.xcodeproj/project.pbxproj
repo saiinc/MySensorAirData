@@ -14,6 +14,7 @@
 
 /* Begin PBXFileReference section */
 		0F7E72F4F2BD48759EBCEB71 /* KotlinMultiplatform.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KotlinMultiplatform.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F55A86E42F8808410068414B /* .gitignore 2 */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".gitignore 2"; sourceTree = "<group>"; };
 		F5C219E32F87DCF800E8ED97 /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = shared.xcframework; sourceTree = "<group>"; };
 		F5D8FEDA2F86D47000CDC417 /* iosApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iosApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapLibreWrapper.m; sourceTree = "<group>"; };
@@ -62,6 +63,7 @@
 				F5D8FEDA2F86D47000CDC417 /* iosApp-Bridging-Header.h */,
 				F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */,
 				F5C219E32F87DCF800E8ED97 /* shared.xcframework */,
+				F55A86E42F8808410068414B /* .gitignore 2 */,
 			);
 			sourceTree = "<group>";
 		};
