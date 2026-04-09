@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F5C219E42F87DCF800E8ED97 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5C219E32F87DCF800E8ED97 /* shared.xcframework */; };
 		F5D8FEC52F8644FA00CDC417 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = F5D8FEC42F8644FA00CDC417 /* MapLibre */; };
 		F5D8FEDC2F86D47000CDC417 /* MapLibreWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */; };
-		F5D8FEEA2F87C2D400CDC417 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5D8FEE92F87C2D400CDC417 /* shared.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0F7E72F4F2BD48759EBCEB71 /* KotlinMultiplatform.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KotlinMultiplatform.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5C219E32F87DCF800E8ED97 /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = shared.xcframework; sourceTree = "<group>"; };
 		F5D8FEDA2F86D47000CDC417 /* iosApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iosApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapLibreWrapper.m; sourceTree = "<group>"; };
-		F5D8FEE92F87C2D400CDC417 /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = shared.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -37,7 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F5D8FEEA2F87C2D400CDC417 /* shared.xcframework in Frameworks */,
+				F5C219E42F87DCF800E8ED97 /* shared.xcframework in Frameworks */,
 				F5D8FEC52F8644FA00CDC417 /* MapLibre in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -61,7 +61,7 @@
 				081F61F07BC5AC6706D34BBA /* Products */,
 				F5D8FEDA2F86D47000CDC417 /* iosApp-Bridging-Header.h */,
 				F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */,
-				F5D8FEE92F87C2D400CDC417 /* shared.xcframework */,
+				F5C219E32F87DCF800E8ED97 /* shared.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
