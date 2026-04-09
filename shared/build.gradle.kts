@@ -145,7 +145,15 @@ kotlin {
             }
         }
     }
-
+    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().configureEach {
+        compilations.getByName("main") {
+            cinterops {
+                val maplibre by creating {
+                    defFile(project.file("src/iosMain/interop/maplibre.def"))
+                }
+            }
+        }
+    }
 }
 
 compose {

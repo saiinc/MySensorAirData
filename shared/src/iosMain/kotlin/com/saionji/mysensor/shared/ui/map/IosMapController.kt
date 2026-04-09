@@ -1,7 +1,9 @@
 package com.saionji.mysensor.shared.ui.map
 
 import com.saionji.mysensor.shared.ui.map.model.MapBounds
+import com.saionji.mysensor.shared.ui.map.interop.MapLibreWrapper
 
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 class IosMapController(
     private val wrapper: MapLibreWrapper
 ) : MapController {
