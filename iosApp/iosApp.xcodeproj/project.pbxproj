@@ -76,6 +76,7 @@
 			buildPhases = (
 				A407D34A0964E04FDFC58AF2 /* Compile Kotlin Framework */,
 				5FEC55D5BEC297EB3832BAE6 /* Sources */,
+				F5B5FFB22F899965006CC893 /* ShellScript */,
 				D93F072FA3E6258BA4D8E016 /* Frameworks */,
 			);
 			buildRules = (
@@ -150,6 +151,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"YES\" = \"$OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED\" ]; then\n  echo \"Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \\\"YES\\\"\"\n  exit 0\nfi\ncd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+		};
+		F5B5FFB22F899965006CC893 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(​SRCROOT)/shared​.xcframework​/​Info​.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nset -euo pipefail\n\nROOT=\"$SRCROOT/..\"\nGRADLEW=\"$ROOT/gradlew\"\n\nif [[ \"$CONFIGURATION\" == \"Debug\" ]]; then\n  TASK=\":shared:assembleSharedDebugXCFramework\"\n  XC_OUT=\"$ROOT/shared/build/XCFrameworks/debug/shared.xcframework\"\nelif [[ \"$CONFIGURATION\" == \"Release\" ]]; then\n  TASK=\":shared:assembleSharedReleaseXCFramework\"\n  XC_OUT=\"$ROOT/shared/build/XCFrameworks/release/shared.xcframework\"\nelse\n  echo \"Unsupported CONFIGURATION=$CONFIGURATION\"\n  exit 1\nfi\n\n\"$GRADLEW\" \"$TASK\"\n\nLINK_PATH=\"$SRCROOT/shared.xcframework\"\nrm -rf \"$LINK_PATH\"\nln -s \"$XC_OUT\" \"$LINK_PATH\"\n\necho \"Linked $LINK_PATH -> $XC_OUT\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
