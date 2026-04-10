@@ -1,0 +1,5 @@
+headers = /Users/saionji/Developer/Projects/MySensorAirData/shared/src/iosMain/interop/MapLibreWrapper.h
+language = Objective-C
+package = com.saionji.mysensor.shared.ui.map.interop
+
+linkerOpts = -ObjC -framework UIKit -framework CoreLocation -framework MapLibre

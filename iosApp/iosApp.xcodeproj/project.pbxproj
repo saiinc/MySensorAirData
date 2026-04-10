@@ -7,22 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F5C219E42F87DCF800E8ED97 /* shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = F5C219E32F87DCF800E8ED97 /* shared.xcframework */; };
 		F5D8FEC52F8644FA00CDC417 /* MapLibre in Frameworks */ = {isa = PBXBuildFile; productRef = F5D8FEC42F8644FA00CDC417 /* MapLibre */; };
+		F5D8FEDC2F86D47000CDC417 /* MapLibreWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0F7E72F4F2BD48759EBCEB71 /* KolinMultiplatform.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KolinMultiplatform.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0F7E72F4F2BD48759EBCEB71 /* KotlinMultiplatform.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KotlinMultiplatform.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F55A86E42F8808410068414B /* .gitignore 2 */ = {isa = PBXFileReference; lastKnownFileType = text; path = ".gitignore 2"; sourceTree = "<group>"; };
+		F5C219E32F87DCF800E8ED97 /* shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = shared.xcframework; sourceTree = "<group>"; };
+		F5D8FEDA2F86D47000CDC417 /* iosApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iosApp-Bridging-Header.h"; sourceTree = "<group>"; };
+		F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapLibreWrapper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		437AE60AB1152C6D26E4923F /* Exceptions for "iosApp" folder in "iosApp" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = 6E8E2832128B2544EA9C0D03 /* iosApp */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		345750543F866ACA6A62B0C6 /* Configuration */ = {
@@ -32,9 +28,6 @@
 		};
 		D675A997F97FDC603C20D320 /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				437AE60AB1152C6D26E4923F /* Exceptions for "iosApp" folder in "iosApp" target */,
-			);
 			path = iosApp;
 			sourceTree = "<group>";
 		};
@@ -45,6 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5C219E42F87DCF800E8ED97 /* shared.xcframework in Frameworks */,
 				F5D8FEC52F8644FA00CDC417 /* MapLibre in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -55,7 +49,7 @@
 		081F61F07BC5AC6706D34BBA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0F7E72F4F2BD48759EBCEB71 /* KolinMultiplatform.app */,
+				0F7E72F4F2BD48759EBCEB71 /* KotlinMultiplatform.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -66,6 +60,10 @@
 				345750543F866ACA6A62B0C6 /* Configuration */,
 				D675A997F97FDC603C20D320 /* iosApp */,
 				081F61F07BC5AC6706D34BBA /* Products */,
+				F5D8FEDA2F86D47000CDC417 /* iosApp-Bridging-Header.h */,
+				F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */,
+				F5C219E32F87DCF800E8ED97 /* shared.xcframework */,
+				F55A86E42F8808410068414B /* .gitignore 2 */,
 			);
 			sourceTree = "<group>";
 		};
@@ -79,7 +77,6 @@
 				A407D34A0964E04FDFC58AF2 /* Compile Kotlin Framework */,
 				5FEC55D5BEC297EB3832BAE6 /* Sources */,
 				D93F072FA3E6258BA4D8E016 /* Frameworks */,
-				5F328B77B7E272CD5FA48834 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -93,7 +90,7 @@
 				F5D8FEC42F8644FA00CDC417 /* MapLibre */,
 			);
 			productName = iosApp;
-			productReference = 0F7E72F4F2BD48759EBCEB71 /* KolinMultiplatform.app */;
+			productReference = 0F7E72F4F2BD48759EBCEB71 /* KotlinMultiplatform.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -104,10 +101,11 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 2640;
 				TargetAttributes = {
 					6E8E2832128B2544EA9C0D03 = {
 						CreatedOnToolsVersion = 16.2;
+						LastSwiftMigration = 2640;
 					};
 				};
 			};
@@ -132,16 +130,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXResourcesBuildPhase section */
-		5F328B77B7E272CD5FA48834 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		A407D34A0964E04FDFC58AF2 /* Compile Kotlin Framework */ = {
@@ -170,6 +158,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5D8FEDC2F86D47000CDC417 /* MapLibreWrapper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,6 +202,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -229,7 +219,9 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -237,13 +229,14 @@
 		0DC0210B4E9EAE4EC983212C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
@@ -256,7 +249,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				SWIFT_BRIDGING_HEADER_IS_INTERNAL = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "iosApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -265,13 +261,14 @@
 		A25244C5B51FDAFFAB198C1C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = arm64;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
-				DEVELOPMENT_TEAM = "${TEAM_ID}";
+				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
@@ -284,7 +281,11 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				SWIFT_BRIDGING_HEADER_IS_INTERNAL = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "iosApp-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -327,6 +328,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "${TEAM_ID}";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
@@ -350,7 +352,9 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;

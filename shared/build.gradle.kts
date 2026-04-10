@@ -56,7 +56,7 @@ kotlin {
         iosSimulatorArm64()
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            baseName = "ComposeApp"
+            baseName = "shared"
             isStatic = true
             xcf.add(this)
         }
@@ -145,7 +145,15 @@ kotlin {
             }
         }
     }
-
+    targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>().configureEach {
+        compilations.getByName("main") {
+            cinterops {
+                val maplibre by creating {
+                    defFile(project.file("src/iosMain/interop/maplibre.def"))
+                }
+            }
+        }
+    }
 }
 
 compose {

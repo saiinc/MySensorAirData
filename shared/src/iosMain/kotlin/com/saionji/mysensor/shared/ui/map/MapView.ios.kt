@@ -4,23 +4,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
+import com.saionji.mysensor.shared.ui.map.interop.MapLibreWrapper
 import platform.UIKit.UIView
 
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 @Composable
 fun IosMapView(
     modifier: Modifier,
     onMapReady: (MapController) -> Unit
 ) {
-    val mapView = remember {
-        // Вызываем Swift wrapper
-        MapLibreWrapper().createMapView()
-    }
+    val wrapper = remember { MapLibreWrapper() }
+    val uiView = remember { wrapper.createMapView() }
 
     UIKitView(
-        factory = { mapView },
+        factory = { uiView },
         modifier = modifier,
         update = {
-            onMapReady(IosMapController(mapView))
+            onMapReady(IosMapController(wrapper))
         }
     )
 }

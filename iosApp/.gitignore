@@ -1,0 +1,33 @@
+# Kotlin/Gradle
+.gradle/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+
+# Xcode
+DerivedData/
+*.xcuserdatad/
+*.xcscmblueprint
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# SwiftPM
+.build/
+.swiftpm/
+
+# XCFramework and other large artifacts
+*.xcframework/
+*.framework.dSYM/
+*.dSYM/
+
+# CocoaPods (if used)
+Pods/
+Podfile.lock
+
+# Logs
+*.log
+
+# OS Files
+.DS_Store
