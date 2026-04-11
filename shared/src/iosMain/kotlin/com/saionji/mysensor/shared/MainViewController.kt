@@ -5,7 +5,7 @@ package com.saionji.mysensor.shared
 import androidx.compose.ui.window.ComposeUIViewController
 import com.saionji.mysensor.shared.di.IosContainer
 import com.saionji.mysensor.shared.ui.app.SensorsAppContent
-import com.saionji.mysensor.shared.ui.map.IosMapView
+import com.saionji.mysensor.shared.ui.map.IosMapScreen
 import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
@@ -26,10 +26,15 @@ fun MainViewController(): UIViewController {
         SensorsAppContent(
             mySensorViewModel = viewModel,
             mapScreen = {
-                IosMapView(
-                    Modifier.fillMaxSize(),
-                    onMapReady = { controller ->
-                        println("Map ready: $controller")
+                IosMapScreen(
+                    mapViewModel = iosContainer.mapViewModel,
+                    currentLocation = null, // TODO: из LocationService
+                    dashboardSensors = viewModel.dashboardItems.collectAsState(),
+                    onAddToDashboard = { id, desc ->
+                        // TODO: добавить сенсор
+                    },
+                    onRemoveFromDashboard = { id ->
+                        // TODO: удалить сенсор
                     }
                 )
             },
