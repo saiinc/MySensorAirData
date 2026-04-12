@@ -18,7 +18,7 @@
 - (UIView *)createMapView {
     self.mapView = [[MLNMapView alloc] init];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.mapView.styleURL = [NSURL URLWithString:@"https://demotiles.maplibre.org/style.json"];
+    self.mapView.styleURL = [NSURL URLWithString:@"https://tiles.openfreemap.org/styles/liberty"];
     
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake(55.7558, 37.6173);
     

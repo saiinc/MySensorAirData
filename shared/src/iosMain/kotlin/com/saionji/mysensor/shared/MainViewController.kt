@@ -8,6 +8,7 @@ import com.saionji.mysensor.shared.ui.app.SensorsAppContent
 import com.saionji.mysensor.shared.ui.map.IosMapScreen
 import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import platform.UIKit.UIViewController
 

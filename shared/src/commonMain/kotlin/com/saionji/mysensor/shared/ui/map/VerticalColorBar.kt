@@ -51,7 +51,7 @@ fun VerticalColorBar(
                     .offset(x = (-15).dp, y = yPosition - 90.dp), // Смещаем влево и по Y
                 textAlign = androidx.compose.ui.text.style.TextAlign.End,
                 fontSize = 12.sp,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.background
+                color = Color.Black
             )
         }
     }
