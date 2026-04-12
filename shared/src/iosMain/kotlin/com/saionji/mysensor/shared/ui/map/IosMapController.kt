@@ -18,6 +18,12 @@ class IosMapController(
     override fun setOnViewportChangedListener(listener: (MapBounds) -> Unit) {
         viewportListener = listener
     }
+    
+    fun setViewportCallback(wrapper: MapLibreWrapper) {
+       wrapper.onViewportChanged = { north, south, east, west, zoom ->
+           viewportListener?.invoke(MapBounds(north, south, east, west, zoom))
+       }
+   }
 
     override fun zoomIn() {
         wrapper.zoomIn()

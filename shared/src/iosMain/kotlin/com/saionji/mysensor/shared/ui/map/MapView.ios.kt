@@ -24,9 +24,14 @@ fun IosMapView(
     val wrapper = remember { MapLibreWrapper() }
     val uiView = remember { wrapper.createMapView() }
     val controller = remember { IosMapController(wrapper) }
+
+    LaunchedEffect(wrapper, controller) {
+        controller.setViewportCallback(wrapper)
+    }
     
     // Обновляем маркеры при изменении списка
     LaunchedEffect(markers) {
+        println("MapView: markers count = ${markers.size}")
         val nsMarkers = markers.map { marker ->
             mapOf(
                 "id" to marker.id as NSString,

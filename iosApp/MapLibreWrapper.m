@@ -16,12 +16,22 @@
 
 @implementation MapLibreWrapper
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        _currentMarkers = [NSMutableArray array];
+    }
+    return self;
+}
+
 - (UIView *)createMapView {
     self.mapView = [[MLNMapView alloc] init];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.mapView.styleURL = [NSURL URLWithString:@"https://tiles.openfreemap.org/styles/liberty"];
-    
+    self.mapView.delegate = self;
+
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake(55.7558, 37.6173);
+    [self.mapView setCenterCoordinate:center zoomLevel:10.0 animated:NO];
     
     return self.mapView;
 }
@@ -54,6 +64,7 @@
 // === Маркеры ===
 
 - (void)setMarkers:(NSArray<NSDictionary *> *)markers {
+    NSLog(@"setMarkers called with %lu markers", (unsigned long)[markers count]);
     // Удаляем старые маркеры
     [self clearMarkers];
     
@@ -77,14 +88,37 @@
     [self.currentMarkers removeAllObjects];
 }
 
+- (void)notifyViewportChanged {
+    if (!self.onViewportChanged || self.mapView == nil) {
+        return;
+    }
+
+    MLNCoordinateBounds bounds = [self.mapView visibleCoordinateBounds];
+    self.onViewportChanged(
+        bounds.ne.latitude,
+        bounds.sw.latitude,
+        bounds.ne.longitude,
+        bounds.sw.longitude,
+        self.mapView.zoomLevel
+    );
+}
+
 // === Delegate для стиля маркеров ===
+
+- (void)mapView:(MLNMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+    [self notifyViewportChanged];
+}
+
+- (void)mapViewDidFinishLoadingMap:(MLNMapView *)mapView {
+    [self notifyViewportChanged];
+}
 
 - (MLNAnnotationView *)mapView:(MLNMapView *)mapView viewForAnnotation:(id<MLNAnnotation>)annotation {
     if (![annotation isKindOfClass:[MLNPointAnnotation class]]) {
         return nil;
     }
     
-    // Сщздаем круглый маркер
+    // Создаем круглый маркер
     MLNAnnotationView *annotationView = [[MLNAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"marker"];
     annotationView.frame = CGRectMake(0, 0, 22, 22);
     annotationView.layer.cornerRadius = 11;

@@ -10,6 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MapLibreWrapper : NSObject
+@property (nonatomic, copy) void (^onViewportChanged)(double north, double south, double east, double west, double zoom);
 
 - (UIView *)createMapView;
 - (void)moveTo:(double)lat lon:(double)lon zoom:(double)zoom;
