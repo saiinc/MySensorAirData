@@ -1,11 +1,15 @@
 package com.saionji.mysensor.shared.ui.map
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.UIKitView
 import com.saionji.mysensor.shared.domain.model.MapMarker
 import com.saionji.mysensor.shared.ui.map.interop.MapLibreWrapper
+import platform.Foundation.NSDictionary
+import platform.Foundation.NSNumber
+import platform.Foundation.NSString
 import platform.UIKit.UIView
 
 @OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
@@ -19,12 +23,26 @@ fun IosMapView(
 ) {
     val wrapper = remember { MapLibreWrapper() }
     val uiView = remember { wrapper.createMapView() }
+    val controller = remember { IosMapController(wrapper) }
+    
+    // Обновляем маркеры при изменении списка
+    LaunchedEffect(markers) {
+        val nsMarkers = markers.map { marker ->
+            mapOf(
+                "id" to marker.id as NSString,
+                "lat" to marker.lat as NSNumber,
+                "lon" to marker.lon as NSNumber,
+                "colorInt" to marker.colorInt as NSNumber
+            ) as NSDictionary
+        }
+        wrapper.setMarkers(nsMarkers)
+    }
 
     UIKitView(
         factory = { uiView },
         modifier = modifier,
         update = {
-            onMapReady(IosMapController(wrapper))
+            onMapReady(controller)
         }
     )
 }

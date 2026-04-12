@@ -11,6 +11,7 @@
 
 @interface MapLibreWrapper ()
 @property (nonatomic, strong) MLNMapView *mapView;
+@property (nonatomic, strong) NSMutableArray<MLNPointAnnotation *> *currentMarkers;
 @end
 
 @implementation MapLibreWrapper
@@ -50,4 +51,47 @@
     return self.mapView.centerCoordinate.longitude;
 }
 
+// === Маркеры ===
+
+- (void)setMarkers:(NSArray<NSDictionary *> *)markers {
+    // Удаляем старые маркеры
+    [self clearMarkers];
+    
+    // Добавляем новые
+    for (NSDictionary *marker in markers) {
+        NSString *markerId = marker[@"id"];
+        double lat = [marker[@"lat"] doubleValue];
+        double lon = [marker[@"lon"] doubleValue];
+        
+        MLNPointAnnotation *annotation = [[MLNPointAnnotation alloc] init];
+        annotation.coordinate = CLLocationCoordinate2DMake(lat, lon);
+        annotation.title = markerId;
+        
+        [self.mapView addAnnotation:annotation];
+        [self.currentMarkers addObject:annotation];
+    }
+}
+
+- (void)clearMarkers {
+    [self.mapView removeAnnotations:self.currentMarkers];
+    [self.currentMarkers removeAllObjects];
+}
+
+// === Delegate для стиля маркеров ===
+
+- (MLNAnnotationView *)mapView:(MLNMapView *)mapView viewForAnnotation:(id<MLNAnnotation>)annotation {
+    if (![annotation isKindOfClass:[MLNPointAnnotation class]]) {
+        return nil;
+    }
+    
+    // Сщздаем круглый маркер
+    MLNAnnotationView *annotationView = [[MLNAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:@"marker"];
+    annotationView.frame = CGRectMake(0, 0, 22, 22);
+    annotationView.layer.cornerRadius = 11;
+    annotationView.layer.borderWidth = 1;
+    annotationView.layer.borderColor = [UIColor darkGrayColor].CGColor;
+    annotationView.backgroundColor = [UIColor colorWithRed:0 green:0.5 blue:1 alpha:0.9]; // TODO: цвет из маркера
+    
+    return  annotationView;
+}
 @end

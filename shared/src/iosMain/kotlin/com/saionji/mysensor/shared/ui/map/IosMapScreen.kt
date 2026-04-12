@@ -25,6 +25,7 @@ fun IosMapScreen(
     val selectedMarker by mapViewModel.selectedMarker.collectAsState()
     val addresses by mapViewModel.addresses.collectAsState()
     val camera by mapViewModel.cameraState.collectAsState()
+    val mapUIState by mapViewModel.mapUiState.collectAsState()
 
     // Синхронизация камеры
     LaunchedEffect(camera, mapController.value) {
@@ -47,6 +48,7 @@ fun IosMapScreen(
         mapView = {
             IosMapView(
                 modifier = Modifier.fillMaxSize(),
+                markers = (mapUiState as? MapUiState.Success)?.markers ?: emptyList(),
                 onMapReady = { controller ->
                     mapController.value = controller
                     controller.setOnViewportChangedListener { bounds ->

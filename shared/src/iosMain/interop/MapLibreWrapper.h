@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (double)getZoom;
 - (double)getCenterLat;
 - (double)getCenterLon;
+- (void)setMarkers:(NSArray<NSDictionary *> *)markers;
+- (void)clearMarkers;
 
 @end
 
