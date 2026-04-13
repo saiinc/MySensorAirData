@@ -10,8 +10,11 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MapLibreWrapper : NSObject
+
+// === Viewport callback ===
 @property (nonatomic, copy) void (^onViewportChanged)(double north, double south, double east, double west, double zoom);
 
+// === Методы карты ===
 - (UIView *)createMapView;
 - (void)moveTo:(double)lat lon:(double)lon zoom:(double)zoom;
 - (void)zoomIn;
@@ -19,6 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (double)getZoom;
 - (double)getCenterLat;
 - (double)getCenterLon;
+
+// === Маркеры ===
 - (void)setMarkers:(NSArray<NSDictionary *> *)markers;
 - (void)clearMarkers;
 
