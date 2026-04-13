@@ -9,11 +9,28 @@
 #import <MapLibre/MapLibre.h>
 #import <CoreLocation/CoreLocation.h>
 
+static NSString * const kSensorsSourceId = @"sensors-source";
+static NSString * const kClustersLayerId = @"clusters-layer";
+static NSString * const kClustersCountLayerId = @"clusters-count-layer";
+static NSString * const kMarkersLayerId = @"markers-layer";
+
 @interface MapLibreWrapper ()
 @property (nonatomic, strong) MLNMapView *mapView;
 @end
 
 @implementation MapLibreWrapper
+
+- (NSArray<NSString *> *)clusterFontNames {
+    return @[@"Noto Sans Regular"];
+}
+
+- (NSString *)hexColorStringFromColorInt:(NSNumber *)colorIntNumber {
+    int colorInt = [colorIntNumber intValue];
+    int r = (colorInt >> 16) & 0xFF;
+    int g = (colorInt >> 8) & 0xFF;
+    int b = colorInt & 0xFF;
+    return [NSString stringWithFormat:@"#%02X%02X%02X", r, g, b];
+}
 
 - (instancetype)init {
     self = [super init];
@@ -62,108 +79,167 @@
 // === Маркеры с кластеризацией ===
 
 - (void)setMarkers:(NSArray<NSDictionary *> *)markers {
-    // Удаляем старые источники и слои
-    [self clearMarkerLayers];
-
-    if ([markers count] == 0) return;
-
-    // Создаём features
-    NSMutableArray<MLNPointFeature *> *features = [NSMutableArray array];
-    for (NSDictionary *marker in markers) {
-        MLNPointFeature *feature = [[MLNPointFeature alloc] init];
-        double lat = [marker[@"lat"] doubleValue];
-        double lon = [marker[@"lon"] doubleValue];
-        feature.coordinate = CLLocationCoordinate2DMake(lat, lon);
-
-        int colorInt = [marker[@"colorInt"] intValue];
-        feature.attributes = @{
-                @"id": marker[@"id"],
-                @"colorInt": marker[@"colorInt"],
-                @"r": @((colorInt >> 16) & 0xFF),
-                @"g": @((colorInt >> 8) & 0xFF),
-                @"b": @(colorInt & 0xFF)
-        };
-        [features addObject:feature];
+    MLNStyle *style = self.mapView.style;
+    if (style == nil) {
+        return;
     }
 
-    // Создаём shape source с кластеризацией
-    NSDictionary *options = @{
-            MLNShapeSourceOptionClustered: @YES,
-            MLNShapeSourceOptionClusterRadius: @40,
-            MLNShapeSourceOptionClusterMaxZoomLevel: @12,
-            MLNShapeSourceOptionClusterProperties: @{
-                    @"sum_r": @[@"sum", @"r"],
-                    @"sum_g": @[@"sum", @"g"],
-                    @"sum_b": @[@"sum", @"b"],
-                    @"count": @[@"count"]
-            }
+    if ([markers count] == 0) {
+        [self clearMarkers];
+        return;
+    }
+
+    // Создаём GeoJSON FeatureCollection. Для кластеризации в iOS MapLibre этот путь
+    // надежнее, чем вручную собранная коллекция MLNPointFeature.
+    NSMutableArray<NSDictionary *> *geoJSONFeatures = [NSMutableArray array];
+    for (NSDictionary *marker in markers) {
+        double lat = [marker[@"lat"] doubleValue];
+        double lon = [marker[@"lon"] doubleValue];
+        NSNumber *colorInt = marker[@"colorInt"] ?: @0;
+        int colorValue = [colorInt intValue];
+        NSDictionary *feature = @{
+                @"type": @"Feature",
+                @"geometry": @{
+                        @"type": @"Point",
+                        @"coordinates": @[@(lon), @(lat)]
+                },
+                @"properties": @{
+                        @"id": marker[@"id"] ?: @"",
+                        @"colorInt": colorInt,
+                        @"color": [self hexColorStringFromColorInt:colorInt],
+                        @"r": @((colorValue >> 16) & 0xFF),
+                        @"g": @((colorValue >> 8) & 0xFF),
+                        @"b": @(colorValue & 0xFF)
+                }
+        };
+        [geoJSONFeatures addObject:feature];
+    }
+
+    NSDictionary *featureCollection = @{
+            @"type": @"FeatureCollection",
+            @"features": geoJSONFeatures
     };
 
-    MLNShapeSource *source = [[MLNShapeSource alloc] initWithIdentifier:@"sensors-source"
-                                                               features:features
-                                                                options:options];
+    NSError *jsonError = nil;
+    NSData *geoJSONData = [NSJSONSerialization dataWithJSONObject:featureCollection options:0 error:&jsonError];
+    if (geoJSONData == nil) {
+        NSLog(@"Failed to serialize marker GeoJSON: %@", jsonError);
+        return;
+    }
 
-    MLNStyle *style = self.mapView.style;
-    [style addSource:source];
+    NSError *shapeError = nil;
+    MLNShape *shape = [MLNShape shapeWithData:geoJSONData
+                                     encoding:NSUTF8StringEncoding
+                                        error:&shapeError];
+    if (shape == nil) {
+        NSLog(@"Failed to parse marker GeoJSON into MLNShape: %@", shapeError);
+        return;
+    }
 
-    // === Слой кластеров ===
-    MLNCircleStyleLayer *clusterLayer = [[MLNCircleStyleLayer alloc] initWithIdentifier:@"clusters-layer"
-                                                                                 source:source];
-    clusterLayer.predicate = [NSPredicate predicateWithFormat:@"point_count != nil"];
+    NSDictionary *clusterProperties = @{
+        @"sum_r": @[
+            [NSExpression expressionWithFormat:@"sum:({$featureAccumulated, sum_r})"],
+            [NSExpression expressionForKeyPath:@"r"]
+        ],
+        @"sum_g": @[
+            [NSExpression expressionWithFormat:@"sum:({$featureAccumulated, sum_g})"],
+            [NSExpression expressionForKeyPath:@"g"]
+        ],
+        @"sum_b": @[
+            [NSExpression expressionWithFormat:@"sum:({$featureAccumulated, sum_b})"],
+            [NSExpression expressionForKeyPath:@"b"]
+        ]
+    };
 
-    // Радиус зависит от количества точек
-    clusterLayer.circleRadius = [NSExpression expressionWithFormat:
-            @"mgl_step:from:stops:(point_count, 14, %@)",
-            @{@10: @18, @50: @24, @100: @30}];
+    NSDictionary *options = @{
+        MLNShapeSourceOptionClustered: @YES,
+        MLNShapeSourceOptionClusterRadius: @40,
+        MLNShapeSourceOptionMaximumZoomLevelForClustering: @12,
+        MLNShapeSourceOptionClusterProperties: clusterProperties
+    };
 
-    // Цвет = средний RGB кластера
-    clusterLayer.circleColor = [NSExpression expressionWithFormat:
-            @"mgl_rgb:(sum_r / count, sum_g / count, sum_b / count)"];
-    clusterLayer.circleOpacity = [NSExpression expressionForConstantValue:@0.8];
-    clusterLayer.circleStrokeColor = [NSExpression expressionForConstantValue:[UIColor darkGrayColor]];
-    clusterLayer.circleStrokeWidth = [NSExpression expressionForConstantValue:@1];
+    MLNShapeSource *source = (MLNShapeSource *)[style sourceWithIdentifier:kSensorsSourceId];
+    if (source == nil) {
+        source = [[MLNShapeSource alloc] initWithIdentifier:kSensorsSourceId
+                                                      shape:shape
+                                                    options:options];
+        [style addSource:source];
+    } else {
+        source.shape = shape;
+    }
 
-    [style addLayer:clusterLayer];
+    if ([style layerWithIdentifier:kClustersLayerId] == nil) {
+        MLNCircleStyleLayer *clusterLayer = [[MLNCircleStyleLayer alloc] initWithIdentifier:kClustersLayerId
+                                                                                     source:source];
+        clusterLayer.predicate = [NSPredicate predicateWithFormat:@"cluster == YES"];
+        clusterLayer.circleRadius = [NSExpression mgl_expressionForSteppingExpression:
+                                     [NSExpression expressionForKeyPath:@"point_count"]
+                                                                             fromExpression:[NSExpression expressionForConstantValue:@14]
+                                                                                      stops:[NSExpression expressionForConstantValue:@{
+                                                                                          @10: @18,
+                                                                                          @50: @24
+                                                                                      }]];
+        clusterLayer.circleColor = [NSExpression expressionForConstantValue:[UIColor colorWithRed:0.12 green:0.55 blue:0.95 alpha:1.0]];
+        clusterLayer.circleOpacity = [NSExpression expressionForConstantValue:@0.8];
+        clusterLayer.circleStrokeColor = [NSExpression expressionForConstantValue:[UIColor darkGrayColor]];
+        clusterLayer.circleStrokeWidth = [NSExpression expressionForConstantValue:@1];
+        [style addLayer:clusterLayer];
+    }
 
-    // === Слой счётчика в кластере ===
-    MLNSymbolStyleLayer *countLayer = [[MLNSymbolStyleLayer alloc] initWithIdentifier:@"clusters-count-layer"
-                                                                               source:source];
-    countLayer.predicate = [NSPredicate predicateWithFormat:@"point_count != nil"];
-    countLayer.text = [NSExpression expressionForKeyPath:@"point_count"];
-    countLayer.textFontSize = [NSExpression expressionForConstantValue:@12];
-    countLayer.textColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
-    countLayer.textHaloColor = [NSExpression expressionForConstantValue:[UIColor colorWithWhite:0.27 alpha:1.0]];
-    countLayer.textHaloWidth = [NSExpression expressionForConstantValue:@1.5];
-    countLayer.textAllowOverlap = [NSExpression expressionForConstantValue:@YES];
+    MLNStyleLayer *clusterLayer = [style layerWithIdentifier:kClustersLayerId];
 
-    [style addLayer:countLayer];
+    if ([style layerWithIdentifier:kClustersCountLayerId] == nil) {
+        MLNSymbolStyleLayer *countLayer = [[MLNSymbolStyleLayer alloc] initWithIdentifier:kClustersCountLayerId
+                                                                                   source:source];
+        countLayer.predicate = [NSPredicate predicateWithFormat:@"cluster == YES"];
+        countLayer.text = [NSExpression expressionForKeyPath:@"point_count_abbreviated"];
+        countLayer.textFontNames = [NSExpression expressionForConstantValue:[self clusterFontNames]];
+        countLayer.textFontSize = [NSExpression expressionForConstantValue:@12];
+        countLayer.textColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
+        countLayer.textHaloColor = [NSExpression expressionForConstantValue:[UIColor colorWithWhite:0.27 alpha:1.0]];
+        countLayer.textHaloWidth = [NSExpression expressionForConstantValue:@1.5];
+        countLayer.textAllowsOverlap = [NSExpression expressionForConstantValue:@YES];
+        countLayer.textIgnoresPlacement = [NSExpression expressionForConstantValue:@YES];
+        [style insertLayer:countLayer aboveLayer:clusterLayer];
+    }
 
-    // === Слой отдельных маркеров ===
-    MLNCircleStyleLayer *markerLayer = [[MLNCircleStyleLayer alloc] initWithIdentifier:@"markers-layer"
-                                                                                source:source];
-    markerLayer.predicate = [NSPredicate predicateWithFormat:@"point_count == nil"];
-    markerLayer.circleRadius = [NSExpression expressionForConstantValue:@11];
+    MLNStyleLayer *countLayer = [style layerWithIdentifier:kClustersCountLayerId];
 
-    // Конвертируем colorInt в UIColor
-    markerLayer.circleColor = [NSExpression expressionWithFormat:
-            @"mgl_rgb:(colorInt >> 16 & 255, colorInt >> 8 & 255, colorInt & 255)"];
-    markerLayer.circleOpacity = [NSExpression expressionForConstantValue:@0.9];
-    markerLayer.circleStrokeColor = [NSExpression expressionForConstantValue:[UIColor darkGrayColor]];
-    markerLayer.circleStrokeWidth = [NSExpression expressionForConstantValue:@1];
+    if ([style layerWithIdentifier:kMarkersLayerId] == nil) {
+        MLNCircleStyleLayer *markerLayer = [[MLNCircleStyleLayer alloc] initWithIdentifier:kMarkersLayerId
+                                                                                    source:source];
+        markerLayer.predicate = [NSPredicate predicateWithFormat:@"cluster != YES"];
+        markerLayer.circleRadius = [NSExpression expressionForConstantValue:@11];
+        markerLayer.circleColor = [NSExpression expressionForKeyPath:@"color"];
+        markerLayer.circleOpacity = [NSExpression expressionForConstantValue:@0.9];
+        markerLayer.circleStrokeColor = [NSExpression expressionForConstantValue:[UIColor darkGrayColor]];
+        markerLayer.circleStrokeWidth = [NSExpression expressionForConstantValue:@1];
 
-    [style addLayer:markerLayer];
+        if (countLayer != nil) {
+            [style insertLayer:markerLayer belowLayer:countLayer];
+        } else {
+            [style addLayer:markerLayer];
+        }
+    }
 }
 
 - (void)clearMarkerLayers {
     MLNStyle *style = self.mapView.style;
+    if (style == nil) return;
 
-    // Удаляем слои
-    [style removeLayer:[style layerWithIdentifier:@"markers-layer"]];
-    [style removeLayer:[style layerWithIdentifier:@"clusters-count-layer"]];
-    [style removeLayer:[style layerWithIdentifier:@"clusters-layer"]];
+    // Удаляем слои с проверкой на nil
+    MLNStyleLayer *markersLayer = [style layerWithIdentifier:kMarkersLayerId];
+    if (markersLayer) [style removeLayer:markersLayer];
 
-    // Удаляем источник
-    [style removeSource:[style sourceWithIdentifier:@"sensors-source"]];
+    MLNStyleLayer *countLayer = [style layerWithIdentifier:kClustersCountLayerId];
+    if (countLayer) [style removeLayer:countLayer];
+
+    MLNStyleLayer *clusterLayer = [style layerWithIdentifier:kClustersLayerId];
+    if (clusterLayer) [style removeLayer:clusterLayer];
+
+    // Удаляем источник с проверкой на nil
+    MLNSource *source = [style sourceWithIdentifier:kSensorsSourceId];
+    if (source) [style removeSource:source];
 }
 
 - (void)clearMarkers {
