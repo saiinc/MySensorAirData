@@ -125,9 +125,8 @@ class SharedMapViewModel(
             _mapUiState.value = MapUiState.Idle
             return
         }
-
-        if (bounds.north - bounds.south > 40 ||
-            bounds.east - bounds.west > 40
+        if (bounds.north - bounds.south > 50 ||
+            bounds.east - bounds.west > 50
         ) {
             return
         }

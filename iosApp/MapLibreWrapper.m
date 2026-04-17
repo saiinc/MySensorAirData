@@ -107,14 +107,17 @@ static NSString * const kMarkersLayerId = @"markers-layer";
                         @"id": marker[@"id"] ?: @"",
                         @"colorInt": colorInt,
                         @"color": [self hexColorStringFromColorInt:colorInt],
-                        @"r": @((colorValue >> 16) & 0xFF),
-                        @"g": @((colorValue >> 8) & 0xFF),
-                        @"b": @(colorValue & 0xFF)
+                        @"r": [NSNumber numberWithDouble:(double)((colorValue >> 16) & 0xFF)] ?: @0.0,
+                        @"g": [NSNumber numberWithDouble:(double)((colorValue >> 8) & 0xFF)] ?: @0.0,
+                        @"b": [NSNumber numberWithDouble:(double)(colorValue & 0xFF)] ?: @0.0,
                 }
         };
         [geoJSONFeatures addObject:feature];
     }
-
+    if (geoJSONFeatures.count > 0) {
+        NSLog(@"DEBUG: First feature properties: %@", geoJSONFeatures.firstObject[@"properties"]);
+    }
+    
     NSDictionary *featureCollection = @{
             @"type": @"FeatureCollection",
             @"features": geoJSONFeatures
@@ -136,37 +139,70 @@ static NSString * const kMarkersLayerId = @"markers-layer";
         return;
     }
 
+    
+    // Если это сработает, в тексте появится максимальный R среди точек кластера
+    //NSDictionary *clusterProperties = @{
+    //    @"sum_r": @[
+    //        [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(r, 'NSNumber')"],
+    //        [NSExpression expressionForKeyPath:@"r"]
+    //    ],
+    //    @"sum_g": @[
+    //        [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(g, 'NSNumber')"],
+    //        [NSExpression expressionForKeyPath:@"g"]
+     //   ],
+     //   @"sum_b": @[
+     //       [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(b, 'NSNumber')"],
+     //       [NSExpression expressionForKeyPath:@"b"]
+     //   ]
+    //};
     NSDictionary *clusterProperties = @{
         @"sum_r": @[
-            [NSExpression expressionWithFormat:@"sum:({$featureAccumulated, sum_r})"],
-            [NSExpression expressionForKeyPath:@"r"]
+            [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(r, 'NSNumber')"],
+            [NSExpression expressionWithFormat:@"CAST(r, 'NSNumber')"]
         ],
         @"sum_g": @[
-            [NSExpression expressionWithFormat:@"sum:({$featureAccumulated, sum_g})"],
-            [NSExpression expressionForKeyPath:@"g"]
+            [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(g, 'NSNumber')"],
+            [NSExpression expressionWithFormat:@"CAST(g, 'NSNumber')"]
         ],
         @"sum_b": @[
-            [NSExpression expressionWithFormat:@"sum:({$featureAccumulated, sum_b})"],
-            [NSExpression expressionForKeyPath:@"b"]
+            [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(b, 'NSNumber')"],
+            [NSExpression expressionWithFormat:@"CAST(b, 'NSNumber')"]
         ]
     };
+    
+    //NSDictionary *clusterProperties = @{
+    //    @"sum_r": @[
+    //        [NSExpression expressionWithFormat:@"$featureAccumulated + TERNARY(r != nil, r, 0)"],
+    //        [NSExpression expressionWithFormat:@"TERNARY(r != nil, r, 0)"]
+    //    ],
+    //    @"sum_g": @[
+    //        [NSExpression expressionWithFormat:@"$featureAccumulated + TERNARY(g != nil, g, 0)"],
+    //        [NSExpression expressionWithFormat:@"TERNARY(g != nil, g, 0)"]
+    //    ],
+    //    @"sum_b": @[
+    //        [NSExpression expressionWithFormat:@"$featureAccumulated + TERNARY(b != nil, b, 0)"],
+    //        [NSExpression expressionWithFormat:@"TERNARY(b != nil, b, 0)"]
+    //    ]
+    //};
+
 
     NSDictionary *options = @{
         MLNShapeSourceOptionClustered: @YES,
         MLNShapeSourceOptionClusterRadius: @40,
         MLNShapeSourceOptionMaximumZoomLevelForClustering: @12,
+        //@"clusterProperties": clusterProperties,
         MLNShapeSourceOptionClusterProperties: clusterProperties
     };
 
-    MLNShapeSource *source = (MLNShapeSource *)[style sourceWithIdentifier:kSensorsSourceId];
-    if (source == nil) {
-        source = [[MLNShapeSource alloc] initWithIdentifier:kSensorsSourceId
-                                                      shape:shape
-                                                    options:options];
-        [style addSource:source];
-    } else {
-        source.shape = shape;
+    MLNSource *existingSource = [style sourceWithIdentifier:kSensorsSourceId];
+    if (existingSource != nil) {
+        [self clearMarkerLayers];
     }
+
+    MLNShapeSource *source = [[MLNShapeSource alloc] initWithIdentifier:kSensorsSourceId
+                                                                  shape:shape
+                                                                options:options];
+    [style addSource:source];
 
     if ([style layerWithIdentifier:kClustersLayerId] == nil) {
         MLNCircleStyleLayer *clusterLayer = [[MLNCircleStyleLayer alloc] initWithIdentifier:kClustersLayerId
@@ -179,9 +215,71 @@ static NSString * const kMarkersLayerId = @"markers-layer";
                                                                                           @10: @18,
                                                                                           @50: @24
                                                                                       }]];
-        clusterLayer.circleColor = [NSExpression expressionForConstantValue:[UIColor colorWithRed:0.12 green:0.55 blue:0.95 alpha:1.0]];
+        
+
+        //clusterLayer.circleColor = [NSExpression expressionWithMLNJSONObject:colorJSON1];
+        
+        //clusterLayer.circleColor = [NSExpression expressionWithFormat:[UIColor colorWithRed:redVal green:0.55 blue:0.95 alpha:1.0]];
+        
+        //clusterLayer.circleColor = [NSExpression expressionWithFormat:@"mgl_expressionForRGB(90, 90, 90)"];
+        
+
+        // --- 2. Блок расчета канала (с защитой от 0 и Double) ---
+        NSArray *(^makeChannelJson)(NSString *) = ^NSArray *(NSString *key) {
+            // ВАЖНО: Убираем деление на point_count!
+            // Просто берем значение и делим на 255 (или 180 для яркости)
+            return @[ @"/",
+                       @[ @"to-number", @[ @"get", key ] ],
+                     @255.0 ];
+        };
+
+        // --- 3. Каскад цветов (Цветовой куб) ---
+        // Это ЕДИНСТВЕННЫЙ способ получить честное смешивание каналов в iOS SDK
+        NSArray *rJ = makeChannelJson(@"sum_r");
+        NSArray *gJ = makeChannelJson(@"sum_g");
+        NSArray *bJ = makeChannelJson(@"sum_b");
+
+        UIColor *(^clr)(float, float, float) = ^UIColor *(float r, float g, float b) {
+            return [UIColor colorWithRed:r green:g blue:b alpha:1.0];
+        };
+
+        NSArray *(^interp)(NSArray *, id, id) = ^NSArray *(NSArray *in, id s0, id s1) {
+            return @[@"interpolate", @[@"linear"], in, @0, s0, @1, s1];
+        };
+
+        // Собираем куб
+        id b00 = interp(bJ, clr(0,0,0), clr(0,0,1));
+        id b01 = interp(bJ, clr(0,1,0), clr(0,1,1));
+        id b10 = interp(bJ, clr(1,0,0), clr(1,0,1));
+        id b11 = interp(bJ, clr(1,1,0), clr(1,1,1));
+
+        id g0 = interp(gJ, b00, b01);
+        id g1 = interp(gJ, b10, b11);
+
+        clusterLayer.circleColor = [NSExpression expressionWithMLNJSONObject:interp(rJ, g0, g1)];
+
+
+
+        
+        //clusterLayer.circleColor = [NSExpression mgl_expressionForInterpolatingExpression:
+        //    [NSExpression expressionWithFormat:@"(sum_r + sum_b + sum_g) / 3.0 / point_count"] // Берем средний красный как индекс
+        //    withCurveType:MLNExpressionInterpolationModeLinear
+        //    parameters:nil
+        //    stops:[NSExpression expressionForConstantValue:@{
+        //        @0:   [UIColor colorWithRed:0.1 green:0.8 blue:0.1 alpha:1.0], // Зеленый
+        //        @127: [UIColor colorWithRed:0.9 green:0.9 blue:0.1 alpha:1.0], // Желтый
+        //        @255: [UIColor colorWithRed:0.9 green:0.1 blue:0.1 alpha:1.0]  // Красный
+        //    }]];
+        
+
+        // Используем MLN/MGL-метод для создания выражения из JSON-массива
+        //clusterLayer.circleColor = [NSExpression expressionWithMLNJSONObject:colorComponents];
+        
+        // используя префикс mgl_, который заставляет парсер работать правильно
+        //clusterLayer.circleColor = [NSExpression expressionWithFormat:@"mln_rgb(sum_r / point_count, sum_g / point_count, sum_b / point_count)"];
+        //clusterLayer.circleColor = [NSExpression expressionWithFormat:@"RGB(sum_r / point_count, sum_g / point_count, sum_b / point_count)"];
         clusterLayer.circleOpacity = [NSExpression expressionForConstantValue:@0.8];
-        clusterLayer.circleStrokeColor = [NSExpression expressionForConstantValue:[UIColor darkGrayColor]];
+        clusterLayer.circleStrokeColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
         clusterLayer.circleStrokeWidth = [NSExpression expressionForConstantValue:@1];
         [style addLayer:clusterLayer];
     }
@@ -191,10 +289,14 @@ static NSString * const kMarkersLayerId = @"markers-layer";
     if ([style layerWithIdentifier:kClustersCountLayerId] == nil) {
         MLNSymbolStyleLayer *countLayer = [[MLNSymbolStyleLayer alloc] initWithIdentifier:kClustersCountLayerId
                                                                                    source:source];
-        countLayer.predicate = [NSPredicate predicateWithFormat:@"cluster == YES"];
+        //countLayer.predicate = [NSPredicate predicateWithFormat:@"cluster == YES"];
+        // В слое текстовых меток (MGLSymbolLayer)
+        //countLayer.text = [NSExpression expressionWithFormat:@"CAST(sum_g, 'NSString')"];
+        //countLayer.text = [NSExpression expressionWithFormat:@"mgl_join({CAST(sum_r/point_count, 'NSString'),' ', CAST(sum_g/point_count, 'NSString')})"];
+
         countLayer.text = [NSExpression expressionForKeyPath:@"point_count_abbreviated"];
         countLayer.textFontNames = [NSExpression expressionForConstantValue:[self clusterFontNames]];
-        countLayer.textFontSize = [NSExpression expressionForConstantValue:@12];
+        countLayer.textFontSize = [NSExpression expressionForConstantValue:@14];
         countLayer.textColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
         countLayer.textHaloColor = [NSExpression expressionForConstantValue:[UIColor colorWithWhite:0.27 alpha:1.0]];
         countLayer.textHaloWidth = [NSExpression expressionForConstantValue:@1.5];

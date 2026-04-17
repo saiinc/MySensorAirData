@@ -22,8 +22,7 @@ class NetworkMySensorRepository(
                 .distinctBy { it.sensor?.id }
                 .filter { it.location?.indoor == 0 }
 
-            return outdoor.mapNotNull { dto ->
-
+            outdoor.mapNotNull { dto ->
                 val id = dto.sensor?.id ?: return@mapNotNull null
                 val lat = dto.location?.latitude
                 val lon = dto.location?.longitude
@@ -41,9 +40,11 @@ class NetworkMySensorRepository(
                     lon = lon ?: return@mapNotNull null,
                     measurements = measurements
                 )
+            }.also {
+                println("MAP_RESPONSE mapped=${it.size}")
             }
-        }
-        catch (_: Exception) {
+        } catch (e: Exception) {
+            println("MAP_RESPONSE error=${e.message}")
             emptyList()
         }
     }
