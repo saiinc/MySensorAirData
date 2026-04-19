@@ -27,6 +27,14 @@ fun IosMapView(
 
     LaunchedEffect(wrapper, controller) {
         controller.setViewportCallback(wrapper)
+
+        wrapper.onMarkerClick = { markerId ->
+            onMarkerClick(markerId)
+        }
+
+        wrapper.onMapClick = {
+            onMapClick()
+        }
     }
     
     // Обновляем маркеры при изменении списка

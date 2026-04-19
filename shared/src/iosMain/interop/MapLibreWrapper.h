@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // === Viewport callback ===
 @property (nonatomic, copy) void (^onViewportChanged)(double north, double south, double east, double west, double zoom);
+@property (nonatomic, copy, nullable) void (^onMarkerClick)(NSString *markerId);
+@property (nonatomic, copy, nullable) void (^onMapClick)(void);
 
 // === Методы карты ===
 - (UIView *)createMapView;

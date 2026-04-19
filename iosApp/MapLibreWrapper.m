@@ -43,6 +43,17 @@ static NSString * const kMarkersLayerId = @"markers-layer";
     self.mapView.styleURL = [NSURL URLWithString:@"https://tiles.openfreemap.org/styles/liberty"];
     self.mapView.delegate = self;
 
+    UITapGestureRecognizer *tapRecognizer =
+            [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleMapTap:)];
+
+    for (UIGestureRecognizer *recognizer in self.mapView.gestureRecognizers) {
+        if ([recognizer isKindOfClass:[UITapGestureRecognizer class]]) {
+            [tapRecognizer requireGestureRecognizerToFail:recognizer];
+        }
+    }
+
+    [self.mapView addGestureRecognizer:tapRecognizer];
+
     CLLocationCoordinate2D center = CLLocationCoordinate2DMake(55.7558, 37.6173);
     [self.mapView setCenterCoordinate:center zoomLevel:10.0 animated:NO];
     
@@ -346,6 +357,32 @@ static NSString * const kMarkersLayerId = @"markers-layer";
 
 - (void)clearMarkers {
     [self clearMarkerLayers];
+}
+
+- (void)handleMapTap:(UITapGestureRecognizer *)recognizer {
+    if (recognizer.state != UIGestureRecognizerStateEnded || self.mapView == nil) {
+        return;
+    }
+
+    CGPoint point = [recognizer locationInView:self.mapView];
+
+    NSArray<id<MGLFeature>> *features =
+            [self.mapView visibleFeaturesAtPoint:point
+                    inStyleLayersWithIdentifiers:[NSSet setWithObject:kMarkersLayerId]];
+
+    id<MGLFeature> feature = features.firstObject;
+    id markerId = feature.identifier ?: feature.attributes[@"id"];
+
+    if (markerId != nil) {
+        if (self.onMarkerClick) {
+            self.onMarkerClick([markerId description]);
+        }
+        return;
+    }
+
+    if (self.onMapClick) {
+        self.onMapClick();
+    }
 }
 
 // === Viewport notification ===

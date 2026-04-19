@@ -6,10 +6,6 @@ import androidx.compose.ui.Modifier
 import com.saionji.mysensor.shared.domain.model.LatLng
 import com.saionji.mysensor.shared.data.model.DashboardSensor
 import com.saionji.mysensor.shared.domain.C
-import com.saionji.mysensor.shared.ui.map.MapController
-import com.saionji.mysensor.shared.ui.map.MapScreenContent
-import com.saionji.mysensor.shared.ui.map.MapUiState
-import com.saionji.mysensor.shared.ui.map.SharedMapViewModel
 
 @Composable
 fun IosMapScreen(
@@ -58,6 +54,17 @@ fun IosMapScreen(
                     mapViewModel.cameraState.value?.let { state ->
                         controller.moveTo(state.lat, state.lon, state.zoom)
                     }
+                },
+                onMarkerClick = { markerId ->
+                    val state = mapUiState
+                    if (state is MapUiState.Success) {
+                        val marker = state.markers.firstOrNull { it.id == markerId }
+                            ?: return@IosMapView
+                        mapViewModel.onMarkerSelected(marker)
+                    }
+                },
+                onMapClick = {
+                    mapViewModel.clearSelectedMarker()
                 }
             )
         },
