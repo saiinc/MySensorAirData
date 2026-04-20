@@ -366,11 +366,11 @@ static NSString * const kMarkersLayerId = @"markers-layer";
 
     CGPoint point = [recognizer locationInView:self.mapView];
 
-    NSArray<id<MGLFeature>> *features =
+    NSArray<id<MLNFeature>> *features =
             [self.mapView visibleFeaturesAtPoint:point
                     inStyleLayersWithIdentifiers:[NSSet setWithObject:kMarkersLayerId]];
 
-    id<MGLFeature> feature = features.firstObject;
+    id<MLNFeature> feature = features.firstObject;
     id markerId = feature.identifier ?: feature.attributes[@"id"];
 
     if (markerId != nil) {
