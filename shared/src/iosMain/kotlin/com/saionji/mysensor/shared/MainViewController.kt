@@ -7,9 +7,7 @@ import com.saionji.mysensor.shared.di.IosContainer
 import com.saionji.mysensor.shared.ui.app.SensorsAppContent
 import com.saionji.mysensor.shared.ui.map.IosMapScreen
 import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Modifier
 import platform.UIKit.UIViewController
 
 private lateinit var iosContainer: IosContainer
@@ -32,10 +30,13 @@ fun MainViewController(): UIViewController {
                     currentLocation = null, // TODO: из LocationService
                     dashboardSensors = viewModel.dashboardItems.collectAsState(),
                     onAddToDashboard = { id, desc ->
-                        // TODO: добавить сенсор
+                        iosContainer.mapViewModel.buildSettingsSensorFromMap(
+                            id, desc,
+                            { settingsSensor ->
+                                viewModel.addSensorDashboardFromMap(settingsSensor)})
                     },
                     onRemoveFromDashboard = { id ->
-                        // TODO: удалить сенсор
+                        viewModel.removeSensorDashboardFromMap(id)
                     }
                 )
             },
