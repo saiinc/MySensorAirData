@@ -44,7 +44,6 @@ class IosLocationService : LocationService {
         }
 
         locationManager.delegate = delegate
-        locationManager.requestWhenInUseAuthorization()
         locationManager.requestLocation()
     }
 }

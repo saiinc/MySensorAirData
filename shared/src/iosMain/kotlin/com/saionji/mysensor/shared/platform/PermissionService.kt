@@ -1,22 +1,34 @@
 package com.saionji.mysensor.shared.platform
 
+import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.CoreLocation.CLLocationManager
+import platform.CoreLocation.CLLocationManagerDelegateProtocol
+import platform.darwin.NSObject
+import kotlin.coroutines.resume
 
 actual class PermissionService {
 
     actual fun hasLocationPermissions(context: Any?): Boolean {
         val status = CLLocationManager.authorizationStatus()
-        // CLAuthorizationStatus числовые значения:
-        // 0 = NotDetermined, 1 = Restricted, 2 = Denied
-        // 3 = AuthorizedWhenInUse, 4 = AuthorizedAlways
-        val statusValue = status
-        return statusValue == 3 || statusValue == 4
-
+        return status == 3 || status == 4
     }
 
     actual suspend fun requestLocationPermissions(context: Any?): Boolean {
-        // На iOS запрос делается через CLLocationManager.requestWhenInUseAuthorization()
-        // который вызывается в LocationService
-        return hasLocationPermissions(context)
+        if (hasLocationPermissions(context)) return true
+
+        return suspendCancellableCoroutine { continuation ->
+            val locationManager = CLLocationManager()
+
+            val delegate = object : NSObject(), CLLocationManagerDelegateProtocol {
+                override fun locationManagerDidChangeAuthorization(manager: CLLocationManager) {
+                    val granted = hasLocationPermissions(null)
+                    continuation.resume(granted)
+                    manager.delegate = null
+                }
+            }
+
+            locationManager.delegate = delegate
+            locationManager.requestWhenInUseAuthorization()
+        }
     }
 }

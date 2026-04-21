@@ -2,19 +2,27 @@
 
 package com.saionji.mysensor.shared
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.window.ComposeUIViewController
 import com.saionji.mysensor.shared.di.IosContainer
 import com.saionji.mysensor.shared.ui.app.SensorsAppContent
 import com.saionji.mysensor.shared.ui.map.IosMapScreen
 import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
 import androidx.compose.runtime.collectAsState
+import com.saionji.mysensor.shared.platform.PermissionService
+import platform.CoreImage.CIContext
 import platform.UIKit.UIViewController
 
 private lateinit var iosContainer: IosContainer
 
+@Composable
 @Suppress("unused")
 fun MainViewController(): UIViewController {
     iosContainer = IosContainer()
+    val currentLocation = iosContainer.mapViewModel.currentLocation.value
+    val permissionService = PermissionService()
+    val context = CIContext
 
     return ComposeUIViewController {
         val viewModel = MySensorViewModel(
@@ -27,7 +35,7 @@ fun MainViewController(): UIViewController {
             mapScreen = {
                 IosMapScreen(
                     mapViewModel = iosContainer.mapViewModel,
-                    currentLocation = null, // TODO: из LocationService
+                    currentLocation = currentLocation,
                     dashboardSensors = viewModel.dashboardItems.collectAsState(),
                     onAddToDashboard = { id, desc ->
                         iosContainer.mapViewModel.buildSettingsSensorFromMap(
@@ -41,7 +49,12 @@ fun MainViewController(): UIViewController {
                 )
             },
             permissionHandler = {
-                // Заглушка - permissions позже
+                LaunchedEffect(Unit) {
+                    if (permissionService.requestLocationPermissions(
+                            context = context
+                        ))
+                        iosContainer.mapViewModel.updateCurrentLocation()
+                }
             },
             onShare = {
                 // Заглушка - sharing позже
