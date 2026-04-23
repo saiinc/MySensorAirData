@@ -125,9 +125,6 @@ static NSString * const kMarkersLayerId = @"markers-layer";
         };
         [geoJSONFeatures addObject:feature];
     }
-    if (geoJSONFeatures.count > 0) {
-        NSLog(@"DEBUG: First feature properties: %@", geoJSONFeatures.firstObject[@"properties"]);
-    }
     
     NSDictionary *featureCollection = @{
             @"type": @"FeatureCollection",

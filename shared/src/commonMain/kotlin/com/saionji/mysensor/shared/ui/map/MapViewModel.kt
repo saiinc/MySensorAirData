@@ -9,6 +9,7 @@ import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.shared.ui.map.model.MapBounds
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -164,7 +165,7 @@ class SharedMapViewModel(
     }
 
     fun updateCurrentLocation() {
-        scope.launch {
+        scope.launch(Dispatchers.Main) {
             locationService.getCurrentLocation { latLng ->
                 if (latLng != null) {
                     onLocationUpdated(latLng.lat, latLng.lon)

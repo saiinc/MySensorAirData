@@ -16,6 +16,7 @@ fun IosMapScreen(
     onRemoveFromDashboard: (String) -> Unit
 ) {
     val mapController = remember { mutableStateOf<MapController?>(null) }
+    var pendingCenterOnMyLocation by remember { mutableStateOf(false) }
     val mapUiState by mapViewModel.mapUiState.collectAsState()
     val selectedValueType by mapViewModel.selectedValueType.collectAsState()
     val selectedMarker by mapViewModel.selectedMarker.collectAsState()
@@ -29,6 +30,15 @@ fun IosMapScreen(
         val state = camera ?: return@LaunchedEffect
         if (!state.isProgrammatic) return@LaunchedEffect
         controller.moveTo(state.lat, state.lon, state.zoom)
+    }
+
+    LaunchedEffect(currentLocation, pendingCenterOnMyLocation, mapController.value) {
+        if (!pendingCenterOnMyLocation) return@LaunchedEffect
+        val location = currentLocation ?: return@LaunchedEffect
+        val controller = mapController.value ?: return@LaunchedEffect
+
+        controller.moveTo(location.lat, location.lon, 12.0)
+        pendingCenterOnMyLocation = false
     }
 
     MapScreenContent(
@@ -73,8 +83,12 @@ fun IosMapScreen(
         onZoomIn = { mapController.value?.zoomIn() },
         onZoomOut = { mapController.value?.zoomOut() },
         onMyLocation = {
+            pendingCenterOnMyLocation = true
+            mapViewModel.updateCurrentLocation()
+
             currentLocation?.let {
                 mapController.value?.moveTo(it.lat, it.lon, 12.0)
+                pendingCenterOnMyLocation = false
             }
         },
         onValueTypeSelected = { mapViewModel.setSelectedValueType(it) },

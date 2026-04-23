@@ -2,8 +2,8 @@
 
 package com.saionji.mysensor.shared
 
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.window.ComposeUIViewController
 import com.saionji.mysensor.shared.di.IosContainer
 import com.saionji.mysensor.shared.ui.app.SensorsAppContent
@@ -16,15 +16,14 @@ import platform.UIKit.UIViewController
 
 private lateinit var iosContainer: IosContainer
 
-@Composable
 @Suppress("unused")
 fun MainViewController(): UIViewController {
     iosContainer = IosContainer()
-    val currentLocation = iosContainer.mapViewModel.currentLocation.value
     val permissionService = PermissionService()
     val context = CIContext
 
     return ComposeUIViewController {
+        val currentLocation by iosContainer.mapViewModel.currentLocation
         val viewModel = MySensorViewModel(
             settingsRepository = iosContainer.settingsRepository,
             getSensorValuesUseCase = iosContainer.getSensorValuesUseCase
@@ -52,8 +51,9 @@ fun MainViewController(): UIViewController {
                 LaunchedEffect(Unit) {
                     if (permissionService.requestLocationPermissions(
                             context = context
-                        ))
+                        )) {
                         iosContainer.mapViewModel.updateCurrentLocation()
+                    }
                 }
             },
             onShare = {
