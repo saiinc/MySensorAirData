@@ -8,6 +8,7 @@ import androidx.compose.ui.window.ComposeUIViewController
 import com.saionji.mysensor.shared.di.IosContainer
 import com.saionji.mysensor.shared.ui.app.SensorsAppContent
 import com.saionji.mysensor.shared.ui.map.IosMapScreen
+import com.saionji.mysensor.shared.ui.ShareManager
 import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
 import androidx.compose.runtime.collectAsState
 import com.saionji.mysensor.shared.platform.PermissionService
@@ -21,6 +22,7 @@ fun MainViewController(): UIViewController {
     iosContainer = IosContainer()
     val permissionService = PermissionService()
     val context = CIContext
+    val shareManager = ShareManager()
 
     return ComposeUIViewController {
         val currentLocation by iosContainer.mapViewModel.currentLocation
@@ -56,8 +58,8 @@ fun MainViewController(): UIViewController {
                     }
                 }
             },
-            onShare = {
-                // Заглушка - sharing позже
+            onShare = { image ->
+                image?.let { shareManager.share(it) }
             }
         )
     }
