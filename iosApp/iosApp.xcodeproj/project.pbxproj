@@ -21,14 +21,28 @@
 		F5D8FEDB2F86D47000CDC417 /* MapLibreWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MapLibreWrapper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F53D392D2F9BFA9A0085A19C /* Exceptions for "iosApp" folder in "iosApp" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				"Preview Content/Preview Assets.xcassets",
+			);
+			target = 6E8E2832128B2544EA9C0D03 /* iosApp */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		345750543F866ACA6A62B0C6 /* Configuration */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Configuration;
 			sourceTree = "<group>";
 		};
-		D675A997F97FDC603C20D320 /* iosApp */ = {
+		F53D39262F9BFA0C0085A19C /* iosApp */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F53D392D2F9BFA9A0085A19C /* Exceptions for "iosApp" folder in "iosApp" target */,
+			);
 			path = iosApp;
 			sourceTree = "<group>";
 		};
@@ -59,7 +73,7 @@
 			isa = PBXGroup;
 			children = (
 				345750543F866ACA6A62B0C6 /* Configuration */,
-				D675A997F97FDC603C20D320 /* iosApp */,
+				F53D39262F9BFA0C0085A19C /* iosApp */,
 				081F61F07BC5AC6706D34BBA /* Products */,
 				F5D8FEDA2F86D47000CDC417 /* iosApp-Bridging-Header.h */,
 				F508C2A12F8BE90200FF41E8 /* MapLibreWrapper.h */,
@@ -80,13 +94,14 @@
 				5FEC55D5BEC297EB3832BAE6 /* Sources */,
 				F5B5FFB22F899965006CC893 /* ShellScript */,
 				D93F072FA3E6258BA4D8E016 /* Frameworks */,
+				F53D392C2F9BFA990085A19C /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				D675A997F97FDC603C20D320 /* iosApp */,
+				F53D39262F9BFA0C0085A19C /* iosApp */,
 			);
 			name = iosApp;
 			packageProductDependencies = (
@@ -133,6 +148,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F53D392C2F9BFA990085A19C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		A407D34A0964E04FDFC58AF2 /* Compile Kotlin Framework */ = {
@@ -252,15 +277,20 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
+				DEVELOPMENT_TEAM = TDL83FLG6G;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "My Sensor";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MySensor needs your location to show nearby air quality sensors";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -271,6 +301,7 @@
 					"@executable_path/Frameworks",
 				);
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.saionji.mysensor;
 				SWIFT_BRIDGING_HEADER_IS_INTERNAL = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "iosApp-Bridging-Header.h";
@@ -284,15 +315,20 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
+				DEVELOPMENT_TEAM = TDL83FLG6G;
 				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "My Sensor";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.weather";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "MySensor needs your location to show nearby air quality sensors";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -303,6 +339,7 @@
 					"@executable_path/Frameworks",
 				);
 				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.saionji.mysensor;
 				SWIFT_BRIDGING_HEADER_IS_INTERNAL = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "iosApp-Bridging-Header.h";

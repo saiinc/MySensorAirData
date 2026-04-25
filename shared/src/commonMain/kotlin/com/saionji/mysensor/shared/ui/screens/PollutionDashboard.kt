@@ -45,16 +45,16 @@ fun PollutionDashboard(
     modifier: Modifier,
     pollutionDataList: State<List<DashboardSensor>>
 ) {
-    if (pollutionDataList.value.isEmpty()
-    ) {
-        HorizontalDivider(modifier = modifier.padding(all = 2.dp))
-        Column (
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+    if (pollutionDataList.value.isEmpty()) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = stringResource(Res.string.add_sensor),
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 24.dp)
             )
         }
     } else {

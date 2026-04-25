@@ -54,8 +54,8 @@ static NSString * const kMarkersLayerId = @"markers-layer";
 
     [self.mapView addGestureRecognizer:tapRecognizer];
 
-    CLLocationCoordinate2D center = CLLocationCoordinate2DMake(55.7558, 37.6173);
-    [self.mapView setCenterCoordinate:center zoomLevel:10.0 animated:NO];
+    //CLLocationCoordinate2D center = CLLocationCoordinate2DMake(55.7558, 37.6173);
+    //[self.mapView setCenterCoordinate:center zoomLevel:10.0 animated:NO];
     
     return self.mapView;
 }
@@ -147,22 +147,6 @@ static NSString * const kMarkersLayerId = @"markers-layer";
         return;
     }
 
-    
-    // Если это сработает, в тексте появится максимальный R среди точек кластера
-    //NSDictionary *clusterProperties = @{
-    //    @"sum_r": @[
-    //        [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(r, 'NSNumber')"],
-    //        [NSExpression expressionForKeyPath:@"r"]
-    //    ],
-    //    @"sum_g": @[
-    //        [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(g, 'NSNumber')"],
-    //        [NSExpression expressionForKeyPath:@"g"]
-     //   ],
-     //   @"sum_b": @[
-     //       [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(b, 'NSNumber')"],
-     //       [NSExpression expressionForKeyPath:@"b"]
-     //   ]
-    //};
     NSDictionary *clusterProperties = @{
         @"sum_r": @[
             [NSExpression expressionWithFormat:@"$featureAccumulated + CAST(r, 'NSNumber')"],
@@ -177,21 +161,6 @@ static NSString * const kMarkersLayerId = @"markers-layer";
             [NSExpression expressionWithFormat:@"CAST(b, 'NSNumber')"]
         ]
     };
-    
-    //NSDictionary *clusterProperties = @{
-    //    @"sum_r": @[
-    //        [NSExpression expressionWithFormat:@"$featureAccumulated + TERNARY(r != nil, r, 0)"],
-    //        [NSExpression expressionWithFormat:@"TERNARY(r != nil, r, 0)"]
-    //    ],
-    //    @"sum_g": @[
-    //        [NSExpression expressionWithFormat:@"$featureAccumulated + TERNARY(g != nil, g, 0)"],
-    //        [NSExpression expressionWithFormat:@"TERNARY(g != nil, g, 0)"]
-    //    ],
-    //    @"sum_b": @[
-    //        [NSExpression expressionWithFormat:@"$featureAccumulated + TERNARY(b != nil, b, 0)"],
-    //        [NSExpression expressionWithFormat:@"TERNARY(b != nil, b, 0)"]
-    //    ]
-    //};
 
 
     NSDictionary *options = @{
@@ -225,12 +194,6 @@ static NSString * const kMarkersLayerId = @"markers-layer";
                                                                                       }]];
         
 
-        //clusterLayer.circleColor = [NSExpression expressionWithMLNJSONObject:colorJSON1];
-        
-        //clusterLayer.circleColor = [NSExpression expressionWithFormat:[UIColor colorWithRed:redVal green:0.55 blue:0.95 alpha:1.0]];
-        
-        //clusterLayer.circleColor = [NSExpression expressionWithFormat:@"mgl_expressionForRGB(90, 90, 90)"];
-        
 
         // --- 2. Блок расчета канала (с защитой от 0 и Double) ---
         NSArray *(^makeChannelJson)(NSString *) = ^NSArray *(NSString *key) {
@@ -265,27 +228,6 @@ static NSString * const kMarkersLayerId = @"markers-layer";
         id g1 = interp(gJ, b10, b11);
 
         clusterLayer.circleColor = [NSExpression expressionWithMLNJSONObject:interp(rJ, g0, g1)];
-
-
-
-        
-        //clusterLayer.circleColor = [NSExpression mgl_expressionForInterpolatingExpression:
-        //    [NSExpression expressionWithFormat:@"(sum_r + sum_b + sum_g) / 3.0 / point_count"] // Берем средний красный как индекс
-        //    withCurveType:MLNExpressionInterpolationModeLinear
-        //    parameters:nil
-        //    stops:[NSExpression expressionForConstantValue:@{
-        //        @0:   [UIColor colorWithRed:0.1 green:0.8 blue:0.1 alpha:1.0], // Зеленый
-        //        @127: [UIColor colorWithRed:0.9 green:0.9 blue:0.1 alpha:1.0], // Желтый
-        //        @255: [UIColor colorWithRed:0.9 green:0.1 blue:0.1 alpha:1.0]  // Красный
-        //    }]];
-        
-
-        // Используем MLN/MGL-метод для создания выражения из JSON-массива
-        //clusterLayer.circleColor = [NSExpression expressionWithMLNJSONObject:colorComponents];
-        
-        // используя префикс mgl_, который заставляет парсер работать правильно
-        //clusterLayer.circleColor = [NSExpression expressionWithFormat:@"mln_rgb(sum_r / point_count, sum_g / point_count, sum_b / point_count)"];
-        //clusterLayer.circleColor = [NSExpression expressionWithFormat:@"RGB(sum_r / point_count, sum_g / point_count, sum_b / point_count)"];
         clusterLayer.circleOpacity = [NSExpression expressionForConstantValue:@0.8];
         clusterLayer.circleStrokeColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
         clusterLayer.circleStrokeWidth = [NSExpression expressionForConstantValue:@1];
@@ -297,11 +239,7 @@ static NSString * const kMarkersLayerId = @"markers-layer";
     if ([style layerWithIdentifier:kClustersCountLayerId] == nil) {
         MLNSymbolStyleLayer *countLayer = [[MLNSymbolStyleLayer alloc] initWithIdentifier:kClustersCountLayerId
                                                                                    source:source];
-        //countLayer.predicate = [NSPredicate predicateWithFormat:@"cluster == YES"];
-        // В слое текстовых меток (MGLSymbolLayer)
-        //countLayer.text = [NSExpression expressionWithFormat:@"CAST(sum_g, 'NSString')"];
-        //countLayer.text = [NSExpression expressionWithFormat:@"mgl_join({CAST(sum_r/point_count, 'NSString'),' ', CAST(sum_g/point_count, 'NSString')})"];
-
+    
         countLayer.text = [NSExpression expressionForKeyPath:@"point_count_abbreviated"];
         countLayer.textFontNames = [NSExpression expressionForConstantValue:[self clusterFontNames]];
         countLayer.textFontSize = [NSExpression expressionForConstantValue:@14];
