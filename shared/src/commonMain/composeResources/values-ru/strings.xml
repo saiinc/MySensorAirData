@@ -10,4 +10,6 @@
     <string name="add_sensor">Пожалуйста, нажмите на значок карты, чтобы добавить ваш сенсор</string>
     <string name="dashboard_add">Добавить в дашборд</string>
     <string name="dashboard_remove">Удалить из дашборда</string>
+    <string name="geocoding_error">Ошибка геокодинга</string>
+    <string name="address_not_found">Адрес не найден</string>
 </resources>

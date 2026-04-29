@@ -26,4 +26,8 @@
     <string name="dashboard_add">Add to dashboard</string>
 
     <string name="dashboard_remove">Remove from dashboard</string>
+
+    <string name="geocoding_error">Geocoding error</string>
+
+    <string name="address_not_found">Address not found</string>
 </resources>
