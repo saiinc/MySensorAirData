@@ -150,6 +150,7 @@ kotlin {
             cinterops {
                 val maplibre by creating {
                     defFile(project.file("src/iosMain/interop/maplibre.def"))
+                    compilerOpts("-I${project.file("src/iosMain/interop").absolutePath}")
                 }
             }
         }
