@@ -1,6 +1,8 @@
 # My Sensor
 
 [![CI](https://github.com/saiinc/MySensorAirData/workflows/CI/badge.svg)](https://github.com/saiinc/MySensorAirData/actions)
+[![Android](https://github.com/saiinc/MySensorAirData/workflows/Android/badge.svg)](https://github.com/saiinc/MySensorAirData/actions)
+[![iOS Status](https://github.com/saiinc/MySensorAirData/workflows/iOS/badge.svg)](https://github.com/saiinc/MySensorAirData/actions)
 
 **My Sensor** is an Android application for air quality monitoring. It retrieves PM2.5, PM10, temperature, humidity, and pressure data from [sensor.community](https://sensor.community/) and displays it on your smartphone.  
 
