@@ -30,7 +30,7 @@ jobs:
       - name: Build iOS App for Simulator
         run: |
           # Создаем символическую ссылку, если Xcode ищет фреймворк прямо в папке iosApp
-          ln -s ../shared/build/XCFrameworks/release/shared.xcframework iosApp/shared.xcframework
+          ln -s ../shared/build/XCFrameworks/debug/shared.xcframework iosApp/shared.xcframework
           
           # Запуск сборки
           xcodebuild -project iosApp/iosApp.xcodeproj \
