@@ -29,6 +29,10 @@ jobs:
       # 2. Проверяем сборку самого приложения через xcodebuild (под симулятор)
       - name: Build iOS App for Simulator
         run: |
+          # Создаем символическую ссылку, если Xcode ищет фреймворк прямо в папке iosApp
+          ln -s ../shared/build/XCFrameworks/release/shared.xcframework iosApp/shared.xcframework
+          
+          # Запуск сборки
           xcodebuild -project iosApp/iosApp.xcodeproj \
                      -scheme iosApp \
                      -sdk iphonesimulator \
