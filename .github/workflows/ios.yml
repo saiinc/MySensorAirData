@@ -24,7 +24,7 @@ jobs:
 
       # 1. Собираем Kotlin-фреймворк для iOS
       - name: Compile Kotlin Multiplatform iOS framework
-        run: ./gradlew :shared:assembleSharedAppleFrameworkForXcode
+        run: ./gradlew :shared:assembleSharedXCFramework
 
       # 2. Проверяем сборку самого приложения через xcodebuild (под симулятор)
       - name: Build iOS App for Simulator
