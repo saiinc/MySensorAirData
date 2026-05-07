@@ -5,3 +5,9 @@ PRODUCT_BUNDLE_IDENTIFIER=com.example.kotlinmultiplatform.KotlinMultiplatform$(T
 
 CURRENT_PROJECT_VERSION=1
 MARKETING_VERSION=1.0
+
+MAPTILER_API_KEY=
+MAPTILER_STYLE_ID=streets-v4
+MAPTILER_USER_AGENT=com.saionji.mysensor
+
+#include? "Local.xcconfig"

@@ -13,4 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/iosApp/Configuration/Local.xcconfig
 /iOS.md

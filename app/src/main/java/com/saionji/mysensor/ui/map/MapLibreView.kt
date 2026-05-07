@@ -7,6 +7,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.saionji.mysensor.BuildConfig
 import com.saionji.mysensor.shared.domain.C
 import com.saionji.mysensor.shared.domain.model.MapMarker
 import com.saionji.mysensor.shared.ui.map.AndroidMapLibreController
@@ -16,6 +17,8 @@ import org.maplibre.android.maps.MapView
 import org.maplibre.android.maps.Style
 import kotlin.apply
 
+private const val MAP_MIN_ZOOM = 3.0
+private const val MAP_MAX_ZOOM = 19.0
 
 @Composable
 fun MapLibreView(
@@ -68,9 +71,16 @@ fun MapLibreView(
         factory = {
             mapView.apply {
                 getMapAsync { map ->
-                    map.setStyle(
-                        Style.Builder().fromUri(C.MAP_STYLE_URI)
-                    ) {
+                    map.setMinZoomPreference(MAP_MIN_ZOOM)
+                    map.setMaxZoomPreference(MAP_MAX_ZOOM)
+
+                    val styleBuilder = if (BuildConfig.MAPTILER_STYLE_URL.endsWith("key=")) {
+                        Style.Builder().fromJson(C.MAP_STYLE_JSON)
+                    } else {
+                        Style.Builder().fromUri(BuildConfig.MAPTILER_STYLE_URL)
+                    }
+
+                    map.setStyle(styleBuilder) {
                         val controller = AndroidMapLibreController(map)
 
                         // ✅ Создаём renderer внутри

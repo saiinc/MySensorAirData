@@ -1,33 +1,37 @@
 <resources>
     <string name="app_name">My Sensor</string>
-
     <string name="retry">Retry</string>
-
     <string name="loading">Loading</string>
-
     <string name="content_description">Sensor</string>
-
     <string name="settings_header">Set sensor ID</string>
-
     <string name="settings_switch">Hide sensor ID when using the 'Share' feature</string>
-
     <string name="settings_button">Done</string>
-
     <string name="settings_sensor_id">Enter id</string>
-
     <string name="settings_sensor_description">Description (optional)</string>
-
     <string name="error_loading">Loading error</string>
-
     <string name="error_unknown">Unknown error</string>
-
     <string name="add_sensor">Please tap the map icon to add your sensor</string>
-
     <string name="dashboard_add">Add to dashboard</string>
-
     <string name="dashboard_remove">Remove from dashboard</string>
-
     <string name="geocoding_error">Geocoding error</string>
-
     <string name="address_not_found">Address not found</string>
+    <string name="about_app">About app</string>
+    <string name="about_back">Back</string>
+    <string name="about_app_description">This app retrieves PM and Temperature/Humidity/Pressure data from sensor.community</string>
+    <string name="about_health_implications">Health Implications</string>
+    <string name="about_quality_good">Good</string>
+    <string name="about_quality_good_desc">Air quality is considered satisfactory, and air pollution poses little or no risk.</string>
+    <string name="about_quality_moderate">Moderate</string>
+    <string name="about_quality_moderate_desc">Air quality is acceptable; however, there may be a moderate health concern for some people.</string>
+    <string name="about_quality_unhealthy_sensitive">Unhealthy for Sensitive Groups</string>
+    <string name="about_quality_unhealthy_sensitive_desc">Members of sensitive groups may experience health effects. The general public is not likely to be affected.</string>
+    <string name="about_quality_unhealthy">Unhealthy</string>
+    <string name="about_quality_unhealthy_desc">Everyone may begin to experience health effects; sensitive groups may experience more serious health effects.</string>
+    <string name="about_quality_very_unhealthy">Very Unhealthy</string>
+    <string name="about_quality_very_unhealthy_desc">Health warnings of emergency conditions. The entire population is more likely to be affected.</string>
+    <string name="about_quality_hazardous">Hazardous</string>
+    <string name="about_quality_hazardous_desc">Health alert: everyone may experience more serious health effects.</string>
+    <string name="about_color_ranges_note">Color ranges for other indicators (temperature, humidity, pressure, etc.) are taken from the sensor.community map.</string>
+    <string name="about_app_link_intro">Build your DIY sensor and become part of the worldwide, opendata &amp; civictech network. With airRohr you can measure air pollution yourself: </string>
+    <string name="about_range_higher">Higher</string>
 </resources>

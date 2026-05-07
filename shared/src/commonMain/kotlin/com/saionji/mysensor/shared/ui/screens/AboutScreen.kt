@@ -38,7 +38,31 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.saionji.mysensor.shared.generated.resources.Res
+import com.saionji.mysensor.shared.generated.resources.about_app
+import com.saionji.mysensor.shared.generated.resources.about_app_description
+import com.saionji.mysensor.shared.generated.resources.about_app_link_intro
+import com.saionji.mysensor.shared.generated.resources.about_back
+import com.saionji.mysensor.shared.generated.resources.about_color_ranges_note
+import com.saionji.mysensor.shared.generated.resources.about_health_implications
+import com.saionji.mysensor.shared.generated.resources.about_quality_good
+import com.saionji.mysensor.shared.generated.resources.about_quality_good_desc
+import com.saionji.mysensor.shared.generated.resources.about_quality_hazardous
+import com.saionji.mysensor.shared.generated.resources.about_quality_hazardous_desc
+import com.saionji.mysensor.shared.generated.resources.about_quality_moderate
+import com.saionji.mysensor.shared.generated.resources.about_quality_moderate_desc
+import com.saionji.mysensor.shared.generated.resources.about_quality_unhealthy
+import com.saionji.mysensor.shared.generated.resources.about_quality_unhealthy_desc
+import com.saionji.mysensor.shared.generated.resources.about_quality_unhealthy_sensitive
+import com.saionji.mysensor.shared.generated.resources.about_quality_unhealthy_sensitive_desc
+import com.saionji.mysensor.shared.generated.resources.about_quality_very_unhealthy
+import com.saionji.mysensor.shared.generated.resources.about_quality_very_unhealthy_desc
+import com.saionji.mysensor.shared.generated.resources.about_range_higher
+import com.saionji.mysensor.shared.generated.resources.app_name
+import org.jetbrains.compose.resources.stringResource
 
+private const val ABOUT_REPO_URL = "https://github.com/saiinc/MySensorAirData"
+private const val SENSOR_COMMUNITY_URL = "https://sensor.community/en/sensors/airrohr/"
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalTextApi::class)
 @Composable
@@ -50,11 +74,11 @@ fun AboutScreen(onBackClicked: () -> Unit) {
                 color = MaterialTheme.colorScheme.onBackground
             )
         ) {
-            append("Build your DIY sensor and become part of the worldwide, opendata & civictech network. With airRohr you can measure air pollution yourself: ")
+            append(stringResource(Res.string.about_app_link_intro))
 
             withStyle(SpanStyle(color = Color.Blue)) {
-                withAnnotation("url", "https://sensor.community/en/sensors/airrohr/") {
-                    append("https://sensor.community/en/sensors/airrohr/")
+                withAnnotation("url", SENSOR_COMMUNITY_URL) {
+                    append(SENSOR_COMMUNITY_URL)
                 }
             }
         }
@@ -63,10 +87,13 @@ fun AboutScreen(onBackClicked: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("About app") },
+                title = { Text(stringResource(Res.string.about_app)) },
                 navigationIcon = {
                     IconButton(onClick = onBackClicked) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(Res.string.about_back)
+                        )
                     }
                 }
             )
@@ -84,94 +111,83 @@ fun AboutScreen(onBackClicked: () -> Unit) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
             ) {
-                // Заголовок приложения
                 Text(
-                    text = "My Sensor",
+                    text = stringResource(Res.string.app_name),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(top = 16.dp)
                 )
 
-                // Описание приложения
                 Text(
-                    text = "This app retrieves PM and Temperature/Humidity/Pressure data from sensor.community",
+                    text = stringResource(Res.string.about_app_description),
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(vertical = 8.dp)
                 )
 
-                Text(
-                    text = "https://github.com/saiinc/MySensorAirData",
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary),
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
-                // Заголовок раздела
                 Text(
-                    text = "Health Implications",
+                    text = stringResource(Res.string.about_health_implications),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Уровни качества воздуха
                 Column(modifier = Modifier.fillMaxWidth()) {
                     AirQualityCard(
                         color = Color(0xFF00E400),
-                        label = "Good",
+                        label = stringResource(Res.string.about_quality_good),
                         pm25Range = "0-12 µg/m³",
                         pm10Range = "0-54 µg/m³",
-                        description = "Air quality is considered satisfactory, and air pollution poses little or no risk."
+                        description = stringResource(Res.string.about_quality_good_desc)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     AirQualityCard(
                         color = Color(0xFFFFE600),
-                        label = "Moderate",
+                        label = stringResource(Res.string.about_quality_moderate),
                         pm25Range = "13-35 µg/m³",
                         pm10Range = "55-154 µg/m³",
-                        description = "Air quality is acceptable; however, there may be a moderate health concern for some people."
+                        description = stringResource(Res.string.about_quality_moderate_desc)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     AirQualityCard(
                         color = Color(0xFFFF7E00),
-                        label = "Unhealthy for Sensitive Groups",
+                        label = stringResource(Res.string.about_quality_unhealthy_sensitive),
                         pm25Range = "36-56 µg/m³",
                         pm10Range = "155-254 µg/m³",
-                        description = "Members of sensitive groups may experience health effects. The general public is not likely to be affected."
+                        description = stringResource(Res.string.about_quality_unhealthy_sensitive_desc)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     AirQualityCard(
                         color = Color(0xFFFE0000),
-                        label = "Unhealthy",
+                        label = stringResource(Res.string.about_quality_unhealthy),
                         pm25Range = "57-151 µg/m³",
                         pm10Range = "255-354 µg/m³",
-                        description = "Everyone may begin to experience health effects; sensitive groups may experience more serious health effects."
+                        description = stringResource(Res.string.about_quality_unhealthy_desc)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     AirQualityCard(
                         color = Color(0xFF98004B),
-                        label = "Very Unhealthy",
+                        label = stringResource(Res.string.about_quality_very_unhealthy),
                         pm25Range = "152-251 µg/m³",
                         pm10Range = "355-424 µg/m³",
-                        description = "Health warnings of emergency conditions. The entire population is more likely to be affected."
+                        description = stringResource(Res.string.about_quality_very_unhealthy_desc)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     AirQualityCard(
                         color = Color(0xFF7E0023),
-                        label = "Hazardous",
-                        pm25Range = "252-Higher µg/m³",
-                        pm10Range = "425-Higher µg/m³",
-                        description = "Health alert: everyone may experience more serious health effects."
+                        label = stringResource(Res.string.about_quality_hazardous),
+                        pm25Range = "252-${stringResource(Res.string.about_range_higher)} µg/m³",
+                        pm10Range = "425-${stringResource(Res.string.about_range_higher)} µg/m³",
+                        description = stringResource(Res.string.about_quality_hazardous_desc)
                     )
                 }
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
-                // Дополнительное описание
                 Text(
-                    text = "Color ranges for other indicators (temperature, humidity, pressure, etc.) are taken from the sensor.community map.",
+                    text = stringResource(Res.string.about_color_ranges_note),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -185,6 +201,11 @@ fun AboutScreen(onBackClicked: () -> Unit) {
                                 uriHandler.openUri(annotation.item)
                             }
                     }
+                )
+                Text(
+                    text = ABOUT_REPO_URL,
+                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.secondary),
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
         }
@@ -206,13 +227,11 @@ fun AirQualityCard(color: Color, label: String, description: String, pm25Range: 
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(8.dp))
-            //HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            // Диапазоны PM
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround
-            ){
+            ) {
                 Column {
                     Text(
                         modifier = Modifier
@@ -226,12 +245,11 @@ fun AirQualityCard(color: Color, label: String, description: String, pm25Range: 
                         style = MaterialTheme.typography.bodyLarge,
                         color = Color.White
                     )
-                    //Spacer(modifier = Modifier.height(4.dp))
                 }
-                Column (
+                Column(
                     modifier = Modifier
                         .padding(start = 20.dp)
-                ){
+                ) {
                     Text(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally),
@@ -248,7 +266,6 @@ fun AirQualityCard(color: Color, label: String, description: String, pm25Range: 
             }
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Описание
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyLarge,

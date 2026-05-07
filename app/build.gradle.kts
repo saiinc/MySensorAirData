@@ -1,3 +1,5 @@
+import java.util.Properties
+
 /*
  * Copyright © Anton Sorokin 2025. All rights reserved
  */
@@ -14,6 +16,22 @@ plugins {
     id("com.google.firebase.crashlytics")
 }
 
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use { stream ->
+            load(stream)
+        }
+    }
+}
+
+fun String.asBuildConfigString(): String =
+    "\"" + replace("\\", "\\\\").replace("\"", "\\\"") + "\""
+
+val mapTilerApiKey = localProperties.getProperty("MAPTILER_API_KEY", "")
+val mapTilerStyleId = localProperties.getProperty("MAPTILER_STYLE_ID", "streets-v4")
+val mapTilerUserAgent = localProperties.getProperty("MAPTILER_USER_AGENT", "com.saionji.mysensor")
+
 android {
     namespace = "com.saionji.mysensor"
     compileSdk = 35
@@ -24,13 +42,20 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "1.2.2"
+        versionName = "1.2.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         //testInstrumentationRunner = "com.kaspersky.kaspresso.runner.KaspressoRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField(
+            "String",
+            "MAPTILER_STYLE_URL",
+            "https://api.maptiler.com/maps/$mapTilerStyleId/style.json?key=$mapTilerApiKey"
+                .asBuildConfigString()
+        )
+        buildConfigField("String", "MAPTILER_USER_AGENT", mapTilerUserAgent.asBuildConfigString())
     }
 
     buildTypes {
@@ -52,6 +77,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
@@ -93,6 +119,7 @@ dependencies {
     implementation("com.google.firebase:protolite-well-known-types:18.0.0")
 
     implementation("org.maplibre.gl:android-sdk:11.8.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("androidx.compose.ui:ui-test-android:1.7.8")
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")

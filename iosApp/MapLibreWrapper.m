@@ -8,17 +8,77 @@
 #import "MapLibreWrapper.h"
 #import <MapLibre/MapLibre.h>
 #import <CoreLocation/CoreLocation.h>
+#import <objc/runtime.h>
 
 static NSString * const kSensorsSourceId = @"sensors-source";
 static NSString * const kClustersLayerId = @"clusters-layer";
 static NSString * const kClustersCountLayerId = @"clusters-count-layer";
 static NSString * const kMarkersLayerId = @"markers-layer";
+static NSString * const kMapTilerDefaultStyleId = @"streets-v4";
+static NSString * const kMapTilerDefaultUserAgent = @"com.saionji.mysensor";
+static double const kMapMinZoom = 3.0;
+static double const kMapMaxZoom = 19.0;
+static NSString *MapTilerUserAgent = nil;
+
+@implementation NSMutableURLRequest (MapTilerUserAgent)
+
++ (void)load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        Class cls = object_getClass((id)self);
+        SEL originalSelector = @selector(requestWithURL:);
+        SEL swizzledSelector = @selector(mysensor_requestWithURL:);
+
+        Method originalMethod = class_getClassMethod(self, originalSelector);
+        Method swizzledMethod = class_getClassMethod(self, swizzledSelector);
+
+        if (cls != Nil && originalMethod != NULL && swizzledMethod != NULL) {
+            method_exchangeImplementations(originalMethod, swizzledMethod);
+        }
+    });
+}
+
++ (instancetype)mysensor_requestWithURL:(NSURL *)URL {
+    NSMutableURLRequest *request = [self mysensor_requestWithURL:URL];
+    if (MapTilerUserAgent.length > 0) {
+        [request setValue:MapTilerUserAgent forHTTPHeaderField:@"User-Agent"];
+    }
+    return request;
+}
+
+@end
 
 @interface MapLibreWrapper ()
 @property (nonatomic, strong) MLNMapView *mapView;
 @end
 
 @implementation MapLibreWrapper
+
++ (NSString *)mapTilerConfigValueForKey:(NSString *)key fallback:(NSString *)fallback {
+    NSString *value = [[NSBundle mainBundle] objectForInfoDictionaryKey:key];
+    if (![value isKindOfClass:[NSString class]] || value.length == 0 || [value hasPrefix:@"$("]) {
+        return fallback;
+    }
+    return value;
+}
+
++ (NSURL *)mapTilerStyleURL {
+    NSString *apiKey = [self mapTilerConfigValueForKey:@"MapTilerAPIKey" fallback:@""];
+    if (apiKey.length == 0) {
+        return [NSURL URLWithString:@"https://tiles.openfreemap.org/styles/liberty"];
+    }
+
+    NSString *styleId = [self mapTilerConfigValueForKey:@"MapTilerStyleId"
+                                               fallback:kMapTilerDefaultStyleId];
+    NSString *encodedStyleId = [styleId stringByAddingPercentEncodingWithAllowedCharacters:
+            [NSCharacterSet URLPathAllowedCharacterSet]];
+    NSString *encodedApiKey = [apiKey stringByAddingPercentEncodingWithAllowedCharacters:
+            [NSCharacterSet URLQueryAllowedCharacterSet]];
+    NSString *urlString = [NSString stringWithFormat:@"https://api.maptiler.com/maps/%@/style.json?key=%@",
+                                                     encodedStyleId,
+                                                     encodedApiKey];
+    return [NSURL URLWithString:urlString];
+}
 
 - (NSArray<NSString *> *)clusterFontNames {
     return @[@"Noto Sans Regular"];
@@ -38,9 +98,13 @@ static NSString * const kMarkersLayerId = @"markers-layer";
 }
 
 - (UIView *)createMapView {
+    MapTilerUserAgent = [MapLibreWrapper mapTilerConfigValueForKey:@"MapTilerUserAgent"
+                                                          fallback:kMapTilerDefaultUserAgent];
     self.mapView = [[MLNMapView alloc] init];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.mapView.styleURL = [NSURL URLWithString:@"https://tiles.openfreemap.org/styles/liberty"];
+    self.mapView.minimumZoomLevel = kMapMinZoom;
+    self.mapView.maximumZoomLevel = kMapMaxZoom;
+    self.mapView.styleURL = [MapLibreWrapper mapTilerStyleURL];
     self.mapView.delegate = self;
 
     UITapGestureRecognizer *tapRecognizer =

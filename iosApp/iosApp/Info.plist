@@ -4,6 +4,12 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>MapTilerAPIKey</key>
+	<string>$(MAPTILER_API_KEY)</string>
+	<key>MapTilerStyleId</key>
+	<string>$(MAPTILER_STYLE_ID)</string>
+	<key>MapTilerUserAgent</key>
+	<string>$(MAPTILER_USER_AGENT)</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

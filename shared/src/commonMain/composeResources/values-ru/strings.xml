@@ -12,4 +12,23 @@
     <string name="dashboard_remove">Удалить из дашборда</string>
     <string name="geocoding_error">Ошибка геокодинга</string>
     <string name="address_not_found">Адрес не найден</string>
+    <string name="about_app">О приложении</string>
+    <string name="about_back">Назад</string>
+    <string name="about_app_description">Это приложение получает данные PM и Temperature/Humidity/Pressure с sensor.community</string>
+    <string name="about_health_implications">Влияние на здоровье</string>
+    <string name="about_quality_good">Хорошо</string>
+    <string name="about_quality_good_desc">Качество воздуха считается удовлетворительным, а загрязнение воздуха несет небольшой риск или не несет его вовсе.</string>
+    <string name="about_quality_moderate">Умеренно</string>
+    <string name="about_quality_moderate_desc">Качество воздуха приемлемое, однако для некоторых людей может быть умеренный риск для здоровья.</string>
+    <string name="about_quality_unhealthy_sensitive">Вредно для чувствительных групп</string>
+    <string name="about_quality_unhealthy_sensitive_desc">Люди из чувствительных групп могут испытывать последствия для здоровья. Для большинства людей риск маловероятен.</string>
+    <string name="about_quality_unhealthy">Вредно</string>
+    <string name="about_quality_unhealthy_desc">У всех могут начаться последствия для здоровья, а у чувствительных групп они могут быть более серьезными.</string>
+    <string name="about_quality_very_unhealthy">Очень вредно</string>
+    <string name="about_quality_very_unhealthy_desc">Предупреждение о вреде для здоровья при опасных условиях. Влиянию с большей вероятностью подвергнется все население.</string>
+    <string name="about_quality_hazardous">Опасно</string>
+    <string name="about_quality_hazardous_desc">Тревога для здоровья: у всех могут возникнуть более серьезные последствия для здоровья.</string>
+    <string name="about_color_ranges_note">Цветовые диапазоны для других показателей (температура, влажность, давление и т.д.) взяты с карты sensor.community.</string>
+    <string name="about_app_link_intro">Соберите свой DIY-сенсор и станьте частью всемирной сети open data и civic tech. С airRohr вы можете измерять загрязнение воздуха самостоятельно: </string>
+    <string name="about_range_higher">Выше</string>
 </resources>
