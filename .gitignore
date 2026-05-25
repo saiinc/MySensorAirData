@@ -1,12 +1,8 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/.kotlin/
+/.idea/
 .DS_Store
 /build
 /captures
@@ -15,3 +11,18 @@
 local.properties
 /iosApp/Configuration/Local.xcconfig
 /iOS.md
+
+# Signing keys and app secrets
+*.jks
+*.keystore
+app/google-services.json
+app/google-services-base64.txt
+
+# Local release artifacts
+app/release/
+*.apk
+*.aab
+*.apks
+
+# Local/generated dependency dumps
+deps.txt
