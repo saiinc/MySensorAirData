@@ -4,9 +4,9 @@
 [![Android](https://github.com/saiinc/MySensorAirData/workflows/Android/badge.svg)](https://github.com/saiinc/MySensorAirData/actions)
 [![iOS Status](https://github.com/saiinc/MySensorAirData/workflows/iOS/badge.svg)](https://github.com/saiinc/MySensorAirData/actions)
 
-**My Sensor** is an Android application for air quality monitoring. It retrieves PM2.5, PM10, temperature, humidity, and pressure data from [sensor.community](https://sensor.community/) and displays it on your smartphone.  
+**My Sensor** is an Android and iOS application for air quality monitoring. It retrieves PM2.5, PM10, temperature, humidity, and pressure data from [sensor.community](https://sensor.community/) and displays it on your smartphone. The iOS version is ready, but not yet published.
 
-**My Sensor** — это Android-приложение для мониторинга качества воздуха. Оно получает данные о PM2.5, PM10, температуре, влажности и давлении с платформы [sensor.community](https://sensor.community/) и отображает их на вашем смартфоне.  
+**My Sensor** — это Android и iOS приложение для мониторинга качества воздуха. Оно получает данные о PM2.5, PM10, температуре, влажности и давлении с платформы [sensor.community](https://sensor.community/) и отображает их на вашем смартфоне. iOS-версия готова, но ещё не опубликована.
 
 ## 📥 Installation / Установка
 
