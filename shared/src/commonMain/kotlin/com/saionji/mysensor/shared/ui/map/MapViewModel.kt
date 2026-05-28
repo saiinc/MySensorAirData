@@ -8,15 +8,22 @@ import com.saionji.mysensor.shared.domain.model.MapMarker
 import com.saionji.mysensor.shared.domain.usecase.GetSensorValuesByAreaUseCase
 import com.saionji.mysensor.shared.domain.model.GetAddressFromCoordinatesUseCase
 import com.saionji.mysensor.shared.ui.map.model.MapBounds
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.math.abs
+
+private const val VIEWPORT_DEBOUNCE_MS = 700L
+private const val MIN_RELOAD_ZOOM_DELTA = 0.25
+private const val MIN_RELOAD_VIEWPORT_SHIFT_RATIO = 0.25
 
 @OptIn(FlowPreview::class)
 class SharedMapViewModel(
@@ -52,6 +59,9 @@ class SharedMapViewModel(
     val selectedValueType: StateFlow<String> = _selectedValueType
 
     private var lastBounds: MapBounds? = null
+    private var lastLoadedBounds: MapBounds? = null
+    private var lastLoadedValueType: String? = null
+    private var loadJob: Job? = null
 
     private val _selectedMarker =
         MutableStateFlow<MapMarker?>(null)
@@ -113,7 +123,7 @@ class SharedMapViewModel(
     init {
         scope.launch {
             viewportFlow
-                .debounce(600)
+                .debounce(VIEWPORT_DEBOUNCE_MS)
                 .collect { bounds ->
                     loadSensorsForArea(bounds)
                 }
@@ -123,6 +133,7 @@ class SharedMapViewModel(
     fun loadSensorsForArea(bounds: MapBounds) {
         lastBounds = bounds
         if (bounds.zoom < 6.0) {
+            loadJob?.cancel()
             _mapUiState.value = MapUiState.Idle
             return
         }
@@ -132,18 +143,28 @@ class SharedMapViewModel(
             return
         }
 
-        scope.launch {
-            _mapUiState.value = MapUiState.Loading
+        val valueType = _selectedValueType.value
+        if (isSameLoadedViewport(bounds, valueType)) return
+
+        loadJob?.cancel()
+        loadJob = scope.launch {
+            if (_mapUiState.value !is MapUiState.Success) {
+                _mapUiState.value = MapUiState.Loading
+            }
             try {
                 val markers = getSensorValuesByAreaUseCase(
                     bounds.north,
                     bounds.west,
                     bounds.south,
                     bounds.east,
-                    _selectedValueType.value
+                    valueType
                 )
 
+                lastLoadedBounds = bounds
+                lastLoadedValueType = valueType
                 _mapUiState.value = MapUiState.Success(markers)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _mapUiState.value = MapUiState.Error(
                     e.message ?: "Ошибка загрузки данных"
@@ -183,4 +204,27 @@ class SharedMapViewModel(
             viewportFlow.tryEmit(it)
         }
     }
+
+    private fun isSameLoadedViewport(bounds: MapBounds, valueType: String): Boolean {
+        val loadedBounds = lastLoadedBounds ?: return false
+        if (lastLoadedValueType != valueType) return false
+
+        if (abs(bounds.zoom - loadedBounds.zoom) >= MIN_RELOAD_ZOOM_DELTA) {
+            return false
+        }
+
+        val latSpan = abs(loadedBounds.north - loadedBounds.south)
+        val lonSpan = abs(loadedBounds.east - loadedBounds.west)
+        val latShift = abs(bounds.centerLat - loadedBounds.centerLat)
+        val lonShift = abs(bounds.centerLon - loadedBounds.centerLon)
+
+        return latShift < latSpan * MIN_RELOAD_VIEWPORT_SHIFT_RATIO &&
+            lonShift < lonSpan * MIN_RELOAD_VIEWPORT_SHIFT_RATIO
+    }
+
+    private val MapBounds.centerLat: Double
+        get() = (north + south) / 2
+
+    private val MapBounds.centerLon: Double
+        get() = (east + west) / 2
 }

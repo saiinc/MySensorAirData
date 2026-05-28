@@ -62,6 +62,9 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            ndk {
+                abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -115,12 +118,10 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-    implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.5")
     implementation("com.google.firebase:protolite-well-known-types:18.0.0")
 
     implementation("org.maplibre.gl:android-sdk:11.8.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("androidx.compose.ui:ui-test-android:1.7.8")
     implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
     implementation("androidx.preference:preference-ktx:1.2.1")
@@ -139,6 +140,7 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit")
     androidTestImplementation("androidx.test.espresso:espresso-core")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.11.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-android:1.7.8")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

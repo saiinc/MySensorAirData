@@ -29,6 +29,6 @@
     <string name="about_quality_hazardous">Опасно</string>
     <string name="about_quality_hazardous_desc">Тревога для здоровья: у всех могут возникнуть более серьезные последствия для здоровья.</string>
     <string name="about_color_ranges_note">Цветовые диапазоны для других показателей (температура, влажность, давление и т.д.) взяты с карты sensor.community.</string>
-    <string name="about_app_link_intro">Соберите свой DIY-сенсор и станьте частью всемирной сети open data и civic tech. С airRohr вы можете измерять загрязнение воздуха самостоятельно: </string>
+    <string name="about_app_link_intro">Вы можете соберать свой DIY-сенсор и стать частью всемирной сети open data и civic tech. При помощи станции мониторинга вы сможете измерять загрязнение воздуха самостоятельно: </string>
     <string name="about_range_higher">Выше</string>
 </resources>

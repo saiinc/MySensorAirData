@@ -299,7 +299,6 @@ fun Input(
         TextField(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 2.dp)
                 .border(
                     BorderStroke(
                         width = 2.dp,
@@ -327,7 +326,7 @@ fun Input(
         )
         TextField(
             modifier = Modifier
-                .weight(2.3f)
+                .weight(2.2f)
                 .padding(start = 2.dp)
                 .border(
                     BorderStroke(

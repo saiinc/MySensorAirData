@@ -20,27 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
-# OSMDroid
--keep class org.osmdroid.** { *; }
--keep class org.osmdroid.views.overlay.** { *; }
--keep class org.osmdroid.tileprovider.** { *; }
--keep class org.osmdroid.util.** { *; }
--dontwarn org.osmdroid.**
-
-# Твои модели, если они участвуют в парсинге
--keep class com.saionji.mysensor.shared.network.model.MySensorRawData { *; }
-
-# Retrofit + Gson
--keepattributes Signature
--keepattributes *Annotation*
--keep class com.google.gson.** { *; }
--keep class com.saionji.mysensor.** { *; }
-
-# Для анонимных или вложенных классов
--keep class * {
-    @com.google.gson.annotations.SerializedName <fields>;
-}
-
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
 -dontwarn java.lang.management.ManagementFactory

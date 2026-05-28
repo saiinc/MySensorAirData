@@ -229,6 +229,53 @@ class SharedMapViewModelTest {
     }
 
     @Test
+    fun `loadSensorsForArea with same loaded bounds should not reload`() = runTest {
+        // Given
+        val bounds = MapBounds(56.0, 38.0, 55.0, 37.0, zoom = 10.0)
+
+        // When
+        viewModel.loadSensorsForArea(bounds)
+        advanceUntilIdle()
+        viewModel.loadSensorsForArea(bounds)
+        advanceUntilIdle()
+
+        // Then
+        assertEquals(1, sensorRepository.callCount)
+    }
+
+    @Test
+    fun `loadSensorsForArea with small viewport shift should not reload`() = runTest {
+        // Given
+        val firstBounds = MapBounds(56.0, 38.0, 55.0, 37.0, zoom = 10.0)
+        val shiftedBounds = MapBounds(56.1, 38.1, 55.1, 37.1, zoom = 10.05)
+
+        // When
+        viewModel.loadSensorsForArea(firstBounds)
+        advanceUntilIdle()
+        viewModel.loadSensorsForArea(shiftedBounds)
+        advanceUntilIdle()
+
+        // Then
+        assertEquals(1, sensorRepository.callCount)
+    }
+
+    @Test
+    fun `setSelectedValueType should reload last bounds even when viewport is unchanged`() = runTest {
+        // Given
+        val bounds = MapBounds(56.0, 38.0, 55.0, 37.0, zoom = 10.0)
+        viewModel.loadSensorsForArea(bounds)
+        advanceUntilIdle()
+
+        // When
+        viewModel.setSelectedValueType("PM10")
+        testScope.advanceTimeBy(701)
+        testScope.advanceUntilIdle()
+
+        // Then
+        assertEquals(2, sensorRepository.callCount)
+    }
+
+    @Test
     fun `loadSensorsForArea on error should set Error state`() = runTest {
         // Given
         sensorRepository = FakeMySensorRepositoryForMap(shouldFail = true)
