@@ -31,3 +31,20 @@ The app allows you to monitor **a specific sensor** in real-time.
 <img width="502" height="891" alt="home_mysensor" src="https://github.com/user-attachments/assets/9d923100-cb26-4b2e-a5f9-fd43b0600343" />
 
 ---
+
+## Android Build Variants
+
+The Android app has two store flavors:
+
+- `play` - regular build with Firebase Analytics and Firebase Crashlytics.
+- `fdroid` - F-Droid-oriented build without Firebase, Crashlytics, or Google Play Services Location.
+
+The `fdroid` variant can run without `local.properties` and without a MapTiler API key by using the built-in raster map style. It does not send crash reports automatically; if a crash report is created, the user can explicitly share it through Android's standard share/email UI.
+
+Useful commands:
+
+```powershell
+.\gradlew.bat :app:assemblePlayDebug
+.\gradlew.bat :app:assembleFdroidDebug
+.\gradlew.bat :app:assembleFdroidRelease
+```

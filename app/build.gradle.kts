@@ -58,6 +58,17 @@ android {
         buildConfigField("String", "MAPTILER_USER_AGENT", mapTilerUserAgent.asBuildConfigString())
     }
 
+    flavorDimensions += "store"
+    productFlavors {
+        create("play") {
+            dimension = "store"
+        }
+
+        create("fdroid") {
+            dimension = "store"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -104,13 +115,13 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.9.3")
 
     // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:33.6.0"))
+    add("playImplementation", platform("com.google.firebase:firebase-bom:33.6.0"))
 
 
     // Add the dependencies for the Crashlytics and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-crashlytics")
-    implementation("com.google.firebase:firebase-analytics")
+    add("playImplementation", "com.google.firebase:firebase-crashlytics")
+    add("playImplementation", "com.google.firebase:firebase-analytics")
 
 
     // Add the dependencies for any other desired Firebase products
@@ -118,11 +129,10 @@ dependencies {
 
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-    implementation("com.google.firebase:protolite-well-known-types:18.0.0")
+    add("playImplementation", "com.google.firebase:protolite-well-known-types:18.0.0")
 
     implementation("org.maplibre.gl:android-sdk:11.8.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.google.accompanist:accompanist-permissions:0.33.2-alpha")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.russhwolf:multiplatform-settings-no-arg:1.1.1")
@@ -153,4 +163,13 @@ dependencies {
     //androidTestImplementation("com.kaspersky.android-components:kaspresso:1.6.0") {
     //    exclude(module = "protobuf-lite")
     //}
+}
+
+tasks.configureEach {
+    if (name.contains("Fdroid", ignoreCase = true) &&
+        (name.contains("GoogleServices", ignoreCase = true) ||
+                name.contains("Crashlytics", ignoreCase = true))
+    ) {
+        enabled = false
+    }
 }

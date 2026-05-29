@@ -10,6 +10,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.russhwolf.settings.Settings
+import com.saionji.mysensor.crash.CrashReporter
 import com.saionji.mysensor.data.AndroidAppContainer
 import com.saionji.mysensor.shared.di.SharedContainer
 import com.saionji.mysensor.shared.data.repository.DataStoreMigrationRunner
@@ -22,6 +23,7 @@ class MySensorApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        CrashReporter.install(applicationContext)
 
         runBlocking {
             runMigration()

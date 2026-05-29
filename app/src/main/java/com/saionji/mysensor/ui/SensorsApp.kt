@@ -23,6 +23,14 @@ import com.saionji.mysensor.shared.ui.viewmodel.MySensorViewModel
 import com.saionji.mysensor.shared.ui.viewmodel.createMySensorViewModel
 import com.saionji.mysensor.ui.map.AndroidMapViewModel
 import com.saionji.mysensor.ui.map.MapScreen
+import android.content.Intent
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import com.saionji.mysensor.crash.CrashReporter
 
 /**
  * Android wrapper для SensorsApp
@@ -43,6 +51,9 @@ fun SensorsApp(
     // === ANDROID-SPECIFIC: Context & DI ===
     val context = LocalContext.current
     val application = context.applicationContext as MySensorApplication
+    var pendingCrashReport by remember {
+        mutableStateOf(CrashReporter.getPendingReport(context))
+    }
     val container = application.container as SharedContainer
 
     // === ANDROID-SPECIFIC: ViewModel creation ===
@@ -110,4 +121,49 @@ fun SensorsApp(
         },
         modifier = modifier
     )
+
+    pendingCrashReport?.let { report ->
+        AlertDialog(
+            onDismissRequest = {
+                CrashReporter.clearPendingReport(context)
+                pendingCrashReport = null
+            },
+            title = {
+                Text("Crash report")
+            },
+            text = {
+                Text("The app crashed during the previous run. You can share a report with the developer.")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_SUBJECT, "My Sensor crash report")
+                            putExtra(Intent.EXTRA_TEXT, report)
+                        }
+
+                        context.startActivity(
+                            Intent.createChooser(sendIntent, "Share crash report")
+                        )
+
+                        CrashReporter.clearPendingReport(context)
+                        pendingCrashReport = null
+                    }
+                ) {
+                    Text("Share")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        CrashReporter.clearPendingReport(context)
+                        pendingCrashReport = null
+                    }
+                ) {
+                    Text("Dismiss")
+                }
+            }
+        )
+    }
 }

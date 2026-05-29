@@ -119,7 +119,6 @@ kotlin {
                 implementation(compose.uiTooling)
                 implementation(compose.preview)
                 implementation("androidx.activity:activity-compose:1.9.0")
-                implementation("com.google.android.gms:play-services-location:21.3.0")
                 implementation("org.maplibre.gl:android-sdk:11.8.0")
             }
         }
