@@ -1,0 +1,8 @@
+My Sensor is an air quality monitoring app.
+
+It displays public sensor.community data such as PM2.5, PM10,
+temperature, humidity, and pressure.
+
+The F-Droid build does not include Firebase Analytics, Firebase
+Crashlytics, or Google Play Services Location. Crash reports are not
+sent automatically and can only be shared manually by the user.
