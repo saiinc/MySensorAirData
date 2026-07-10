@@ -32,6 +32,12 @@ The app allows you to monitor **a specific sensor** in real-time.
 
 ---
 
+<a href="https://f-droid.org/packages/com.saionji.mysensor/">
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+         alt="Get it on F-Droid"
+         height="80">
+</a>
+
 ## Android Build Variants
 
 The Android app has two store flavors:
