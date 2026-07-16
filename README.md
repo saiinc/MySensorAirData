@@ -28,7 +28,7 @@ You can use the app as a **dashboard** to monitor air quality in your area.
 ### 🏠 Personal Sensor Monitoring / Мониторинг персонального сенсора
 The app allows you to monitor **a specific sensor** in real-time.  
 Приложение позволяет отслеживать данные **конкретного сенсора** в режиме реального времени.  
-<img width="502" height="891" alt="home_mysensor" src="https://github.com/user-attachments/assets/9d923100-cb26-4b2e-a5f9-fd43b0600343" />
+<img width="502" height="893" alt="my_sensor_home" src="https://github.com/user-attachments/assets/1f6c122a-a386-45e8-b368-f59559608b53" />
 
 ---
 
