@@ -16,36 +16,36 @@ class NetworkMySensorRepository(
         lat2: Double,
         lon2: Double
     ): List<MapSensor> {
-        return try {
-            val result = sensorService.getSensorsByArea(lat1, lon1, lat2, lon2)
-            val outdoor = result
-                .distinctBy { it.sensor?.id }
-                .filter { it.location?.indoor == 0 }
 
-            outdoor.mapNotNull { dto ->
-                val id = dto.sensor?.id ?: return@mapNotNull null
-                val lat = dto.location?.latitude
-                val lon = dto.location?.longitude
+        val result = sensorService.getSensorsByArea(
+            lat1 = lat1,
+            lon1 = lon1,
+            lat2 = lat2,
+            lon2 = lon2
+        )
 
-                val measurements = dto.sensordatavalues.map { valueDto ->
-                    MapMeasurement(
-                        value = valueDto.value ?: return@mapNotNull null,
-                        valueType = valueDto.valueType ?: return@mapNotNull null
-                    )
-                }
+        val outdoor = result
+            .distinctBy { it.sensor?.id }
+            .filter { it.location?.indoor == 0 }
 
-                MapSensor(
-                    id = id.toString(),
-                    lat = lat ?: return@mapNotNull null,
-                    lon = lon ?: return@mapNotNull null,
-                    measurements = measurements
+        return outdoor.mapNotNull { dto ->
+            val id = dto.sensor?.id ?: return@mapNotNull null
+            val lat = dto.location?.latitude
+            val lon = dto.location?.longitude
+
+            val measurements = dto.sensordatavalues.map { valueDto ->
+                MapMeasurement(
+                    value = valueDto.value ?: return@mapNotNull null,
+                    valueType = valueDto.valueType ?: return@mapNotNull null
                 )
-            }.also {
-                println("MAP_RESPONSE mapped=${it.size}")
             }
-        } catch (e: Exception) {
-            println("MAP_RESPONSE error=${e.message}")
-            emptyList()
+
+            MapSensor(
+                id = id.toString(),
+                lat = lat ?: return@mapNotNull null,
+                lon = lon ?: return@mapNotNull null,
+                measurements = measurements
+            )
         }
     }
 

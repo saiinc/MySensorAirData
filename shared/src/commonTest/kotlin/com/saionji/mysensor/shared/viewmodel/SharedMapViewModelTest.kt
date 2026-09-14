@@ -298,6 +298,41 @@ class SharedMapViewModelTest {
         assertTrue(state is MapUiState.Error)
     }
 
+    @Test
+    fun `loadSensorsForArea with successful empty response should set Success`() = runTest {
+        // Given
+        sensorRepository = FakeMySensorRepositoryForMap(
+            markers = emptyList()
+        )
+
+        viewModel = SharedMapViewModel(
+            getAddressFromCoordinatesUseCase =
+                GetAddressFromCoordinatesUseCase(geocodingRepository),
+            getSensorValuesByAreaUseCase =
+                GetSensorValuesByAreaUseCase(sensorRepository),
+            locationService = locationService,
+            scope = testScope
+        )
+
+        val bounds = MapBounds(
+            north = 56.0,
+            east = 38.0,
+            south = 55.0,
+            west = 37.0,
+            zoom = 10.0
+        )
+
+        // When
+        viewModel.loadSensorsForArea(bounds)
+        advanceUntilIdle()
+
+        // Then
+        val state = viewModel.mapUiState.value
+
+        assertTrue(state is MapUiState.Success)
+        assertTrue((state as MapUiState.Success).markers.isEmpty())
+    }
+
     // ========== Address Tests ==========
 
     @Test
