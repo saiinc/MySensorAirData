@@ -25,47 +25,77 @@ class GetSensorValuesUseCase(
         return mySensorRepository
             .getSensor(device.id)
             .filter { it.valueType != "pressure_at_sealevel" }
-            .map { sensor ->
-
+            .mapNotNull { sensor ->
                 when (sensor.valueType) {
-
                     "P0" -> sensor.copy(
                         valueType = "PM1",
                         value = "${sensor.value}µg/m³"
                     )
 
-                    "P1" -> sensor.copy(
-                        valueType = "PM10",
-                        color = ColorResolver.resolveColorInt("PM10", sensor.value.toDouble()),
-                        value = "${sensor.value}µg/m³"
-                    )
+                    "P1" -> {
+                        val numericValue = sensor.value.toDoubleOrNull()
+                            ?: return@mapNotNull null
 
-                    "P2" -> sensor.copy(
-                        valueType = "PM2.5",
-                        color = ColorResolver.resolveColorInt("PM2.5", sensor.value.toDouble()),
-                        value = "${sensor.value}µg/m³"
-                    )
+                        sensor.copy(
+                            valueType = "PM10",
+                            color = ColorResolver.resolveColorInt("PM10", numericValue),
+                            value = "${sensor.value}µg/m³"
+                        )
+                    }
 
-                    "temperature" -> sensor.copy(
-                        color = ColorResolver.resolveColorInt("temperature", sensor.value.toDouble()),
-                        value = "${sensor.value.toDouble().roundToInt()}°C"
-                    )
+                    "P2" -> {
+                        val numericValue = sensor.value.toDoubleOrNull()
+                            ?: return@mapNotNull null
 
-                    "humidity" -> sensor.copy(
-                        color = ColorResolver.resolveColorInt("humidity", sensor.value.toDouble()),
-                        value = "${sensor.value.toDouble().roundToInt()}% RH"
-                    )
+                        sensor.copy(
+                            valueType = "PM2.5",
+                            color = ColorResolver.resolveColorInt("PM2.5", numericValue),
+                            value = "${sensor.value}µg/m³"
+                        )
+                    }
 
-                    "noise_LAeq" -> sensor.copy(
-                        valueType = "noise LAeq",
-                        color = ColorResolver.resolveColorInt("noise LAeq", sensor.value.toDouble()),
-                        value = "${sensor.value}dBA"
-                    )
+                    "temperature" -> {
+                        val numericValue = sensor.value.toDoubleOrNull()
+                            ?: return@mapNotNull null
 
-                    "pressure" -> sensor.copy(
-                        color = ColorResolver.resolveColorInt("pressure", sensor.value.toDouble() / 100),
-                        value = "${(sensor.value.toDouble() / 100).roundToInt()}hPA"
-                    )
+                        sensor.copy(
+                            color = ColorResolver.resolveColorInt("temperature", numericValue),
+                            value = "${numericValue.roundToInt()}°C"
+                        )
+                    }
+
+                    "humidity" -> {
+                        val numericValue = sensor.value.toDoubleOrNull()
+                            ?: return@mapNotNull null
+
+                        sensor.copy(
+                            color = ColorResolver.resolveColorInt("humidity", numericValue),
+                            value = "${numericValue.roundToInt()}% RH"
+                        )
+                    }
+
+                    "noise_LAeq" -> {
+                        val numericValue = sensor.value.toDoubleOrNull()
+                            ?: return@mapNotNull null
+
+                        sensor.copy(
+                            valueType = "noise LAeq",
+                            color = ColorResolver.resolveColorInt("noise LAeq", numericValue),
+                            value = "${sensor.value}dBA"
+                        )
+                    }
+
+                    "pressure" -> {
+                        val numericValue = sensor.value.toDoubleOrNull()
+                            ?: return@mapNotNull null
+
+                        val pressure = numericValue / 100
+
+                        sensor.copy(
+                            color = ColorResolver.resolveColorInt("pressure", pressure),
+                            value = "${pressure.roundToInt()}hPA"
+                        )
+                    }
 
                     else -> sensor
                 }
